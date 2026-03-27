@@ -1,0 +1,155 @@
+# Dependencies
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# Python Virtual Environments
+.venv/
+venv/
+env/
+ENV/
+.Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Environment Variables
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+.env.production
+# .env.example - NOT ignored (needed for setup reference)
+# .env.example
+*.local
+
+# Build outputs
+dist/
+dist-ssr/
+build/
+*.tsbuildinfo
+
+# Logs
+logs/
+*.log
+
+# Runtime data
+pids/
+*.pid
+*.seed
+*.pid.lock
+
+# Coverage directory used by tools like istanbul
+coverage/
+*.lcov
+
+# Temporary folders
+tmp/
+temp/
+
+# IDE and Editor files
+.vscode/*
+!.vscode/extensions.json
+.idea/
+*.swp
+*.swo
+*~
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+
+# Database backups
+*.sql
+db_backup/
+backup/
+
+# Uploads and user-generated content
+uploads/
+!backend/uploads/.gitkeep
+user-uploads/
+media/
+static/media/
+
+# Machine Learning Models and Data (binary files only)
+*.h5
+*.hdf5
+*.pkl
+*.pickle
+*.model
+*.weights
+*.pt
+*.pth
+*.ckpt
+*.pb
+# models/ - NOT ignored (backend/models/ contains source code)
+checkpoints/
+trained_models/
+
+# Jupyter Notebook
+.ipynb_checkpoints/
+
+# pyenv
+.python-version
+
+# Certificates and keys
+*.pem
+*.key
+*.crt
+*.p12
+*.pfx
+*.jks
+
+# Package files
+*.7z
+*.dmg
+*.gz
+*.iso
+*.jar
+*.rar
+*.tar
+*.zip
+
+# Application specific
+config/local.json
+config/production.json
+*.config.local.*
+
+# Documentation build
+docs/_build/
+
+# Pytest
+.pytest_cache/
+.coverage
+
+# MyPy
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# other/ - only ignore non-docs content
+other/DB_backup/
+other/docs/commit-guide.md
+
