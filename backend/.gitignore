@@ -1,0 +1,11 @@
+node_modules/
+uploads/*
+!uploads/.gitkeep
+.env
+python-sidecar/__pycache__/
+python-sidecar/*.pyc
+ml_model/*.h5
+ml_model/*.pt
+ml_model/*.pkl
+*.log
+dist/
