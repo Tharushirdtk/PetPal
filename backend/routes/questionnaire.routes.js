@@ -139,4 +139,30 @@ router.get('/active', ctrl.getActive);
  */
 router.post('/response', optionalAuth, ctrl.submitResponse);
 
+/**
+ * @swagger
+ * /questionnaire/context:
+ *   post:
+ *     summary: Save structured questionnaire answers directly to llm_context
+ *     tags: [Questionnaire]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - consultation_id
+ *               - answers
+ *             properties:
+ *               consultation_id:
+ *                 type: integer
+ *               answers:
+ *                 type: object
+ *     responses:
+ *       200:
+ *         description: Context updated
+ */
+router.post('/context', optionalAuth, ctrl.saveContext);
+
 module.exports = router;

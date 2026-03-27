@@ -16,6 +16,43 @@ exports.getActive = asyncHandler(async (_req, res) => {
   });
 });
 
+/**
+ * Save structured answers directly to llm_context (used when mock questions are used
+ * or when we just need to update the LLM context with questionnaire answers).
+ */
+exports.saveContext = asyncHandler(async (req, res) => {
+  const { consultation_id, answers } = req.body;
+
+  if (!consultation_id || !answers || typeof answers !== 'object') {
+    return fail(res, 'consultation_id and answers object are required');
+  }
+
+  // Find conversation for this consultation
+  const convRows = await query(
+    'SELECT id FROM conversation WHERE consultation_id = ? ORDER BY id DESC LIMIT 1',
+    [consultation_id]
+  );
+
+  if (!convRows[0]) {
+    return fail(res, 'No conversation found for this consultation', 404);
+  }
+
+  const conversationId = convRows[0].id;
+
+  // Load existing llm_context
+  const existing = await LlmContextModel.getByConversation(conversationId);
+  const currentData = existing?.json_data
+    ? (typeof existing.json_data === 'string' ? JSON.parse(existing.json_data) : existing.json_data)
+    : {};
+
+  // Merge answers into json_data
+  currentData.answers = answers;
+
+  await LlmContextModel.updateJsonData(conversationId, currentData);
+
+  return ok(res, { message: 'Context updated', conversation_id: conversationId });
+});
+
 exports.submitResponse = asyncHandler(async (req, res) => {
   const {
     questionnaire_id,

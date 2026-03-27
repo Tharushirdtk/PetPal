@@ -1,5 +1,5 @@
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
-const GEMINI_MODEL = 'gemini-1.5-flash';
+const GEMINI_MODEL = 'gemini-2.0-flash';
 const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${GEMINI_API_KEY}`;
 
 const SYSTEM_PROMPT = `You are PetPal, an expert AI veterinary assistant. You help pet owners identify possible health conditions in dogs and cats. You are NOT a replacement for a vet. Always recommend professional veterinary care for serious conditions. Be empathetic, clear, and concise.

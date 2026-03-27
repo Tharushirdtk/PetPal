@@ -9,7 +9,7 @@ import {
 } from 'lucide-react';
 import { useLang } from '../i18n/LanguageContext';
 import { useConsultation } from '../context/ConsultationContext';
-import { getActiveQuestionnaire, submitResponse } from '../api/questionnaire';
+import { getActiveQuestionnaire, submitResponse, saveContext } from '../api/questionnaire';
 import { questionFlow, EMERGENCY_TRIGGERS } from '../data/mockData';
 import Navbar from '../components/Navbar';
 import EmergencyBanner from '../components/EmergencyBanner';
@@ -246,7 +246,17 @@ const QuestionnairePage = () => {
       setSubmitting(true);
       setError(null);
 
+      /* Build structured answers keyed by question code/id */
+      const structuredAnswers = {};
+      for (const [qId, value] of Object.entries(answers)) {
+        /* Use the question's code if available, otherwise use the id */
+        const questionObj = questions.find((qi) => qi.id === qId);
+        const key = questionObj?.code || qId;
+        structuredAnswers[key] = value;
+      }
+
       if (!usingMockData && questionnaireId) {
+        /* API questions — submit to the formal response endpoint */
         const formattedAnswers = Object.entries(answers).map(
           ([questionId, value]) => ({
             question_id: questionId,
@@ -260,6 +270,19 @@ const QuestionnairePage = () => {
           consultation_id: consultationId,
           answers: formattedAnswers,
         });
+      }
+
+      /* Always save structured answers to llm_context so the chat/LLM can use them */
+      if (consultationId) {
+        try {
+          await saveContext({
+            consultation_id: consultationId,
+            answers: structuredAnswers,
+          });
+        } catch {
+          /* Non-critical — chat will still work, just without questionnaire context */
+          console.warn('Failed to save questionnaire context');
+        }
       }
 
       navigate('/chat');

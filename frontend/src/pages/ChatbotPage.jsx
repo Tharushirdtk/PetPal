@@ -139,7 +139,7 @@ const ChatbotPage = () => {
       const aiMsg = {
         id: Date.now() + 1,
         role: 'ai',
-        text: data.message || data.content || data.reply || '',
+        text: data.reply || data.message || data.content || '',
         time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
       };
       setMessages((prev) => [...prev, aiMsg]);
@@ -150,12 +150,12 @@ const ChatbotPage = () => {
       }
 
       /* Handle final diagnosis */
-      if (data.is_final) {
+      if (data.is_final && data.diagnosis_data) {
         setDiagnosisData({
-          condition: data.diagnosis?.condition || data.diagnosis?.title || 'Diagnosis Ready',
-          description: data.diagnosis?.description || '',
-          confidence: data.diagnosis?.confidence || null,
-          reportId: data.report_id || null,
+          condition: data.diagnosis_data.primary_label || 'Diagnosis Ready',
+          description: data.diagnosis_data.explanation || '',
+          confidence: data.diagnosis_data.confidence ? Math.round(data.diagnosis_data.confidence * 100) : null,
+          reportId: data.diagnosis_id || null,
         });
       }
     } catch (err) {
