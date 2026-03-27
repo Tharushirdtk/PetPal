@@ -149,7 +149,6 @@ docs/_build/
 .dmypy.json
 dmypy.json
 
-# other/ - only ignore non-docs content
-other/DB_backup/
-other/docs/commit-guide.md
+# other/
+other/
 
