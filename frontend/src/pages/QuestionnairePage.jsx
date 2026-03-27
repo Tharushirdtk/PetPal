@@ -6,10 +6,14 @@ import {
   ChevronRight,
   ClipboardList,
   AlertTriangle,
+  Dog,
+  Cat,
 } from 'lucide-react';
 import { useLang } from '../i18n/LanguageContext';
+import { useAuth } from '../context/AuthContext';
 import { useConsultation } from '../context/ConsultationContext';
 import { getActiveQuestionnaire, submitResponse, saveContext } from '../api/questionnaire';
+import { getSpecies, getBreeds } from '../api/pets';
 import { questionFlow, EMERGENCY_TRIGGERS } from '../data/mockData';
 import Navbar from '../components/Navbar';
 import EmergencyBanner from '../components/EmergencyBanner';
@@ -63,6 +67,10 @@ const QuestionnairePage = () => {
   const { t, lang } = useLang();
   const navigate = useNavigate();
   const { consultationId } = useConsultation();
+  const { isAuthenticated } = useAuth();
+
+  /* ── Whether to show pet info step (only for unregistered/guest users) ── */
+  const showPetInfoStep = !isAuthenticated;
 
   const [questions, setQuestions] = useState([]);
   const [questionnaireId, setQuestionnaireId] = useState(null);
@@ -74,6 +82,16 @@ const QuestionnairePage = () => {
   const [currentStep, setCurrentStep] = useState(0);
   const [answers, setAnswers] = useState({});
   const [showEmergency, setShowEmergency] = useState(false);
+
+  /* ── Pet info state (for guest users) ── */
+  const [petInfoDone, setPetInfoDone] = useState(false);
+  const [petType, setPetType] = useState(''); // 'dog' or 'cat'
+  const [petBreedId, setPetBreedId] = useState('');
+  const [petBreedName, setPetBreedName] = useState('');
+  const [petAge, setPetAge] = useState('');
+  const [speciesList, setSpeciesList] = useState([]);
+  const [breedList, setBreedList] = useState([]);
+  const [loadingBreeds, setLoadingBreeds] = useState(false);
 
   /* History stack so "Back" can retrace the exact path taken */
   const [stepHistory, setStepHistory] = useState([0]);
@@ -127,6 +145,39 @@ const QuestionnairePage = () => {
     };
   }, [lang]);
 
+  /* ── Load species list for pet info step ── */
+  useEffect(() => {
+    if (!showPetInfoStep) return;
+    getSpecies()
+      .then((res) => setSpeciesList(res.data || []))
+      .catch(() => {
+        /* Fallback species if API unavailable */
+        setSpeciesList([
+          { id: 1, name: 'Dog' },
+          { id: 2, name: 'Cat' },
+        ]);
+      });
+  }, [showPetInfoStep]);
+
+  /* ── Load breeds when pet type changes ── */
+  useEffect(() => {
+    if (!petType) {
+      setBreedList([]);
+      return;
+    }
+    const species = speciesList.find(
+      (s) => s.name.toLowerCase() === petType.toLowerCase()
+    );
+    if (!species) return;
+    setLoadingBreeds(true);
+    setPetBreedId('');
+    setPetBreedName('');
+    getBreeds(species.id)
+      .then((res) => setBreedList(res.data || []))
+      .catch(() => setBreedList([]))
+      .finally(() => setLoadingBreeds(false));
+  }, [petType, speciesList]);
+
   /* ── Evaluate visibility rules (for API questions only) ── */
   const isQuestionVisible = (question) => {
     if (usingMockData) return true; // mock flow uses conditionalNext instead
@@ -146,8 +197,10 @@ const QuestionnairePage = () => {
 
   const q = questions[currentStep];
   const totalSteps = questions.length;
+  const displayTotal = showPetInfoStep ? totalSteps + 1 : totalSteps;
+  const displayStep = showPetInfoStep && !petInfoDone ? 1 : (showPetInfoStep ? stepHistory.length + 1 : stepHistory.length);
   const progress =
-    totalSteps > 0 ? Math.round(((currentStep + 1) / totalSteps) * 100) : 0;
+    displayTotal > 0 ? Math.round((displayStep / displayTotal) * 100) : 0;
 
   /* ── Select an option (single/boolean) ── */
   const handleSelect = (option) => {
@@ -248,6 +301,14 @@ const QuestionnairePage = () => {
 
       /* Build structured answers keyed by question code/id */
       const structuredAnswers = {};
+
+      /* Include pet info for guest users */
+      if (showPetInfoStep && petType) {
+        structuredAnswers.pet_type = petType;
+        structuredAnswers.pet_breed = petBreedName || 'Unknown';
+        structuredAnswers.pet_age = petAge || 'Unknown';
+      }
+
       for (const [qId, value] of Object.entries(answers)) {
         /* Use the question's code if available, otherwise use the id */
         const questionObj = questions.find((qi) => qi.id === qId);
@@ -367,15 +428,154 @@ const QuestionnairePage = () => {
           </div>
         )}
 
+        {/* ── Pet Info Step (guest users only) ── */}
+        {!loading && !error && showPetInfoStep && !petInfoDone && questions.length > 0 && (
+          <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
+            {/* Progress Bar */}
+            <div className="px-6 pt-5 pb-0">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-xs font-semibold text-gray-500 tracking-wide">
+                  {t('quest_step')} 1 {t('quest_of')} {displayTotal}
+                </span>
+                <span className="text-xs font-semibold text-[#7C3AED]">
+                  {progress}% {t('quest_complete')}
+                </span>
+              </div>
+              <div className="h-2 rounded-full bg-gray-100 overflow-hidden">
+                <div
+                  className="h-full rounded-full bg-[#7C3AED] transition-all duration-500"
+                  style={{ width: `${progress}%` }}
+                />
+              </div>
+            </div>
+
+            {/* Title */}
+            <div className="px-6 pt-5 pb-2">
+              <h2 className="text-base font-semibold text-gray-900 leading-relaxed">
+                {t('quest_pet_info_title')}
+              </h2>
+              <p className="text-xs text-gray-400 mt-1">
+                {t('quest_pet_info_subtitle')}
+              </p>
+            </div>
+
+            <div className="px-6 pb-4 space-y-5">
+              {/* Pet Type Selection */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  {t('quest_pet_type')}
+                </label>
+                <div className="grid grid-cols-2 gap-3">
+                  <button
+                    type="button"
+                    onClick={() => setPetType('dog')}
+                    className={`rounded-xl border-2 p-4 flex flex-col items-center gap-2 cursor-pointer transition-all duration-200
+                      bg-orange-50 border-orange-200
+                      ${petType === 'dog'
+                        ? 'border-[#7C3AED] ring-2 ring-[#7C3AED]/20 scale-[1.02] shadow-sm'
+                        : 'border-transparent hover:border-gray-300 hover:shadow-sm'
+                      }`}
+                  >
+                    <Dog className="w-8 h-8 text-orange-500" />
+                    <span className="text-sm font-medium text-gray-700">
+                      {t('quest_pet_type_dog')}
+                    </span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setPetType('cat')}
+                    className={`rounded-xl border-2 p-4 flex flex-col items-center gap-2 cursor-pointer transition-all duration-200
+                      bg-purple-50 border-purple-200
+                      ${petType === 'cat'
+                        ? 'border-[#7C3AED] ring-2 ring-[#7C3AED]/20 scale-[1.02] shadow-sm'
+                        : 'border-transparent hover:border-gray-300 hover:shadow-sm'
+                      }`}
+                  >
+                    <Cat className="w-8 h-8 text-purple-500" />
+                    <span className="text-sm font-medium text-gray-700">
+                      {t('quest_pet_type_cat')}
+                    </span>
+                  </button>
+                </div>
+              </div>
+
+              {/* Breed Selection */}
+              {petType && (
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    {t('quest_pet_breed')}
+                  </label>
+                  <select
+                    value={petBreedId}
+                    onChange={(e) => {
+                      const id = e.target.value;
+                      setPetBreedId(id);
+                      if (id === 'mixed') {
+                        setPetBreedName('Mixed / Unknown');
+                      } else {
+                        const breed = breedList.find((b) => String(b.id) === id);
+                        setPetBreedName(breed?.name || '');
+                      }
+                    }}
+                    disabled={loadingBreeds}
+                    className="w-full border-2 border-gray-200 rounded-xl p-3 text-sm text-gray-700 outline-none focus:border-[#7C3AED] transition-colors bg-white"
+                  >
+                    <option value="">{loadingBreeds ? '...' : t('quest_pet_breed_placeholder')}</option>
+                    {breedList.map((breed) => (
+                      <option key={breed.id} value={breed.id}>
+                        {breed.name}
+                      </option>
+                    ))}
+                    <option value="mixed">{t('quest_pet_breed_mixed')}</option>
+                  </select>
+                </div>
+              )}
+
+              {/* Age Input */}
+              {petType && (
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    {t('quest_pet_age')}
+                  </label>
+                  <input
+                    type="number"
+                    min="0"
+                    max="30"
+                    value={petAge}
+                    onChange={(e) => setPetAge(e.target.value)}
+                    placeholder={t('quest_pet_age_placeholder')}
+                    className="w-full border-2 border-gray-200 rounded-xl p-3 text-sm text-gray-700 outline-none focus:border-[#7C3AED] transition-colors"
+                  />
+                </div>
+              )}
+            </div>
+
+            {/* Footer */}
+            <div className="border-t border-gray-100 px-6 py-4">
+              <div className="flex items-center justify-end">
+                <button
+                  type="button"
+                  onClick={() => setPetInfoDone(true)}
+                  disabled={!petType || !petBreedId || !petAge}
+                  className="flex items-center gap-1 px-6 py-2.5 rounded-full bg-[#7C3AED] text-white text-sm font-medium hover:bg-[#6D28D9] transition-colors disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
+                >
+                  {t('quest_continue')}
+                  <ChevronRight className="w-4 h-4" />
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Question Card */}
-        {!loading && !error && q && (
+        {!loading && !error && q && (!showPetInfoStep || petInfoDone) && (
           <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
             {/* ─── Progress Bar (top) ─── */}
             <div className="px-6 pt-5 pb-0">
               <div className="flex items-center justify-between mb-2">
                 <span className="text-xs font-semibold text-gray-500 tracking-wide">
-                  {t('quest_step')} {stepHistory.length} {t('quest_of')}{' '}
-                  {totalSteps}
+                  {t('quest_step')} {displayStep} {t('quest_of')}{' '}
+                  {displayTotal}
                 </span>
                 <span className="text-xs font-semibold text-[#7C3AED]">
                   {progress}% {t('quest_complete')}
@@ -535,8 +735,14 @@ const QuestionnairePage = () => {
               <div className="flex items-center justify-between">
                 <button
                   type="button"
-                  onClick={handleBack}
-                  disabled={stepHistory.length <= 1}
+                  onClick={() => {
+                    if (stepHistory.length <= 1 && showPetInfoStep && petInfoDone) {
+                      setPetInfoDone(false);
+                    } else {
+                      handleBack();
+                    }
+                  }}
+                  disabled={stepHistory.length <= 1 && (!showPetInfoStep || !petInfoDone)}
                   className="flex items-center gap-1 text-sm text-gray-500 hover:text-gray-700 transition-colors disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
                 >
                   <ChevronLeft className="w-4 h-4" />
