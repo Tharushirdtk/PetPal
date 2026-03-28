@@ -163,6 +163,11 @@ export const translations = {
     chat_important_note: "Important: Please consult a licensed veterinarian for an official diagnosis.",
     chat_today: "TODAY",
     chat_current: "CURRENT",
+    chat_img_uploading: "Uploading image...",
+    chat_img_analyzing: "Analyzing image...",
+    chat_img_complete: "Image analysis complete! The AI can now see your image results.",
+    chat_img_upload_title: "Upload pet photo for AI analysis (optional)",
+    chat_img_hint: "Upload a photo of your pet's condition for AI-powered visual analysis (optional)",
 
     // Questionnaire
     quest_title: "Pet Health Questionnaire",
@@ -484,6 +489,11 @@ export const translations = {
     chat_important_note: "වැදගත්: නිල රෝග විනිශ්චයක් සඳහා බලපත්‍රලාභී පශු වෛද්‍යවරයෙකු හමුවෙන්න.",
     chat_today: "අද",
     chat_current: "වත්මන්",
+    chat_img_uploading: "රූපය උඩුගත කරමින්...",
+    chat_img_analyzing: "රූපය විශ්ලේෂණය කරමින්...",
+    chat_img_complete: "රූප විශ්ලේෂණය සම්පූර්ණයි! AI ට දැන් ඔබේ රූප ප්‍රතිඵල දැකිය හැකිය.",
+    chat_img_upload_title: "AI විශ්ලේෂණය සඳහා සතා ඡායාරූපයක් උඩුගත කරන්න (විකල්ප)",
+    chat_img_hint: "AI බලයෙන් ක්‍රියා කරන දෘශ්‍ය විශ්ලේෂණය සඳහා ඔබේ සතාගේ තත්ත්වයේ ඡායාරූපයක් උඩුගත කරන්න (විකල්ප)",
 
     // Questionnaire
     quest_title: "සතා සෞඛ්‍ය ප්‍රශ්නාවලිය",

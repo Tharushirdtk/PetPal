@@ -29,7 +29,30 @@ function buildUserPrompt({ pet, jsonAnswers, imageSnapshot, vectorResults, conve
   }
 
   if (jsonAnswers && Object.keys(jsonAnswers).length > 0) {
-    prompt += `Symptom answers: ${JSON.stringify(jsonAnswers)}\n`;
+    prompt += '\n--- QUESTIONNAIRE SUMMARY ---\n';
+    if (jsonAnswers.pet) {
+      const p = jsonAnswers.pet;
+      prompt += `Pet Info: ${p.type || 'Unknown'} | Breed: ${p.breed || 'Unknown'} | Age: ${p.age || 'Unknown'} | Gender: ${p.gender || 'Unknown'} | Neutered: ${p.neutered || 'Unknown'} | Vaccinated: ${p.vaccinated || 'Unknown'}\n`;
+    }
+    if (jsonAnswers.main_symptom) {
+      prompt += `Main Symptom: ${jsonAnswers.main_symptom}\n`;
+    }
+    if (jsonAnswers.symptom_details && Object.keys(jsonAnswers.symptom_details).length > 0) {
+      prompt += `Symptom Details:\n`;
+      for (const [key, val] of Object.entries(jsonAnswers.symptom_details)) {
+        prompt += `  - ${key}: ${val}\n`;
+      }
+    }
+    if (jsonAnswers.general) {
+      const g = jsonAnswers.general;
+      if (g.duration) prompt += `Duration: ${g.duration}\n`;
+      if (g.severity) prompt += `Severity: ${g.severity}\n`;
+      if (g.behaviour_change) prompt += `Behaviour Change: ${g.behaviour_change}\n`;
+    }
+    if (jsonAnswers.emergency_flags && jsonAnswers.emergency_flags.length > 0) {
+      prompt += `Emergency Flags: ${jsonAnswers.emergency_flags.join(', ')}\n`;
+    }
+    prompt += '--- END QUESTIONNAIRE ---\n\n';
   }
 
   if (imageSnapshot && Object.keys(imageSnapshot).length > 0) {

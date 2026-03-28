@@ -10,6 +10,9 @@ import {
   ArrowRight,
   MessageCircle,
   AlertTriangle,
+  ImagePlus,
+  X,
+  Loader2,
 } from 'lucide-react';
 import { useLang } from '../i18n/LanguageContext';
 import { useConsultation } from '../context/ConsultationContext';
@@ -17,6 +20,7 @@ import { useAuth } from '../context/AuthContext';
 import { sendMessage, getChatHistory } from '../api/chat';
 import { getConsultationHistory } from '../api/consultation';
 import { useStartConsultation } from '../hooks/useConsultation';
+import { useImageUpload } from '../hooks/useImageUpload';
 import StatusBadge from '../components/StatusBadge';
 import ErrorAlert from '../components/ErrorAlert';
 import LoadingSpinner from '../components/LoadingSpinner';
@@ -38,7 +42,13 @@ const ChatbotPage = () => {
   const [showEmergency, setShowEmergency] = useState(false);
   const [diagnosisData, setDiagnosisData] = useState(null);
 
+  /* ── Image upload state ── */
+  const { upload, uploading, analysis, status: imgStatus, error: imgError, reset: resetImg } = useImageUpload();
+  const [selectedImages, setSelectedImages] = useState([]); // { file, preview }[]
+  const fileInputRef = useRef(null);
+
   const messagesEndRef = useRef(null);
+  const welcomeSentRef = useRef(false);
 
   /* ── Auto-scroll to bottom when messages change ── */
   useEffect(() => {
@@ -62,7 +72,7 @@ const ChatbotPage = () => {
         const history = res.data?.messages || res.data || [];
         const mapped = history.map((msg, idx) => ({
           id: msg.id || idx,
-          role: msg.role === 'assistant' || msg.role === 'ai' ? 'ai' : 'user',
+          role: msg.sender_type === 'ai' || msg.role === 'assistant' || msg.role === 'ai' ? 'ai' : 'user',
           text: msg.content || msg.message || msg.text || '',
           time: msg.created_at
             ? new Date(msg.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
@@ -71,9 +81,8 @@ const ChatbotPage = () => {
         setMessages(mapped);
       } catch (err) {
         if (!cancelled) {
-          /* If 404, it means no history yet — that is fine */
-          if (err?.response?.status !== 404) {
-            setError(err?.response?.data?.message || 'Failed to load chat history.');
+          if (err?.response?.status !== 404 && err?.status !== 404) {
+            setError(err?.response?.data?.message || err?.error || 'Failed to load chat history.');
           }
         }
       } finally {
@@ -83,6 +92,57 @@ const ChatbotPage = () => {
     loadHistory();
     return () => { cancelled = true; };
   }, [consultationId]);
+
+  /* ── Auto-send welcome message when chat first loads with no messages ── */
+  useEffect(() => {
+    if (welcomeSentRef.current) return;
+    if (noConsultation || loadingHistory || !consultationId || !conversationId) return;
+    if (messages.length > 0) return;
+
+    welcomeSentRef.current = true;
+
+    const sendWelcome = async () => {
+      setIsTyping(true);
+      try {
+        const res = await sendMessage({
+          conversation_id: conversationId,
+          message: 'Hello, I just completed the questionnaire. Please review my answers and help me understand what might be going on with my pet.',
+          consultation_id: consultationId,
+        });
+        const data = res.data;
+
+        const userMsg = {
+          id: Date.now(),
+          role: 'user',
+          text: 'Hello, I just completed the questionnaire. Please review my answers and help me understand what might be going on with my pet.',
+          time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        };
+        const aiMsg = {
+          id: Date.now() + 1,
+          role: 'ai',
+          text: data.reply || data.message || data.content || '',
+          time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        };
+        setMessages([userMsg, aiMsg]);
+
+        if (data.is_emergency) setShowEmergency(true);
+        if (data.is_final && data.diagnosis_data) {
+          setDiagnosisData({
+            condition: data.diagnosis_data.primary_label || 'Diagnosis Ready',
+            description: data.diagnosis_data.explanation || '',
+            confidence: data.diagnosis_data.confidence ? Math.round(data.diagnosis_data.confidence * 100) : null,
+            reportId: data.diagnosis_id || null,
+          });
+        }
+      } catch {
+        /* Non-critical — user can still type */
+      } finally {
+        setIsTyping(false);
+      }
+    };
+
+    sendWelcome();
+  }, [noConsultation, loadingHistory, consultationId, conversationId, messages.length]);
 
   /* ── Load consultation history for sidebar ── */
   useEffect(() => {
@@ -113,13 +173,27 @@ const ChatbotPage = () => {
   /* ── Send message ── */
   const handleSend = async () => {
     const text = inputText.trim();
-    if (!text || isTyping) return;
+    if ((!text && selectedImages.length === 0) || isTyping) return;
+
+    /* Upload images first if any */
+    if (selectedImages.length > 0) {
+      for (const img of selectedImages) {
+        try {
+          await upload(img.file, { consultation_id: consultationId });
+        } catch {
+          /* continue — error shown via imgError */
+        }
+      }
+      setSelectedImages([]);
+    }
+
+    const msgText = text || '(Uploaded image for analysis)';
 
     /* Add user message to local state immediately */
     const userMsg = {
       id: Date.now(),
       role: 'user',
-      text,
+      text: msgText,
       time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
     };
     setMessages((prev) => [...prev, userMsg]);
@@ -130,7 +204,7 @@ const ChatbotPage = () => {
     try {
       const res = await sendMessage({
         conversation_id: conversationId,
-        message: text,
+        message: msgText,
         consultation_id: consultationId,
       });
       const data = res.data;
@@ -159,7 +233,7 @@ const ChatbotPage = () => {
         });
       }
     } catch (err) {
-      setError(err?.response?.data?.message || 'Failed to send message. Please try again.');
+      setError(err?.response?.data?.message || err?.error || 'Failed to send message. Please try again.');
     } finally {
       setIsTyping(false);
     }
@@ -171,6 +245,26 @@ const ChatbotPage = () => {
       e.preventDefault();
       handleSend();
     }
+  };
+
+  /* ── Image selection ── */
+  const handleImageSelect = (e) => {
+    const files = Array.from(e.target.files || []);
+    const newImages = files.map((file) => ({
+      file,
+      preview: URL.createObjectURL(file),
+    }));
+    setSelectedImages((prev) => [...prev, ...newImages]);
+    if (fileInputRef.current) fileInputRef.current.value = '';
+  };
+
+  const removeImage = (index) => {
+    setSelectedImages((prev) => {
+      const updated = [...prev];
+      URL.revokeObjectURL(updated[index].preview);
+      updated.splice(index, 1);
+      return updated;
+    });
   };
 
   /* ── Start new consultation ── */
@@ -348,10 +442,10 @@ const ChatbotPage = () => {
         </div>
         )}
 
-        {/* Empty state */}
-        {messages.length === 0 && !loadingHistory && (
+        {/* Empty state — while waiting for auto-welcome */}
+        {messages.length === 0 && !isTyping && (
           <div className="flex items-center justify-center h-full">
-            <p className="text-sm text-gray-400">{t('chat_empty') || 'Start the conversation by typing a message below.'}</p>
+            <p className="text-sm text-gray-400">{t('chat_empty') || 'Start a conversation...'}</p>
           </div>
         )}
 
@@ -365,7 +459,7 @@ const ChatbotPage = () => {
                   <span className="text-[#7C3AED] text-sm">&#128062;</span>
                 </div>
                 <div className="bg-white rounded-2xl p-4 shadow-sm max-w-lg">
-                  <p className="text-sm text-gray-700 leading-relaxed">{msg.text}</p>
+                  <p className="text-sm text-gray-700 leading-relaxed whitespace-pre-wrap">{msg.text}</p>
                   <p className="text-xs text-gray-400 mt-2">{msg.time}</p>
                 </div>
               </div>
@@ -426,10 +520,73 @@ const ChatbotPage = () => {
           </button>
         </div>
 
+        {/* Image preview strip */}
+        {selectedImages.length > 0 && (
+          <div className="flex gap-2 mb-3 flex-wrap">
+            {selectedImages.map((img, idx) => (
+              <div key={idx} className="relative group">
+                <img
+                  src={img.preview}
+                  alt={`Selected ${idx + 1}`}
+                  className="h-16 w-16 object-cover rounded-lg border-2 border-[#7C3AED]"
+                />
+                <button
+                  onClick={() => removeImage(idx)}
+                  className="absolute -top-1.5 -right-1.5 h-5 w-5 rounded-full bg-red-500 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                >
+                  <X size={12} />
+                </button>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* Upload status */}
+        {(uploading || imgStatus === 'queued' || imgStatus === 'processing') && (
+          <div className="flex items-center gap-2 mb-3 px-3 py-2 bg-purple-50 rounded-lg border border-purple-200">
+            <Loader2 size={16} className="text-[#7C3AED] animate-spin" />
+            <span className="text-sm text-[#7C3AED] font-medium">
+              {uploading ? t('chat_img_uploading') || 'Uploading image...' : t('chat_img_analyzing') || 'Analyzing image...'}
+            </span>
+          </div>
+        )}
+
+        {/* Image upload error */}
+        {imgError && (
+          <div className="flex items-center gap-2 mb-3 px-3 py-2 bg-red-50 rounded-lg border border-red-200">
+            <span className="text-sm text-red-600">{imgError}</span>
+            <button onClick={resetImg} className="text-xs text-red-500 underline">{t('common_close')}</button>
+          </div>
+        )}
+
+        {/* Image analysis result notification */}
+        {analysis && (
+          <div className="flex items-center gap-2 mb-3 px-3 py-2 bg-green-50 rounded-lg border border-green-200">
+            <span className="text-sm text-green-700">{t('chat_img_complete') || 'Image analysis complete! The AI can now see your image results.'}</span>
+            <button onClick={resetImg} className="text-xs text-green-600 underline">{t('common_close')}</button>
+          </div>
+        )}
+
         {/* Input bar */}
         <div className="flex items-center gap-3 bg-white rounded-xl border border-gray-200 px-4 py-3 shadow-sm">
-          <button className="text-gray-400 hover:text-[#7C3AED] transition-colors">
-            <Camera size={20} />
+          {/* Highlighted image upload button  */}
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/jpeg,image/png,image/webp,image/gif"
+            multiple
+            className="hidden"
+            onChange={handleImageSelect}
+          />
+          <button
+            onClick={() => fileInputRef.current?.click()}
+            disabled={uploading}
+            className="relative flex items-center justify-center h-9 w-9 rounded-lg bg-gradient-to-br from-[#7C3AED] to-[#A855F7] text-white hover:from-[#6D28D9] hover:to-[#9333EA] transition-all shadow-md hover:shadow-lg disabled:opacity-50 flex-shrink-0"
+            title={t('chat_img_upload_title') || 'Upload pet photo for AI analysis (optional)'}
+          >
+            <ImagePlus size={18} />
+            {/* Pulsing dot to draw attention */}
+            <span className="absolute -top-1 -right-1 h-3 w-3 rounded-full bg-green-400 border-2 border-white animate-pulse" />
           </button>
 
           <input
@@ -444,12 +601,17 @@ const ChatbotPage = () => {
 
           <button
             onClick={handleSend}
-            disabled={!inputText.trim() || isTyping}
+            disabled={(!inputText.trim() && selectedImages.length === 0) || isTyping}
             className="h-9 w-9 rounded-full bg-[#7C3AED] flex items-center justify-center text-white hover:bg-[#6D28D9] transition-colors flex-shrink-0 disabled:opacity-40 disabled:cursor-not-allowed"
           >
             <ArrowRight size={16} />
           </button>
         </div>
+
+        {/* Optional hint under input */}
+        <p className="text-xs text-gray-400 mt-2 text-center">
+          {t('chat_img_hint') || 'Upload a photo of your pet\'s condition for AI-powered visual analysis (optional)'}
+        </p>
       </div>
       </>
       )}
