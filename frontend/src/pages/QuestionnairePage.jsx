@@ -113,7 +113,7 @@ const SD1_ICONS = {
 const QuestionnairePage = () => {
   const { t, lang } = useLang();
   const navigate = useNavigate();
-  const { consultationId } = useConsultation();
+  const { consultationId, savePetInfo } = useConsultation();
   const { isAuthenticated } = useAuth(); // eslint-disable-line no-unused-vars
   const { start: startNewConsultation } = useStartConsultation();
 
@@ -350,7 +350,11 @@ const QuestionnairePage = () => {
         }
       }
 
-      navigate('/chat');
+      /* 3. Save pet info to context for right sidebar */
+      savePetInfo(payload.pet);
+
+      /* Navigate to optional image upload step */
+      navigate('/image-upload');
     } catch (err) {
       setError(err?.message || 'Failed to submit questionnaire.');
     } finally {

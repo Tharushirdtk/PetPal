@@ -169,6 +169,15 @@ export const translations = {
     chat_img_upload_title: "Upload pet photo for AI analysis (optional)",
     chat_img_hint: "Upload a photo of your pet's condition for AI-powered visual analysis (optional)",
 
+    // Image Upload Step
+    img_step_title: "Photo Upload",
+    img_step_heading: "Upload a Photo of Your Pet",
+    img_step_desc: "Our AI can analyze photos of skin conditions, injuries, or unusual symptoms for a more accurate diagnosis. This step is optional.",
+    img_skip: "Skip, go to chat",
+    img_continue_chat: "Continue to AI Chat",
+    img_step_note: "Image analysis results will automatically be included in your AI consultation for a more accurate diagnosis.",
+    img_upload_another: "Upload another image",
+
     // Questionnaire
     quest_title: "Pet Health Questionnaire",
     quest_subtitle: "Answer a few questions to help us understand your pet's condition.",
@@ -494,6 +503,15 @@ export const translations = {
     chat_img_complete: "රූප විශ්ලේෂණය සම්පූර්ණයි! AI ට දැන් ඔබේ රූප ප්‍රතිඵල දැකිය හැකිය.",
     chat_img_upload_title: "AI විශ්ලේෂණය සඳහා සතා ඡායාරූපයක් උඩුගත කරන්න (විකල්ප)",
     chat_img_hint: "AI බලයෙන් ක්‍රියා කරන දෘශ්‍ය විශ්ලේෂණය සඳහා ඔබේ සතාගේ තත්ත්වයේ ඡායාරූපයක් උඩුගත කරන්න (විකල්ප)",
+
+    // Image Upload Step
+    img_step_title: "ඡායාරූප උඩුගත කිරීම",
+    img_step_heading: "ඔබේ සතාගේ ඡායාරූපයක් උඩුගත කරන්න",
+    img_step_desc: "වඩාත් නිවැරදි රෝග විනිශ්චයක් සඳහා අපගේ AI ට සම් තත්ත්වයන්, තුවාල, හෝ අසාමාන්‍ය රෝග ලක්ෂණ ඡායාරූප විශ්ලේෂණය කළ හැකිය. මෙම පියවර විකල්පයි.",
+    img_skip: "මඟහරින්න, chat වෙත යන්න",
+    img_continue_chat: "AI Chat වෙත ඉදිරියට",
+    img_step_note: "රූප විශ්ලේෂණ ප්‍රතිඵල ස්වයංක්‍රීයව ඔබේ AI උපදේශනයට ඇතුළත් කරනු ලැබේ.",
+    img_upload_another: "තවත් රූපයක් උඩුගත කරන්න",
 
     // Questionnaire
     quest_title: "සතා සෞඛ්‍ය ප්‍රශ්නාවලිය",
