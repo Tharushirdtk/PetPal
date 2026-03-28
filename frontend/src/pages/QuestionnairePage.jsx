@@ -120,7 +120,7 @@ const QuestionnairePage = () => {
   const { t, lang } = useLang();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const { consultationId, savePetInfo } = useConsultation();
+  const { consultationId, savePetInfo, clearSession } = useConsultation();
   const { isAuthenticated } = useAuth(); // eslint-disable-line no-unused-vars
   const { start: startNewConsultation } = useStartConsultation();
 
@@ -149,13 +149,14 @@ const QuestionnairePage = () => {
 
   /* ── Auto-create consultation if needed ── */
   useEffect(() => {
-    if (!consultationId) {
-      const opts = petIdFromUrl
-        ? { pet_id: Number(petIdFromUrl) }
-        : { guest_handle: `guest_${Date.now()}` };
-      startNewConsultation(opts).catch(() => {});
+    // Always start a fresh consultation when pet_id is specified (new diagnosis flow)
+    if (petIdFromUrl) {
+      clearSession();
+      startNewConsultation({ pet_id: Number(petIdFromUrl) }).catch(() => {});
+    } else if (!consultationId) {
+      startNewConsultation({ guest_handle: `guest_${Date.now()}` }).catch(() => {});
     }
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [petIdFromUrl]); // eslint-disable-line react-hooks/exhaustive-deps
 
   /* ── Fetch selected pet data and pre-fill answers ── */
   useEffect(() => {
@@ -423,16 +424,22 @@ const QuestionnairePage = () => {
   const stepTitle = STEP_TITLES[currentStep]?.[lang] || STEP_TITLES[currentStep]?.en || '';
 
   /* ── Render helpers ── */
+  const getOptionBg = (color) => {
+    // Extract only the bg-* class from the option color, ignore border-* (we control borders for selection)
+    if (!color) return 'bg-gray-50';
+    return color.split(' ').filter((c) => c.startsWith('bg-')).join(' ') || 'bg-gray-50';
+  };
+
   const renderOptionButton = (q, opt, isSelected) => (
     <button
       key={opt.value}
       type="button"
       onClick={() => handleAnswer(q.code, opt.value)}
       className={`rounded-xl border-2 p-4 flex items-center gap-3 text-left cursor-pointer transition-all duration-200
-        ${opt.color || 'bg-gray-50 border-gray-200'}
+        ${getOptionBg(opt.color)}
         ${isSelected
           ? 'border-[#7C3AED] ring-2 ring-[#7C3AED]/20 scale-[1.02] shadow-sm'
-          : 'border-transparent hover:border-gray-300 hover:shadow-sm'
+          : 'border-gray-200 hover:border-gray-300 hover:shadow-sm'
         }`}
     >
       {opt.icon && <span className="text-xl flex-shrink-0">{opt.icon}</span>}
@@ -496,10 +503,10 @@ const QuestionnairePage = () => {
                 type="button"
                 onClick={() => handleAnswer('P1', 'dog')}
                 className={`rounded-xl border-2 p-4 flex flex-col items-center gap-2 cursor-pointer transition-all duration-200
-                  bg-orange-50 border-orange-200
+                  bg-orange-50
                   ${answers.P1 === 'dog'
                     ? 'border-[#7C3AED] ring-2 ring-[#7C3AED]/20 scale-[1.02] shadow-sm'
-                    : 'border-transparent hover:border-gray-300 hover:shadow-sm'
+                    : 'border-gray-200 hover:border-gray-300 hover:shadow-sm'
                   }`}
               >
                 <Dog className="w-8 h-8 text-orange-500" />
@@ -509,10 +516,10 @@ const QuestionnairePage = () => {
                 type="button"
                 onClick={() => handleAnswer('P1', 'cat')}
                 className={`rounded-xl border-2 p-4 flex flex-col items-center gap-2 cursor-pointer transition-all duration-200
-                  bg-purple-50 border-purple-200
+                  bg-purple-50
                   ${answers.P1 === 'cat'
                     ? 'border-[#7C3AED] ring-2 ring-[#7C3AED]/20 scale-[1.02] shadow-sm'
-                    : 'border-transparent hover:border-gray-300 hover:shadow-sm'
+                    : 'border-gray-200 hover:border-gray-300 hover:shadow-sm'
                   }`}
               >
                 <Cat className="w-8 h-8 text-purple-500" />
@@ -599,10 +606,10 @@ const QuestionnairePage = () => {
                 type="button"
                 onClick={() => handleAnswer('SD1', opt.value)}
                 className={`rounded-xl border-2 p-4 flex items-center gap-3 text-left cursor-pointer transition-all duration-200
-                  ${opt.color || 'bg-gray-50 border-gray-200'}
+                  ${getOptionBg(opt.color)}
                   ${isSelected
                     ? 'border-[#7C3AED] ring-2 ring-[#7C3AED]/20 scale-[1.02] shadow-sm'
-                    : 'border-transparent hover:border-gray-300 hover:shadow-sm'
+                    : 'border-gray-200 hover:border-gray-300 hover:shadow-sm'
                   }`}
               >
                 <span className="text-2xl flex-shrink-0">{icon}</span>

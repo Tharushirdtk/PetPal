@@ -39,7 +39,20 @@ exports.uploadImage = asyncHandler(async (req, res) => {
   try {
     const absolutePath = path.resolve(filePath);
     const startTime = Date.now();
-    analysisResult = await runInference(absolutePath);
+
+    // Look up pet species to filter predictions to correct animal type
+    let species = null;
+    if (pet_id) {
+      const petRows = await query(
+        `SELECT s.name AS species_name FROM pet p
+         JOIN species s ON p.species_id = s.id
+         WHERE p.id = ?`,
+        [pet_id]
+      );
+      if (petRows[0]) species = petRows[0].species_name;
+    }
+
+    analysisResult = await runInference(absolutePath, species);
     const processingTime = Date.now() - startTime;
 
     // 5. Save to image_analysis

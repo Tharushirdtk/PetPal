@@ -36,6 +36,10 @@ CLASS_LABELS = {
     21: "Worm Infection in Dog",
 }
 
+# Indices belonging to each species (for species-aware filtering)
+DOG_INDICES = [i for i, lbl in CLASS_LABELS.items() if "Dog" in lbl]
+CAT_INDICES = [i for i, lbl in CLASS_LABELS.items() if "Cat" in lbl or "Feline" in lbl]
+
 # ──────────────────────────────────────────────
 #  Load model and embedding model once at startup
 # ──────────────────────────────────────────────
@@ -70,6 +74,7 @@ def preprocess_image(image_path):
 def predict():
     data = request.get_json(force=True)
     image_path = data.get("image_path")
+    species = (data.get("species") or "").strip().lower()  # "dog", "cat", or ""
 
     if not image_path or not os.path.isfile(image_path):
         return jsonify({"error": f"Image file not found: {image_path}"}), 400
@@ -78,17 +83,37 @@ def predict():
         tensor = preprocess_image(image_path)
         predictions = tf_model.predict(tensor, verbose=0)[0]
 
-        top_index = int(np.argmax(predictions))
-        confidence = float(predictions[top_index])
+        # If species is known, zero-out predictions for the wrong species
+        # so only relevant conditions are returned
+        if species == "dog":
+            filtered = predictions.copy()
+            for i in CAT_INDICES:
+                filtered[i] = 0.0
+            # Re-normalize so confidences sum to ~1
+            total = filtered.sum()
+            if total > 0:
+                filtered = filtered / total
+        elif species == "cat":
+            filtered = predictions.copy()
+            for i in DOG_INDICES:
+                filtered[i] = 0.0
+            total = filtered.sum()
+            if total > 0:
+                filtered = filtered / total
+        else:
+            filtered = predictions
+
+        top_index = int(np.argmax(filtered))
+        confidence = float(filtered[top_index])
         confidence_percent = round(confidence * 100, 2)
         top_label = CLASS_LABELS.get(top_index, f"class_{top_index}")
 
         # Build top-5 for raw result
-        top5_indices = np.argsort(predictions)[::-1][:5]
+        top5_indices = np.argsort(filtered)[::-1][:5]
         top5 = [
             {
                 "label": CLASS_LABELS.get(int(i), f"class_{i}"),
-                "confidence": round(float(predictions[i]) * 100, 2),
+                "confidence": round(float(filtered[i]) * 100, 2),
             }
             for i in top5_indices
         ]
