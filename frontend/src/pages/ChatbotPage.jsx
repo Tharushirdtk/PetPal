@@ -44,6 +44,15 @@ const ChatbotPage = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages, isTyping]);
 
+  /* ── Reset state when consultation changes ── */
+  useEffect(() => {
+    setMessages([]);
+    setError(null);
+    setShowEmergency(false);
+    setDiagnosisData(null);
+    welcomeSentRef.current = false;
+  }, [consultationId]);
+
   /* ── Load chat history on mount ── */
   useEffect(() => {
     let cancelled = false;
@@ -70,7 +79,7 @@ const ChatbotPage = () => {
       } catch (err) {
         if (!cancelled) {
           if (err?.response?.status !== 404 && err?.status !== 404) {
-            setError(err?.response?.data?.message || err?.error || 'Failed to load chat history.');
+            setError('Failed to load chat history.');
           }
         }
       } finally {
@@ -120,7 +129,7 @@ const ChatbotPage = () => {
           });
         }
       } catch {
-        /* Non-critical */
+        setError('Unable to connect to PetPal AI right now. Please try again in a moment.');
       } finally {
         setIsTyping(false);
       }
@@ -189,8 +198,8 @@ const ChatbotPage = () => {
           reportId: data.diagnosis_id || null,
         });
       }
-    } catch (err) {
-      setError(err?.response?.data?.message || err?.error || 'Failed to send message. Please try again.');
+    } catch {
+      setError('Failed to send message. Please try again.');
     } finally {
       setIsTyping(false);
     }
@@ -416,7 +425,7 @@ const ChatbotPage = () => {
               </div>
             )}
 
-            {messages.length > 0 && (
+            {messages.some((m) => m.role === 'ai') && (
               <p className="text-sm italic text-[#7C3AED] mt-4">{t('chat_important_note')}</p>
             )}
 

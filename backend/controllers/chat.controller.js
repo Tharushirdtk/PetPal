@@ -16,17 +16,15 @@ exports.sendMessage = asyncHandler(async (req, res) => {
     return fail(res, 'conversation_id and message are required');
   }
 
-  // 1. Save user message to message table
-  await query(
-    `INSERT INTO message (conversation_id, sender_type, content, created_by)
-     VALUES (?, 'user', ?, ?)`,
-    [conversation_id, message, userId]
-  );
-
-  // 2. Emergency trigger check — skip LLM if triggered
+  // 1. Emergency trigger check — skip LLM if triggered
   const emergency = checkEmergency(message);
   if (emergency.triggered) {
-    // Save emergency response as AI message
+    // Save both user message and emergency response together
+    await query(
+      `INSERT INTO message (conversation_id, sender_type, content, created_by)
+       VALUES (?, 'user', ?, ?)`,
+      [conversation_id, message, userId]
+    );
     await query(
       `INSERT INTO message (conversation_id, sender_type, content, created_by)
        VALUES (?, 'ai', ?, NULL)`,
@@ -40,7 +38,7 @@ exports.sendMessage = asyncHandler(async (req, res) => {
     });
   }
 
-  // 3. Load llm_context
+  // 2. Load llm_context
   const llmContext = await LlmContextModel.getByConversation(conversation_id);
   const jsonData = llmContext?.json_data
     ? (typeof llmContext.json_data === 'string' ? JSON.parse(llmContext.json_data) : llmContext.json_data)
@@ -54,7 +52,7 @@ exports.sendMessage = asyncHandler(async (req, res) => {
     ? (typeof llmContext.recent_messages === 'string' ? JSON.parse(llmContext.recent_messages) : llmContext.recent_messages)
     : { user: [], ai: [] };
 
-  // 4. Load pet info if available
+  // 3. Load pet info if available
   let pet = null;
   if (consultation_id) {
     const consultation = await ConsultationModel.findById(consultation_id);
@@ -63,7 +61,7 @@ exports.sendMessage = asyncHandler(async (req, res) => {
     }
   }
 
-  // 5. Build conversation history (last 3 user + last 3 AI interleaved)
+  // 4. Build conversation history from existing messages (excludes current message)
   const historyRows = await query(
     `SELECT sender_type, content FROM message
      WHERE conversation_id = ?
@@ -73,7 +71,7 @@ exports.sendMessage = asyncHandler(async (req, res) => {
   );
   const conversationHistory = historyRows.reverse();
 
-  // 6. Query ChromaDB for similar past cases
+  // 5. Query ChromaDB for similar past cases
   let vectorResults = [];
   try {
     vectorResults = await querySimilar(message, 3);
@@ -81,29 +79,49 @@ exports.sendMessage = asyncHandler(async (req, res) => {
     console.warn('Vector DB query failed (non-fatal):', err.message);
   }
 
-  // 7. Call Gemini LLM
-  const { reply, diagnosis } = await getLLMResponse({
-    pet,
-    jsonAnswers: jsonData.answers || {},
-    imageSnapshot,
-    vectorResults,
-    conversationHistory,
-    currentMessage: message,
-  });
+  // 6. Call Gemini LLM
+  let reply, diagnosis;
+  try {
+    ({ reply, diagnosis } = await getLLMResponse({
+      pet,
+      jsonAnswers: jsonData.answers || {},
+      imageSnapshot,
+      vectorResults,
+      conversationHistory,
+      currentMessage: message,
+    }));
+  } catch (llmErr) {
+    console.error('LLM call failed:', llmErr.message);
+    const friendlyMsg = llmErr.status === 429
+      ? 'Our AI service is temporarily busy due to high demand. Please try again in a few moments.'
+      : 'Sorry, I\u2019m having trouble connecting to the AI service right now. Please try again shortly.';
 
-  // 8. Save AI response to message table
+    return ok(res, {
+      reply: friendlyMsg,
+      is_final: false,
+      diagnosis_id: null,
+      diagnosis_data: null,
+    });
+  }
+
+  // 7. Save BOTH user message and AI response (only after successful LLM call)
+  await query(
+    `INSERT INTO message (conversation_id, sender_type, content, created_by)
+     VALUES (?, 'user', ?, ?)`,
+    [conversation_id, message, userId]
+  );
   await query(
     `INSERT INTO message (conversation_id, sender_type, content, created_by)
      VALUES (?, 'ai', ?, NULL)`,
     [conversation_id, reply]
   );
 
-  // 9. Update llm_context.recent_messages (keep last 3 each)
+  // 8. Update llm_context.recent_messages (keep last 3 each)
   recentMsgs.user = [...(recentMsgs.user || []), message].slice(-3);
   recentMsgs.ai = [...(recentMsgs.ai || []), reply].slice(-3);
   await LlmContextModel.updateRecentMessages(conversation_id, recentMsgs);
 
-  // 10. If confident diagnosis detected, save to DB
+  // 9. If confident diagnosis detected, save to DB
   let diagnosisId = null;
   if (diagnosis && consultation_id) {
     const completedStatusId = await ConsultationModel.getStatusIdByName('completed');

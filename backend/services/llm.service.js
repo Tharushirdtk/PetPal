@@ -1,5 +1,5 @@
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
-const GEMINI_MODEL = 'gemini-2.0-flash';
+const GEMINI_MODEL = 'gemini-2.5-flash';
 const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${GEMINI_API_KEY}`;
 
 const SYSTEM_PROMPT = `You are PetPal, an expert AI veterinary assistant. You help pet owners identify possible health conditions in dogs and cats. You are NOT a replacement for a vet. Always recommend professional veterinary care for serious conditions. Be empathetic, clear, and concise.
@@ -100,20 +100,43 @@ async function callGemini(userPrompt) {
     },
   };
 
-  const response = await fetch(GEMINI_URL, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(body),
-  });
+  const MAX_RETRIES = 2;
+  let lastError;
 
-  if (!response.ok) {
+  for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {
+    const response = await fetch(GEMINI_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+    });
+
+    if (response.ok) {
+      const json = await response.json();
+      const text = json.candidates?.[0]?.content?.parts?.[0]?.text || '';
+      return text;
+    }
+
     const errBody = await response.text();
-    throw new Error(`Gemini API error ${response.status}: ${errBody}`);
+
+    if (response.status === 429 && attempt < MAX_RETRIES) {
+      const waitMs = (attempt + 1) * 5000;
+      console.warn(`Gemini rate-limited (429), retrying in ${waitMs}ms (attempt ${attempt + 1}/${MAX_RETRIES})...`);
+      await new Promise((r) => setTimeout(r, waitMs));
+      lastError = new Error('RATE_LIMITED');
+      lastError.status = 429;
+      continue;
+    }
+
+    const err = new Error(
+      response.status === 429
+        ? 'Our AI service is temporarily busy due to high demand. Please try again in a few moments.'
+        : `Gemini API error ${response.status}`
+    );
+    err.status = response.status;
+    throw err;
   }
 
-  const json = await response.json();
-  const text = json.candidates?.[0]?.content?.parts?.[0]?.text || '';
-  return text;
+  throw lastError;
 }
 
 /**
