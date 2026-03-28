@@ -189,8 +189,10 @@ export const translations = {
     quest_pet_age: "Age (years)",
     quest_pet_age_placeholder: "Enter age",
     quest_continue: "Continue",
-
-    // Image Analysis
+    quest_no_branch: "No specific follow-up questions for this symptom.",
+    quest_emergency_blood_vomit: "Blood in vomit detected — please seek immediate veterinary care!",
+    quest_emergency_breathing: "Breathing difficulty detected — seek immediate veterinary care!",
+    quest_emergency_bleeding: "Heavy bleeding or visible bone — seek emergency care immediately!",
     img_title: "Image Analysis Queue",
     img_subtitle: "Effortless AI scanning for your furry friends.",
     img_drag: "Drag & Drop Photos Here",
@@ -508,8 +510,10 @@ export const translations = {
     quest_pet_age: "වයස (අවුරුදු)",
     quest_pet_age_placeholder: "වයස ඇතුළත් කරන්න",
     quest_continue: "ඉදිරියට",
-
-    // Image Analysis
+    quest_no_branch: "මෙම රෝග ලක්ෂණය සඳහා විශේෂ පසු විපරම් ප්‍රශ්න නොමැත.",
+    quest_emergency_blood_vomit: "වමනයේ ලේ හඳුනාගෙන ඇත — කරුණාකර වහාම පශු වෛද්‍ය සත්කාර ලබා ගන්න!",
+    quest_emergency_breathing: "හුස්ම ගැනීමේ අපහසුතාව හඳුනාගෙන ඇත — වහාම පශු වෛද්‍ය සත්කාර ලබා ගන්න!",
+    quest_emergency_bleeding: "අධික ලේ ගැලීමක් හෝ පෙනෙන ඇටයක් — වහාම හදිස්සි සත්කාර ලබා ගන්න!",
     img_title: "රූප විශ්ලේෂණ පෝලිම",
     img_subtitle: "ඔබේ ලොම් යාළුවන් සඳහා AI scanning.",
     img_drag: "ඡායාරූප මෙහි ඇදගෙන දමන්න",

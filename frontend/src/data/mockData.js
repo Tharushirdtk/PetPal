@@ -100,178 +100,180 @@ export const mockChatHistory = [
   { id: 3, title: 'Luna — Skin Rash', date: 'Oct 12', active: false },
 ];
 
+/* ── Symptom-driven question flow (fallback when API is unavailable) ── */
 export const questionFlow = [
-  {
-    id: 'q1',
-    text_en: 'Is your pet eating normally?',
-    text_si: 'ඔබේ සතා සාමාන්‍ය පරිදි ආහාර ගනීද?',
-    type: 'yesno',
+  /* Step 1: Pet Details */
+  { code: 'P1', text_en: 'What type of pet do you have?', text_si: 'ඔබට ඇති සතා වර්ගය කුමක්ද?', type: 'single', step: 1,
     options: [
-      { value: 'yes', label_en: "Yes, everything's fine", label_si: 'ඔව්, හොඳින් ඇත', icon: '✅', color: 'bg-green-50 border-green-200' },
-      { value: 'no', label_en: 'No, eating less/nothing', label_si: 'නැත, අඩුවෙන්/කිසිවක් නෑ', icon: '❌', color: 'bg-red-50 border-red-200' },
-      { value: 'more', label_en: 'Eating more than usual', label_si: 'සාමාන්‍යයට වඩා වැඩියෙන්', icon: '📈', color: 'bg-orange-50 border-orange-200' },
-      { value: 'picky', label_en: 'Being very picky', label_si: 'ඉතා තෝරාගැනීමක්', icon: '🤔', color: 'bg-blue-50 border-blue-200' },
-    ],
-    conditionalNext: { no: 'q2', more: 'q2', picky: 'q2' },
-    defaultNext: 'q3',
-  },
-  {
-    id: 'q2',
-    text_en: 'How often is your pet vomiting?',
-    text_si: 'ඔබේ සතා කොපමණ වාර ගණනක් වමනය කරයිද?',
-    type: 'choice',
+      { value: 'dog', label_en: 'Dog', label_si: 'බල්ලා', icon: 'dog', color: 'bg-orange-50 border-orange-200' },
+      { value: 'cat', label_en: 'Cat', label_si: 'පූසා', icon: 'cat', color: 'bg-purple-50 border-purple-200' },
+    ] },
+  { code: 'P2', text_en: 'How old is your pet (in years)?', text_si: 'ඔබේ සතාගේ වයස කීයද (අවුරුදු)?', type: 'number', step: 1, options: [] },
+  { code: 'P3', text_en: "What is your pet's gender?", text_si: 'ඔබේ සතාගේ ස්ත්‍රී පුරුෂ භාවය කුමක්ද?', type: 'single', step: 1,
     options: [
-      { value: 'none', label_en: 'Not at all', label_si: 'කිසිසේත් නැත', icon: '✅', color: 'bg-green-50 border-green-200' },
-      { value: 'rarely', label_en: 'Once or twice', label_si: 'එක් වරක් හෝ දෙවරක්', icon: '⚠️', color: 'bg-yellow-50 border-yellow-200' },
-      { value: 'often', label_en: 'Multiple times daily', label_si: 'දිනකට කිහිප වාරයක්', icon: '🔴', color: 'bg-red-50 border-red-200' },
-      { value: 'blood', label_en: 'With blood present', label_si: 'ලේ සමඟ', icon: '🚨', color: 'bg-red-100 border-red-300', emergencyTrigger: true },
-    ],
-    conditionalNext: { blood: 'emergency' },
-    defaultNext: 'q3',
-  },
-  {
-    id: 'q3',
-    text_en: 'How would you describe energy levels?',
-    text_si: 'ශක්ති මට්ටම් ඔබ විස්තර කරන්නේ කෙසේද?',
-    type: 'choice',
+      { value: 'male', label_en: 'Male', label_si: 'පිරිමි', icon: '♂️', color: 'bg-blue-50 border-blue-200' },
+      { value: 'female', label_en: 'Female', label_si: 'ගැහැණු', icon: '♀️', color: 'bg-pink-50 border-pink-200' },
+    ] },
+  { code: 'P4', text_en: 'Is your pet neutered/spayed?', text_si: 'ඔබේ සතා වඳ කර තිබේද?', type: 'single', step: 1,
     options: [
-      { value: 'normal', label_en: 'Normal and playful', label_si: 'සාමාන්‍ය සහ සෙල්ලම්කාර', icon: '🎾', color: 'bg-green-50 border-green-200' },
-      { value: 'low', label_en: 'Less active than usual', label_si: 'සාමාන්‍යයට වඩා අඩු ක්‍රියාකාරී', icon: '😴', color: 'bg-yellow-50 border-yellow-200' },
-      { value: 'lethargic', label_en: 'Very lethargic/tired', label_si: 'ඉතා මැලි/මහන්සි', icon: '💤', color: 'bg-orange-50 border-orange-200' },
-      { value: 'restless', label_en: 'Restless and anxious', label_si: 'නොසන්සුන් සහ කනස්සල්ලෙන්', icon: '😰', color: 'bg-blue-50 border-blue-200' },
-    ],
-    defaultNext: 'q4',
-  },
-  {
-    id: 'q4',
-    text_en: 'Any changes in water intake?',
-    text_si: 'ජල පරිභෝජනයේ වෙනස්කම් තිබේද?',
-    type: 'choice',
+      { value: 'yes', label_en: 'Yes', label_si: 'ඔව්', icon: '✅', color: 'bg-green-50 border-green-200' },
+      { value: 'no', label_en: 'No', label_si: 'නැත', icon: '❌', color: 'bg-red-50 border-red-200' },
+      { value: 'not_sure', label_en: 'Not Sure', label_si: 'විශ්වාස නැත', icon: '🤷', color: 'bg-gray-50 border-gray-200' },
+    ] },
+  { code: 'P5', text_en: 'Is your pet vaccinated?', text_si: 'ඔබේ සතාට එන්නත් දී තිබේද?', type: 'single', step: 1,
     options: [
-      { value: 'normal', label_en: 'Drinking normally', label_si: 'සාමාන්‍ය පරිදි බොමින්', icon: '💧', color: 'bg-blue-50 border-blue-200' },
-      { value: 'more', label_en: 'Drinking much more', label_si: 'ගොඩක් වැඩියෙන් බොමින්', icon: '🌊', color: 'bg-yellow-50 border-yellow-200' },
-      { value: 'less', label_en: 'Drinking less', label_si: 'අඩුවෙන් බොමින්', icon: '🏜️', color: 'bg-orange-50 border-orange-200' },
-      { value: 'none', label_en: 'Refusing water', label_si: 'ජලය ප්‍රතික්ෂේප කිරීම', icon: '🚫', color: 'bg-red-50 border-red-200' },
-    ],
-    defaultNext: 'q5',
-  },
-  {
-    id: 'q5',
-    text_en: 'Have you noticed any skin issues?',
-    text_si: 'සමේ ගැටලු කිසිවක් ඔබ දැක ඇත්ද?',
-    type: 'choice',
+      { value: 'fully', label_en: 'Fully Vaccinated', label_si: 'සම්පූර්ණයෙන් එන්නත්', icon: '💉', color: 'bg-green-50 border-green-200' },
+      { value: 'partially', label_en: 'Partially', label_si: 'අර්ධ වශයෙන්', icon: '⚠️', color: 'bg-yellow-50 border-yellow-200' },
+      { value: 'not_vaccinated', label_en: 'Not Vaccinated', label_si: 'එන්නත් නැත', icon: '❌', color: 'bg-red-50 border-red-200' },
+      { value: 'not_sure', label_en: 'Not Sure', label_si: 'විශ්වාස නැත', icon: '🤷', color: 'bg-gray-50 border-gray-200' },
+    ] },
+
+  /* Step 2: Main Symptom */
+  { code: 'SD1', text_en: 'What is the main symptom you have noticed?', text_si: 'ඔබ දුටු ප්‍රධාන රෝග ලක්ෂණය කුමක්ද?', type: 'single', step: 2,
     options: [
-      { value: 'none', label_en: 'Skin looks normal', label_si: 'සම සාමාන්‍ය පෙනේ', icon: '✅', color: 'bg-green-50 border-green-200' },
-      { value: 'rash', label_en: 'Rash or redness', label_si: 'කැසීම හෝ රතු පැහැය', icon: '🔴', color: 'bg-red-50 border-red-200' },
-      { value: 'dry', label_en: 'Dry or flaky skin', label_si: 'වියළි හෝ පිපිරුණු සම', icon: '🏜️', color: 'bg-yellow-50 border-yellow-200' },
-      { value: 'lumps', label_en: 'Lumps or swelling', label_si: 'ගැටිති හෝ ඉදිමීම', icon: '⚠️', color: 'bg-orange-50 border-orange-200' },
-    ],
-    defaultNext: 'q6',
-  },
-  {
-    id: 'q6',
-    text_en: 'Is your pet showing any breathing difficulty?',
-    text_si: 'ඔබේ සතාට හුස්ම ගැනීමේ අපහසුතාවක් පෙන්වයිද?',
-    type: 'yesno',
+      { value: 'skin', label_en: 'Skin Problem', label_si: 'සම ගැටලුවක්', icon: '🐾', color: 'bg-orange-50 border-orange-200' },
+      { value: 'vomiting', label_en: 'Vomiting', label_si: 'වමනය', icon: '🤮', color: 'bg-yellow-50 border-yellow-200' },
+      { value: 'diarrhea', label_en: 'Diarrhea', label_si: 'පාචනය', icon: '💩', color: 'bg-amber-50 border-amber-200' },
+      { value: 'coughing', label_en: 'Coughing', label_si: 'කැස්ස', icon: '🫁', color: 'bg-blue-50 border-blue-200' },
+      { value: 'injury', label_en: 'Injury', label_si: 'තුවාලයක්', icon: '🩹', color: 'bg-red-50 border-red-200' },
+      { value: 'appetite_loss', label_en: 'Loss of Appetite', label_si: 'ආහාර රුචිය නැතිවීම', icon: '🍽️', color: 'bg-purple-50 border-purple-200' },
+      { value: 'other', label_en: 'Other', label_si: 'වෙනත්', icon: '❓', color: 'bg-gray-50 border-gray-200' },
+    ] },
+
+  /* Step 3 branches — each has visibleWhen */
+  /* Skin */
+  { code: 'SD2_SKIN', text_en: 'Is there any hair loss?', text_si: 'කෙස් වැටීමක් තිබේද?', type: 'single', step: 3, visibleWhen: { SD1: 'skin' },
     options: [
-      { value: 'no', label_en: 'No, breathing is fine', label_si: 'නැත, හුස්ම හොඳින්', icon: '✅', color: 'bg-green-50 border-green-200' },
-      { value: 'mild', label_en: 'Slightly labored', label_si: 'තරමක් අපහසු', icon: '😤', color: 'bg-yellow-50 border-yellow-200' },
-      { value: 'severe', label_en: 'Severe difficulty', label_si: 'දරුණු අපහසුතාව', icon: '🚨', color: 'bg-red-50 border-red-200', emergencyTrigger: true },
-      { value: 'noisy', label_en: 'Noisy/wheezing', label_si: 'ශබ්දකාරී/හුස්ම ගැහීම', icon: '🫁', color: 'bg-orange-50 border-orange-200' },
-    ],
-    conditionalNext: { severe: 'emergency' },
-    defaultNext: 'q7',
-  },
-  {
-    id: 'q7',
-    text_en: 'How is your pet\'s mobility?',
-    text_si: 'ඔබේ සතාගේ චලනය කෙසේද?',
-    type: 'choice',
+      { value: 'yes', label_en: 'Yes', label_si: 'ඔව්', icon: '✅', color: 'bg-green-50 border-green-200' },
+      { value: 'no', label_en: 'No', label_si: 'නැත', icon: '❌', color: 'bg-red-50 border-red-200' },
+      { value: 'not_sure', label_en: 'Not Sure', label_si: 'විශ්වාස නැත', icon: '🤷', color: 'bg-gray-50 border-gray-200' },
+    ] },
+  { code: 'SD3_SKIN', text_en: 'Is there itching or scratching?', text_si: 'කැසීමක් හෝ긁ීමක් තිබේද?', type: 'single', step: 3, visibleWhen: { SD1: 'skin' },
     options: [
-      { value: 'normal', label_en: 'Moving freely', label_si: 'නිදහසේ ගමන් කරමින්', icon: '🏃', color: 'bg-green-50 border-green-200' },
-      { value: 'limping', label_en: 'Limping slightly', label_si: 'සුළු ලෙස කොර ගැසීම', icon: '🦿', color: 'bg-yellow-50 border-yellow-200' },
-      { value: 'stiff', label_en: 'Stiff movements', label_si: 'තද චලනයන්', icon: '🤖', color: 'bg-orange-50 border-orange-200' },
-      { value: 'unable', label_en: 'Unable to stand', label_si: 'සිටගත නොහැක', icon: '🚨', color: 'bg-red-50 border-red-200' },
-    ],
-    defaultNext: 'q8',
-  },
-  {
-    id: 'q8',
-    text_en: 'Any eye or ear discharge?',
-    text_si: 'ඇස් හෝ කන් ස්‍රාවයක්?',
-    type: 'choice',
+      { value: 'yes', label_en: 'Yes', label_si: 'ඔව්', icon: '✅', color: 'bg-green-50 border-green-200' },
+      { value: 'no', label_en: 'No', label_si: 'නැත', icon: '❌', color: 'bg-red-50 border-red-200' },
+      { value: 'not_sure', label_en: 'Not Sure', label_si: 'විශ්වාස නැත', icon: '🤷', color: 'bg-gray-50 border-gray-200' },
+    ] },
+  { code: 'SD4_SKIN', text_en: 'Is there redness or wounds?', text_si: 'රතු පැහැයක් හෝ තුවාල තිබේද?', type: 'single', step: 3, visibleWhen: { SD1: 'skin' },
     options: [
-      { value: 'none', label_en: 'No discharge', label_si: 'ස්‍රාවයක් නැත', icon: '✅', color: 'bg-green-50 border-green-200' },
-      { value: 'eye', label_en: 'Eye discharge', label_si: 'ඇස් ස්‍රාවය', icon: '👁️', color: 'bg-yellow-50 border-yellow-200' },
-      { value: 'ear', label_en: 'Ear discharge', label_si: 'කන් ස්‍රාවය', icon: '👂', color: 'bg-yellow-50 border-yellow-200' },
-      { value: 'both', label_en: 'Both eyes and ears', label_si: 'ඇස් සහ කන් දෙකම', icon: '⚠️', color: 'bg-orange-50 border-orange-200' },
-    ],
-    defaultNext: 'q9',
-  },
-  {
-    id: 'q9',
-    text_en: 'Has your pet been around other sick animals?',
-    text_si: 'ඔබේ සතා වෙනත් රෝගී සතුන් අතර සිටියාද?',
-    type: 'yesno',
+      { value: 'yes', label_en: 'Yes, redness', label_si: 'ඔව්, රතු පැහැය', icon: '🔴', color: 'bg-red-50 border-red-200' },
+      { value: 'wounds', label_en: 'Yes, open wounds', label_si: 'ඔව්, විවෘත තුවාල', icon: '🩹', color: 'bg-red-50 border-red-200' },
+      { value: 'both', label_en: 'Both redness and wounds', label_si: 'රතු පැහැය සහ තුවාල දෙකම', icon: '⚠️', color: 'bg-orange-50 border-orange-200' },
+      { value: 'no', label_en: 'No', label_si: 'නැත', icon: '❌', color: 'bg-green-50 border-green-200' },
+    ] },
+
+  /* Vomiting */
+  { code: 'SD2_VOM', text_en: 'How many times has your pet vomited?', text_si: 'ඔබේ සතා කී වතාවක් වමනය කළේද?', type: 'single', step: 3, visibleWhen: { SD1: 'vomiting' },
     options: [
-      { value: 'no', label_en: 'No contact', label_si: 'සම්බන්ධයක් නැත', icon: '🏠', color: 'bg-green-50 border-green-200' },
-      { value: 'yes', label_en: 'Yes, recently', label_si: 'ඔව්, මෑතදී', icon: '⚠️', color: 'bg-yellow-50 border-yellow-200' },
-      { value: 'unsure', label_en: 'Not sure', label_si: 'විශ්වාස නැත', icon: '🤷', color: 'bg-blue-50 border-blue-200' },
-      { value: 'park', label_en: 'Dog park/boarding', label_si: 'සුනඛ උද්‍යානය', icon: '🌳', color: 'bg-green-50 border-green-200' },
-    ],
-    defaultNext: 'q10',
-  },
-  {
-    id: 'q10',
-    text_en: 'When did the symptoms first appear?',
-    text_si: 'රෝග ලක්ෂණ මුලින්ම පෙනී ආවේ කවදාද?',
-    type: 'choice',
+      { value: 'once', label_en: 'Once', label_si: 'එක් වරක්', icon: '1️⃣', color: 'bg-green-50 border-green-200' },
+      { value: 'two_three', label_en: '2-3 times', label_si: 'වාර 2-3ක්', icon: '⚠️', color: 'bg-yellow-50 border-yellow-200' },
+      { value: 'more', label_en: 'More than 3 times', label_si: 'වාර 3ට වඩා', icon: '🔴', color: 'bg-orange-50 border-orange-200' },
+      { value: 'continuous', label_en: 'Continuously', label_si: 'නොනවත්වා', icon: '🚨', color: 'bg-red-50 border-red-200' },
+    ] },
+  { code: 'SD3_VOM', text_en: 'Is there blood in the vomit?', text_si: 'වමනයේ ලේ තිබේද?', type: 'single', step: 3, visibleWhen: { SD1: 'vomiting' }, emergency: true,
     options: [
-      { value: 'today', label_en: 'Today', label_si: 'අද', icon: '📅', color: 'bg-blue-50 border-blue-200' },
-      { value: 'days', label_en: '2-3 days ago', label_si: 'දින 2-3 කට පෙර', icon: '📆', color: 'bg-yellow-50 border-yellow-200' },
+      { value: 'yes', label_en: 'Yes', label_si: 'ඔව්', icon: '🚨', color: 'bg-red-50 border-red-200', emergencyTrigger: true },
+      { value: 'no', label_en: 'No', label_si: 'නැත', icon: '✅', color: 'bg-green-50 border-green-200' },
+    ] },
+  { code: 'SD4_VOM', text_en: 'Is your pet eating normally?', text_si: 'ඔබේ සතා සාමාන්‍යයෙන් ආහාර ගනීද?', type: 'single', step: 3, visibleWhen: { SD1: 'vomiting' },
+    options: [
+      { value: 'yes', label_en: 'Yes, eating normally', label_si: 'ඔව්, සාමාන්‍යයෙන් කයි', icon: '✅', color: 'bg-green-50 border-green-200' },
+      { value: 'less', label_en: 'Eating less', label_si: 'අඩුවෙන් කයි', icon: '⚠️', color: 'bg-yellow-50 border-yellow-200' },
+      { value: 'nothing', label_en: 'Not eating at all', label_si: 'කිසිවක් නොකයි', icon: '🚫', color: 'bg-red-50 border-red-200' },
+    ] },
+
+  /* Diarrhea */
+  { code: 'SD2_DIA', text_en: 'Is the stool watery?', text_si: 'මලය ජලමය ද?', type: 'single', step: 3, visibleWhen: { SD1: 'diarrhea' },
+    options: [
+      { value: 'yes', label_en: 'Yes, very watery', label_si: 'ඔව්, ඉතා ජලමය', icon: '💧', color: 'bg-blue-50 border-blue-200' },
+      { value: 'soft', label_en: 'Soft but not watery', label_si: 'මෘදු නමුත් ජලමය නැත', icon: '⚠️', color: 'bg-yellow-50 border-yellow-200' },
+      { value: 'mucus', label_en: 'Has mucus', label_si: 'ශ්ලේෂ්මය ඇත', icon: '🔴', color: 'bg-orange-50 border-orange-200' },
+    ] },
+  { code: 'SD3_DIA', text_en: 'Is there blood in the stool?', text_si: 'මලයේ ලේ තිබේද?', type: 'single', step: 3, visibleWhen: { SD1: 'diarrhea' },
+    options: [
+      { value: 'yes', label_en: 'Yes', label_si: 'ඔව්', icon: '🚨', color: 'bg-red-50 border-red-200' },
+      { value: 'no', label_en: 'No', label_si: 'නැත', icon: '✅', color: 'bg-green-50 border-green-200' },
+    ] },
+  { code: 'SD4_DIA', text_en: 'Does your pet seem weak or dehydrated?', text_si: 'ඔබේ සතා දුර්වල හෝ විජලනය වී පෙනේද?', type: 'single', step: 3, visibleWhen: { SD1: 'diarrhea' },
+    options: [
+      { value: 'yes', label_en: 'Yes', label_si: 'ඔව්', icon: '⚠️', color: 'bg-red-50 border-red-200' },
+      { value: 'no', label_en: 'No', label_si: 'නැත', icon: '✅', color: 'bg-green-50 border-green-200' },
+      { value: 'not_sure', label_en: 'Not Sure', label_si: 'විශ්වාස නැත', icon: '🤷', color: 'bg-gray-50 border-gray-200' },
+    ] },
+
+  /* Coughing */
+  { code: 'SD2_COU', text_en: 'Is the cough dry or wet?', text_si: 'කැස්ස වියළි ද තෙත් ද?', type: 'single', step: 3, visibleWhen: { SD1: 'coughing' },
+    options: [
+      { value: 'dry', label_en: 'Dry cough', label_si: 'වියළි කැස්ස', icon: '🌵', color: 'bg-yellow-50 border-yellow-200' },
+      { value: 'wet', label_en: 'Wet / productive cough', label_si: 'තෙත් කැස්ස', icon: '💧', color: 'bg-blue-50 border-blue-200' },
+      { value: 'not_sure', label_en: 'Not Sure', label_si: 'විශ්වාස නැත', icon: '🤷', color: 'bg-gray-50 border-gray-200' },
+    ] },
+  { code: 'SD3_COU', text_en: 'Is there difficulty breathing?', text_si: 'හුස්ම ගැනීමේ අපහසුතාවක් තිබේද?', type: 'single', step: 3, visibleWhen: { SD1: 'coughing' }, emergency: true,
+    options: [
+      { value: 'yes', label_en: 'Yes', label_si: 'ඔව්', icon: '🚨', color: 'bg-red-50 border-red-200', emergencyTrigger: true },
+      { value: 'no', label_en: 'No', label_si: 'නැත', icon: '✅', color: 'bg-green-50 border-green-200' },
+    ] },
+
+  /* Injury */
+  { code: 'SD2_INJ', text_en: 'Where is the injury located?', text_si: 'තුවාලය පිහිටා ඇත්තේ කොතැනද?', type: 'text', step: 3, visibleWhen: { SD1: 'injury' }, options: [] },
+  { code: 'SD3_INJ', text_en: 'Is your pet limping?', text_si: 'ඔබේ සතා කොරගැසෙනවාද?', type: 'single', step: 3, visibleWhen: { SD1: 'injury' },
+    options: [
+      { value: 'yes', label_en: 'Yes', label_si: 'ඔව්', icon: '🦿', color: 'bg-yellow-50 border-yellow-200' },
+      { value: 'no', label_en: 'No', label_si: 'නැත', icon: '✅', color: 'bg-green-50 border-green-200' },
+    ] },
+  { code: 'SD4_INJ', text_en: 'Is there heavy bleeding or visible bone?', text_si: 'අධික ලේ ගැලීමක් හෝ පෙනෙන ඇටයක් තිබේද?', type: 'single', step: 3, visibleWhen: { SD1: 'injury' }, emergency: true,
+    options: [
+      { value: 'yes', label_en: 'Yes', label_si: 'ඔව්', icon: '🚨', color: 'bg-red-50 border-red-200', emergencyTrigger: true },
+      { value: 'no', label_en: 'No', label_si: 'නැත', icon: '✅', color: 'bg-green-50 border-green-200' },
+    ] },
+
+  /* Loss of Appetite */
+  { code: 'SD2_APP', text_en: 'How long has the appetite loss lasted?', text_si: 'ආහාර රුචිය නැතිවීම කොපමණ කාලයක් ද?', type: 'single', step: 3, visibleWhen: { SD1: 'appetite_loss' },
+    options: [
+      { value: 'today', label_en: 'Just today', label_si: 'අද පමණි', icon: '📅', color: 'bg-blue-50 border-blue-200' },
+      { value: 'few_days', label_en: 'A few days', label_si: 'දින කිහිපයක්', icon: '📆', color: 'bg-yellow-50 border-yellow-200' },
       { value: 'week', label_en: 'About a week', label_si: 'සතියක් පමණ', icon: '🗓️', color: 'bg-orange-50 border-orange-200' },
       { value: 'longer', label_en: 'More than a week', label_si: 'සතියකට වඩා', icon: '⏳', color: 'bg-red-50 border-red-200' },
-    ],
-    defaultNext: 'q11',
-  },
-  {
-    id: 'q11',
-    text_en: 'Is your pet up to date on vaccinations?',
-    text_si: 'ඔබේ සතාගේ එන්නත් යාවත්කාලීනද?',
-    type: 'yesno',
+    ] },
+  { code: 'SD3_APP', text_en: 'Is there also vomiting or diarrhea?', text_si: 'වමනය හෝ පාචනය ද තිබේද?', type: 'single', step: 3, visibleWhen: { SD1: 'appetite_loss' },
     options: [
-      { value: 'yes', label_en: 'Yes, fully vaccinated', label_si: 'ඔව්, සම්පූර්ණයෙන් එන්නත්', icon: '💉', color: 'bg-green-50 border-green-200' },
-      { value: 'partial', label_en: 'Partially', label_si: 'අර්ධ වශයෙන්', icon: '⚠️', color: 'bg-yellow-50 border-yellow-200' },
-      { value: 'no', label_en: 'No vaccinations', label_si: 'එන්නත් නැත', icon: '❌', color: 'bg-red-50 border-red-200' },
-      { value: 'unsure', label_en: 'Not sure', label_si: 'විශ්වාස නැත', icon: '🤷', color: 'bg-blue-50 border-blue-200' },
-    ],
-    defaultNext: 'q12',
-  },
-  {
-    id: 'q12',
-    text_en: 'Any recent changes to diet or environment?',
-    text_si: 'ආහාර හෝ පරිසරයේ මෑත වෙනස්කම්?',
-    type: 'choice',
+      { value: 'vomiting', label_en: 'Yes, vomiting', label_si: 'ඔව්, වමනය', icon: '🤮', color: 'bg-yellow-50 border-yellow-200' },
+      { value: 'diarrhea', label_en: 'Yes, diarrhea', label_si: 'ඔව්, පාචනය', icon: '💩', color: 'bg-yellow-50 border-yellow-200' },
+      { value: 'both', label_en: 'Both', label_si: 'දෙකම', icon: '⚠️', color: 'bg-orange-50 border-orange-200' },
+      { value: 'neither', label_en: 'Neither', label_si: 'එකක්වත් නැත', icon: '✅', color: 'bg-green-50 border-green-200' },
+    ] },
+
+  /* Other */
+  { code: 'SD2_OTHER', text_en: 'Please describe the symptoms you have noticed.', text_si: 'ඔබ දුටු රෝග ලක්ෂණ විස්තර කරන්න.', type: 'text', step: 3, visibleWhen: { SD1: 'other' }, options: [] },
+
+  /* Step 4: Global */
+  { code: 'SD5', text_en: 'How long has this problem been happening?', text_si: 'මෙම ගැටලුව කොපමණ කාලයක් තිස්සේ පවතීද?', type: 'single', step: 4,
     options: [
-      { value: 'none', label_en: 'No changes', label_si: 'වෙනස්කම් නැත', icon: '✅', color: 'bg-green-50 border-green-200' },
-      { value: 'food', label_en: 'New food/treats', label_si: 'නව ආහාර/treat', icon: '🍖', color: 'bg-yellow-50 border-yellow-200' },
-      { value: 'move', label_en: 'Moved/new home', label_si: 'ගෙදර මාරු වීම', icon: '🏠', color: 'bg-blue-50 border-blue-200' },
-      { value: 'both', label_en: 'Multiple changes', label_si: 'බහු වෙනස්කම්', icon: '🔄', color: 'bg-orange-50 border-orange-200' },
-    ],
-    defaultNext: 'complete',
-  },
+      { value: 'today', label_en: 'Just today', label_si: 'අද පමණි', icon: '📅', color: 'bg-blue-50 border-blue-200' },
+      { value: 'few_days', label_en: '2-3 days', label_si: 'දින 2-3ක්', icon: '📆', color: 'bg-yellow-50 border-yellow-200' },
+      { value: 'week', label_en: 'About a week', label_si: 'සතියක් පමණ', icon: '🗓️', color: 'bg-orange-50 border-orange-200' },
+      { value: 'longer', label_en: 'More than a week', label_si: 'සතියකට වඩා', icon: '⏳', color: 'bg-red-50 border-red-200' },
+    ] },
+  { code: 'SD6', text_en: 'How severe would you say the symptoms are?', text_si: 'රෝග ලක්ෂණ කෙතරම් දරුණු ද?', type: 'single', step: 4,
+    options: [
+      { value: 'mild', label_en: 'Mild', label_si: 'සැහැල්ලු', icon: '🟢', color: 'bg-green-50 border-green-200' },
+      { value: 'moderate', label_en: 'Moderate', label_si: 'මධ්‍යම', icon: '🟡', color: 'bg-yellow-50 border-yellow-200' },
+      { value: 'severe', label_en: 'Severe', label_si: 'දරුණු', icon: '🔴', color: 'bg-red-50 border-red-200' },
+    ] },
+  { code: 'SD7', text_en: "Has your pet's behaviour changed?", text_si: 'ඔබේ සතාගේ හැසිරීම වෙනස් වී තිබේද?', type: 'single', step: 4,
+    options: [
+      { value: 'yes', label_en: 'Yes', label_si: 'ඔව්', icon: '⚠️', color: 'bg-yellow-50 border-yellow-200' },
+      { value: 'no', label_en: 'No', label_si: 'නැත', icon: '✅', color: 'bg-green-50 border-green-200' },
+      { value: 'not_sure', label_en: 'Not Sure', label_si: 'විශ්වාස නැත', icon: '🤷', color: 'bg-gray-50 border-gray-200' },
+    ] },
 ];
 
-export const EMERGENCY_TRIGGERS = [
-  'blood_in_vomit',
-  'difficulty_breathing',
-  'unconscious',
-  'severe_bleeding',
-  'suspected_poisoning',
-  'seizure',
-  'blood',
-  'severe',
-];
+/* Emergency trigger rules: { questionCode: triggerValue } */
+export const EMERGENCY_RULES = {
+  SD3_VOM: 'yes',  // blood in vomit
+  SD3_COU: 'yes',  // difficulty breathing
+  SD4_INJ: 'yes',  // heavy bleeding / visible bone
+};
 
 export const recentActivity = [
   { icon: '📋', title: 'New Health Report Available', subtitle: 'Diagnosis report for Luna is ready to view.', time: '2h ago' },
