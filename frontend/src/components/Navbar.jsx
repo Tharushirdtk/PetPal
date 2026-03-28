@@ -168,7 +168,7 @@ const Navbar = ({ variant = 'default' }) => {
         </Link>
         <div className="hidden md:flex items-center gap-8">
           <Link to="/dashboard" className={`text-sm font-medium no-underline ${isActive('/dashboard') ? 'text-[#7C3AED]' : 'text-gray-600 hover:text-[#7C3AED]'} transition-colors`}>{t('nav_my_pets')}</Link>
-          <Link to="/chat" className={`text-sm font-medium no-underline ${isActive('/chat') ? 'text-[#7C3AED]' : 'text-gray-600 hover:text-[#7C3AED]'} transition-colors`}>{t('nav_diagnosis')}</Link>
+          <Link to="/questionnaire" className={`text-sm font-medium no-underline ${isActive('/questionnaire') || isActive('/chat') ? 'text-[#7C3AED]' : 'text-gray-600 hover:text-[#7C3AED]'} transition-colors`}>{t('nav_diagnosis')}</Link>
           <Link to="/" className={`text-sm font-medium no-underline ${isActive('/vets') ? 'text-[#7C3AED]' : 'text-gray-600 hover:text-[#7C3AED]'} transition-colors`}>{t('nav_vets')}</Link>
           <Link to="/" className={`text-sm font-medium no-underline ${isActive('/library') ? 'text-[#7C3AED]' : 'text-gray-600 hover:text-[#7C3AED]'} transition-colors`}>{t('nav_library')}</Link>
         </div>
@@ -194,7 +194,7 @@ const Navbar = ({ variant = 'default' }) => {
       {mobileOpen && (
         <div className="md:hidden border-t border-[#E5E7EB] bg-white px-6 py-4 flex flex-col gap-3">
           <Link to="/dashboard" className="text-sm font-medium text-gray-600 no-underline">{t('nav_my_pets')}</Link>
-          <Link to="/chat" className="text-sm font-medium text-gray-600 no-underline">{t('nav_diagnosis')}</Link>
+          <Link to="/questionnaire" className="text-sm font-medium text-gray-600 no-underline">{t('nav_diagnosis')}</Link>
           <Link to="/" className="text-sm font-medium text-gray-600 no-underline">{t('nav_vets')}</Link>
           <Link to="/" className="text-sm font-medium text-gray-600 no-underline">{t('nav_library')}</Link>
           {isAuthenticated && (

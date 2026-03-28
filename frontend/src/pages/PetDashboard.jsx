@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
-import { Plus, Camera, ChevronRight, Calendar, Activity, FileText, Pencil, Trash2 } from 'lucide-react';
+import { Link, useNavigate } from 'react-router-dom';
+import { Plus, Camera, ChevronRight, Calendar, Activity, FileText, Pencil, Trash2, Stethoscope } from 'lucide-react';
 import { useLang } from '../i18n/LanguageContext';
 import { useAuth } from '../context/AuthContext';
 import { usePets } from '../hooks/usePets';
@@ -49,6 +49,7 @@ const PetDashboard = () => {
   const [editingPet, setEditingPet] = useState(null);
   const [deletingPet, setDeletingPet] = useState(null);
   const [formLoading, setFormLoading] = useState(false);
+  const navigate = useNavigate();
 
   const handleAddPet = async (data) => {
     setFormLoading(true);
@@ -177,6 +178,13 @@ const PetDashboard = () => {
                         {t('dashboard_view_profile')}
                       </Link>
                       <div className="flex items-center gap-2">
+                        <button
+                          onClick={() => navigate(`/questionnaire?pet_id=${pet.id}`)}
+                          className="w-9 h-9 rounded-full border border-[#E5E7EB] flex items-center justify-center text-gray-400 hover:text-green-600 hover:border-green-400 transition-colors cursor-pointer"
+                          title="Diagnose pet"
+                        >
+                          <Stethoscope className="w-4 h-4" />
+                        </button>
                         <button
                           onClick={() => setEditingPet(pet)}
                           className="w-9 h-9 rounded-full border border-[#E5E7EB] flex items-center justify-center text-gray-400 hover:text-[#7C3AED] hover:border-[#7C3AED] transition-colors cursor-pointer"

@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import {
   ChevronLeft,
   ChevronRight,
@@ -14,7 +14,7 @@ import { useAuth } from '../context/AuthContext';
 import { useConsultation } from '../context/ConsultationContext';
 import { useStartConsultation } from '../hooks/useConsultation';
 import { getActiveQuestionnaire, submitResponse, saveContext } from '../api/questionnaire';
-import { getSpecies, getBreeds } from '../api/pets';
+import { getSpecies, getBreeds, getMyPets } from '../api/pets';
 import { questionFlow, EMERGENCY_RULES } from '../data/mockData';
 import Navbar from '../components/Navbar';
 import LoadingSpinner from '../components/LoadingSpinner';
@@ -105,17 +105,26 @@ const isVisible = (question, answers, usingMock) => {
 
 /* ── SD1 symptom icons ── */
 const SD1_ICONS = {
-  skin: '🐾', vomiting: '🤮', diarrhea: '💩', coughing: '🫁',
-  injury: '🩹', appetite_loss: '🍽️', other: '❓',
+  skin: '\uD83D\uDC3E', vomiting: '\uD83E\uDD2E', diarrhea: '\uD83D\uDCA9', coughing: '\uD83E\uDEC1',
+  injury: '\uD83E\uDE79', appetite_loss: '\uD83C\uDF7D\uFE0F', other: '\u2753',
+};
+
+/* ── Species emoji for selected pet banner ── */
+const speciesEmoji = (name) => {
+  const map = { dog: '\uD83D\uDC15', cat: '\uD83D\uDC08' };
+  return map[name] || '\uD83D\uDC3E';
 };
 
 /* ════════════════════════════════════════════════════════════════ */
 const QuestionnairePage = () => {
   const { t, lang } = useLang();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const { consultationId, savePetInfo } = useConsultation();
   const { isAuthenticated } = useAuth(); // eslint-disable-line no-unused-vars
   const { start: startNewConsultation } = useStartConsultation();
+
+  const petIdFromUrl = searchParams.get('pet_id');
 
   /* ── Core state ── */
   const [allQuestions, setAllQuestions] = useState([]);
@@ -136,13 +145,60 @@ const QuestionnairePage = () => {
   const [loadingBreeds, setLoadingBreeds] = useState(false);
   const [petBreedId, setPetBreedId] = useState('');
   const [petBreedName, setPetBreedName] = useState('');
+  const [selectedPet, setSelectedPet] = useState(null);
 
   /* ── Auto-create consultation if needed ── */
   useEffect(() => {
     if (!consultationId) {
-      startNewConsultation({ guest_handle: `guest_${Date.now()}` }).catch(() => {});
+      const opts = petIdFromUrl
+        ? { pet_id: Number(petIdFromUrl) }
+        : { guest_handle: `guest_${Date.now()}` };
+      startNewConsultation(opts).catch(() => {});
     }
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  /* ── Fetch selected pet data and pre-fill answers ── */
+  useEffect(() => {
+    if (!petIdFromUrl) return;
+    let cancelled = false;
+    getMyPets()
+      .then((res) => {
+        if (cancelled) return;
+        const pets = res.data?.pets || [];
+        const pet = pets.find((p) => String(p.id) === petIdFromUrl);
+        if (!pet) return;
+        setSelectedPet(pet);
+
+        // Pre-fill answers from pet data
+        const prefilled = {};
+        const speciesName = (pet.species?.name || '').toLowerCase();
+        if (speciesName === 'dog' || speciesName === 'cat') {
+          prefilled.P1 = speciesName;
+        }
+        if (pet.birth_year) {
+          prefilled.P2 = String(new Date().getFullYear() - pet.birth_year);
+        }
+        if (pet.gender && pet.gender !== 'Unknown') {
+          prefilled.P3 = pet.gender.toLowerCase();
+        }
+        if (pet.is_neutered !== undefined && pet.is_neutered !== null) {
+          prefilled.P4 = pet.is_neutered ? 'yes' : 'no';
+        }
+        if (pet.is_vaccinated !== undefined && pet.is_vaccinated !== null) {
+          prefilled.P5 = pet.is_vaccinated ? 'yes' : 'no';
+        }
+
+        setAnswers((prev) => ({ ...prefilled, ...prev }));
+
+        // Pre-fill breed
+        if (pet.breed) {
+          setPetBreedId(String(pet.breed.id || ''));
+          setPetBreedName(pet.breed.name || '');
+        }
+      })
+      .catch(() => {});
+    return () => { cancelled = true; };
+  }, [petIdFromUrl]);
 
   /* ── Load questionnaire ── */
   useEffect(() => {
@@ -622,6 +678,23 @@ const QuestionnairePage = () => {
             </p>
           </div>
         </div>
+
+        {/* Selected pet banner */}
+        {selectedPet && (
+          <div className="bg-purple-50 border border-purple-200 rounded-xl p-3 mb-4 flex items-center gap-3">
+            <div className="w-8 h-8 rounded-full bg-white flex items-center justify-center text-lg">
+              {speciesEmoji((selectedPet.species?.name || '').toLowerCase())}
+            </div>
+            <div>
+              <p className="text-sm font-semibold text-gray-900">
+                Diagnosing: {selectedPet.name}
+              </p>
+              <p className="text-xs text-gray-500">
+                {selectedPet.species?.name}{selectedPet.breed?.name ? ` \u2022 ${selectedPet.breed.name}` : ''}
+              </p>
+            </div>
+          </div>
+        )}
 
         {/* Loading */}
         {loading && (
