@@ -38,9 +38,11 @@ const ChatbotPage = () => {
   const [diagnosisData, setDiagnosisData] = useState(null);
   const [expandedPets, setExpandedPets] = useState(new Set());
   const [petGroups, setPetGroups] = useState([]);
+  const [selectedPetData, setSelectedPetData] = useState(null);
 
   const messagesEndRef = useRef(null);
   const welcomeSentRef = useRef(false);
+  const petDataMapRef = useRef({});
 
   /* ── Auto-scroll ── */
   useEffect(() => {
@@ -149,9 +151,13 @@ const ChatbotPage = () => {
         if (cancelled) return;
         const list = res.data?.consultations || res.data || [];
 
+        // Filter out consultations with no messages (blank chats)
+        const nonEmpty = list.filter((item) => Number(item.message_count) > 0);
+
         // Group by pet_name
         const grouped = {};
-        list.forEach((item) => {
+        const petDataMap = {};
+        nonEmpty.forEach((item) => {
           const pet = item.pet_name || `Consultation #${item.id}`;
           if (!grouped[pet]) grouped[pet] = [];
           grouped[pet].push({
@@ -161,6 +167,13 @@ const ChatbotPage = () => {
             primaryLabel: item.primary_label || '',
             active: item.id === consultationId,
           });
+          // Store pet details per consultation for right panel
+          petDataMap[item.id] = {
+            name: item.pet_name || '',
+            species: item.species_name || '',
+            statusName: item.status_name || '',
+            primaryLabel: item.primary_label || '',
+          };
         });
 
         const groups = Object.entries(grouped).map(([petName, consultations]) => ({
@@ -168,6 +181,14 @@ const ChatbotPage = () => {
           consultations,
         }));
         setPetGroups(groups);
+
+        // Set selected pet data for current consultation
+        if (consultationId && petDataMap[consultationId]) {
+          setSelectedPetData(petDataMap[consultationId]);
+        }
+
+        // Store the map for use when switching
+        petDataMapRef.current = petDataMap;
 
         // Auto-expand the group containing the active consultation
         const activeGroup = groups.find((g) => g.consultations.some((c) => c.active));
@@ -249,6 +270,10 @@ const ChatbotPage = () => {
       const res = await getChatHistory(targetConsultationId);
       const convId = res.data?.conversation_id;
       if (convId) {
+        // Update right panel with selected consultation's pet data
+        if (petDataMapRef.current[targetConsultationId]) {
+          setSelectedPetData(petDataMapRef.current[targetConsultationId]);
+        }
         startSession({
           consultation_id: targetConsultationId,
           conversation_id: convId,
@@ -259,14 +284,21 @@ const ChatbotPage = () => {
     }
   };
 
-  /* ── Pet info for right sidebar (from questionnaire context) ── */
-  const petName = petInfo?.breed || petInfo?.type || 'Your Pet';
-  const petType = petInfo?.type || '';
-  const petBreed = petInfo?.breed || 'Unknown Breed';
-  const petAge = petInfo?.age || '?';
-  const petGender = petInfo?.gender || '';
-  const petVaccinated = petInfo?.vaccinated;
-  const petEmoji = petType === 'cat' ? '\u{1F431}' : petType === 'dog' ? '\u{1F436}' : '\u{1F43E}';
+  /* ── Pet info for right sidebar ── */
+  // Use selectedPetData (from switching consultations) or petInfo (from questionnaire)
+  const displayPetName = selectedPetData?.name || petInfo?.breed || petInfo?.type || 'Your Pet';
+  const displaySpecies = selectedPetData?.species || petInfo?.type || '';
+  const displayBreed = petInfo?.breed || '';
+  const displayAge = petInfo?.age || '';
+  const displayGender = petInfo?.gender || '';
+  const displayVaccinated = petInfo?.vaccinated;
+  const displayStatus = selectedPetData?.statusName || '';
+  const displayDiagnosis = selectedPetData?.primaryLabel || '';
+  const petEmoji = displaySpecies === 'Cat' || displaySpecies === 'cat'
+    ? '\u{1F431}'
+    : displaySpecies === 'Dog' || displaySpecies === 'dog'
+    ? '\u{1F436}'
+    : '\u{1F43E}';
 
   const togglePetGroup = (petName) => {
     setExpandedPets((prev) => {
@@ -554,29 +586,6 @@ const ChatbotPage = () => {
 
           {/* Bottom input area */}
           <div className="bg-[#F9FAFB] px-6 pb-5">
-            {/* Finish & Get Report button */}
-            {!diagnosisData && consultationId && messages.length > 0 && (
-              <div className="mb-3">
-                <button
-                  onClick={handleFinishAndReport}
-                  disabled={isTyping}
-                  className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-gradient-to-r from-[#7C3AED] to-[#9333EA] text-white text-sm font-semibold hover:from-[#6D28D9] hover:to-[#7C3AED] transition-all shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  {isTyping ? (
-                    <>
-                      <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                      {t('chat_finishing')}
-                    </>
-                  ) : (
-                    <>
-                      <FileText size={16} />
-                      {t('chat_finish_report')}
-                    </>
-                  )}
-                </button>
-              </div>
-            )}
-
             {/* Input bar */}
             <div className="flex items-center gap-3 bg-white rounded-xl border border-gray-200 px-4 py-3 shadow-sm">
               <input
@@ -596,60 +605,97 @@ const ChatbotPage = () => {
                 <ArrowRight size={16} />
               </button>
             </div>
+
+            {/* Finish & Get Report button — below input */}
+            {!diagnosisData && consultationId && messages.length > 0 && (
+              <button
+                onClick={handleFinishAndReport}
+                disabled={isTyping}
+                className="w-full mt-3 flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl border-2 border-[#7C3AED] text-[#7C3AED] text-sm font-semibold hover:bg-[#7C3AED] hover:text-white transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {isTyping ? (
+                  <>
+                    <div className="w-4 h-4 border-2 border-[#7C3AED]/30 border-t-[#7C3AED] rounded-full animate-spin" />
+                    {t('chat_finishing')}
+                  </>
+                ) : (
+                  <>
+                    <FileText size={16} />
+                    {t('chat_finish_report')}
+                  </>
+                )}
+              </button>
+            )}
           </div>
         </>
         )}
       </section>
 
-      {/* ═══════ RIGHT PANEL — dynamic pet info ═══════ */}
+      {/* ═══════ RIGHT PANEL — pet info ═══════ */}
       <aside className="hidden xl:flex flex-col w-72 bg-white border-l border-[#E5E7EB] overflow-y-auto p-4">
         {/* Pet avatar */}
-        <div className="h-44 rounded-2xl bg-gradient-to-br from-purple-100 to-pink-100 flex items-center justify-center text-5xl mb-4">
+        <div className="h-36 rounded-2xl bg-gradient-to-br from-purple-100 to-pink-100 flex items-center justify-center text-5xl mb-4">
           {petEmoji}
         </div>
 
-        {/* Pet info from questionnaire */}
-        <h3 className="text-lg font-bold text-gray-900">{petName}</h3>
-        <p className="text-xs font-semibold uppercase tracking-wider text-gray-400 mt-0.5">
-          {petBreed.toUpperCase()}
-        </p>
-        <span className="inline-flex items-center gap-1 mt-2 px-3 py-1 rounded-full bg-purple-50 text-purple-600 text-xs font-medium w-fit">
-          {petAge} {petAge === '1' ? 'year' : 'years'}
-        </span>
-
-        {petGender && (
-          <span className="inline-flex items-center gap-1 mt-1.5 px-3 py-1 rounded-full bg-blue-50 text-blue-600 text-xs font-medium w-fit capitalize">
-            {petGender}
-          </span>
+        {/* Pet info */}
+        <h3 className="text-lg font-bold text-gray-900">{displayPetName}</h3>
+        {displayBreed && (
+          <p className="text-xs font-semibold uppercase tracking-wider text-gray-400 mt-0.5">
+            {displayBreed.toUpperCase()}
+          </p>
+        )}
+        {displaySpecies && !displayBreed && (
+          <p className="text-xs font-semibold uppercase tracking-wider text-gray-400 mt-0.5">
+            {displaySpecies.toUpperCase()}
+          </p>
         )}
 
-        <div className="mt-3">
-          <StatusBadge status={petInfo ? 'pending' : 'healthy'} />
+        <div className="flex flex-wrap gap-1.5 mt-2">
+          {displayAge && (
+            <span className="inline-flex items-center px-3 py-1 rounded-full bg-purple-50 text-purple-600 text-xs font-medium">
+              {displayAge} {displayAge === '1' ? 'year' : 'years'}
+            </span>
+          )}
+          {displayGender && (
+            <span className="inline-flex items-center px-3 py-1 rounded-full bg-blue-50 text-blue-600 text-xs font-medium capitalize">
+              {displayGender}
+            </span>
+          )}
         </div>
 
-        {/* Medical Snapshot */}
-        <p className="mt-6 text-xs font-semibold uppercase tracking-wider text-gray-400">
-          {t('chat_medical_snapshot')}
-        </p>
+        <div className="mt-3">
+          <StatusBadge status={
+            diagnosisData ? 'completed'
+              : displayStatus === 'completed' ? 'completed'
+              : (petInfo || selectedPetData) ? 'pending'
+              : 'healthy'
+          } />
+        </div>
 
-        <div className="mt-3 space-y-3">
-          {/* Vaccines */}
-          <div className="flex items-center justify-between">
-            <span className="text-sm text-gray-600">{t('chat_vaccines')}</span>
-            <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold border ${
-              petVaccinated === 'yes'
-                ? 'bg-green-50 text-green-700 border-green-200'
-                : petVaccinated === 'no'
-                ? 'bg-red-50 text-red-600 border-red-200'
-                : 'bg-gray-50 text-gray-500 border-gray-200'
-            }`}>
-              {petVaccinated === 'yes' ? (t('chat_current') || 'CURRENT')
-                : petVaccinated === 'no' ? 'NOT CURRENT'
-                : 'UNKNOWN'}
-            </span>
+        {/* Diagnosis result */}
+        {(diagnosisData?.condition || displayDiagnosis) && (
+          <div className="mt-4 bg-purple-50 rounded-xl p-3">
+            <p className="text-xs font-semibold uppercase tracking-wider text-purple-400 mb-1">{t('chat_potential_match')}</p>
+            <p className="text-sm font-bold text-gray-900">{diagnosisData?.condition || displayDiagnosis}</p>
           </div>
+        )}
 
-          {/* Neutered */}
+        {/* Quick stats */}
+        <div className="mt-5 space-y-2.5">
+          {displayVaccinated && (
+            <div className="flex items-center justify-between">
+              <span className="text-sm text-gray-600">{t('chat_vaccines')}</span>
+              <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold border ${
+                displayVaccinated === 'yes'
+                  ? 'bg-green-50 text-green-700 border-green-200'
+                  : 'bg-red-50 text-red-600 border-red-200'
+              }`}>
+                {displayVaccinated === 'yes' ? (t('chat_current') || 'CURRENT') : 'NOT CURRENT'}
+              </span>
+            </div>
+          )}
+
           {petInfo?.neutered && (
             <div className="flex items-center justify-between">
               <span className="text-sm text-gray-600">{t('chat_neutered') || 'Neutered'}</span>
@@ -666,15 +712,10 @@ const ChatbotPage = () => {
 
         {/* Consultation info */}
         {consultationId && (
-        <>
-          <p className="mt-6 text-xs font-semibold uppercase tracking-wider text-gray-400">
-            {t('chat_consultation_info') || 'CONSULTATION'}
-          </p>
-          <div className="mt-3 bg-[#F9FAFB] rounded-xl p-4">
+          <div className="mt-5 bg-[#F9FAFB] rounded-xl p-4">
             <p className="text-sm font-semibold text-gray-900">Consultation #{consultationId}</p>
             <p className="text-xs text-gray-400 mt-1">{new Date().toLocaleDateString()}</p>
           </div>
-        </>
         )}
       </aside>
       </div>

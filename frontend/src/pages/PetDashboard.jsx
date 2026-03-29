@@ -110,14 +110,14 @@ const PetDashboard = () => {
     for (const r of recentActivity) {
       if (!r.pet_id || map[r.pet_id]) continue; // take most recent only
       const status = (r.status_name || '').toLowerCase();
-      const flags = r.severity_flags
-        ? (typeof r.severity_flags === 'string' ? r.severity_flags : '')
-        : '';
-      const hasSeverity = flags.length > 0;
+      const flags = r.severity_flags;
+      const hasSeverity = flags
+        && (typeof flags === 'string' ? flags.length > 0
+          : typeof flags === 'object' && flags.severity && flags.severity !== 'low');
 
       if (hasSeverity) {
         map[r.pet_id] = 'emergency';
-      } else if (status === 'completed' && r.primary_label) {
+      } else if (status === 'completed') {
         map[r.pet_id] = 'completed';
       } else if (status === 'active' || status === 'in_progress' || status === 'pending') {
         map[r.pet_id] = 'pending';
