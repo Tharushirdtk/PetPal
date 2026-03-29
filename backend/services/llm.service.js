@@ -24,10 +24,8 @@ If you need more information, just ask follow-up questions without the <DIAGNOSI
 function buildUserPrompt({ pet, jsonAnswers, imageSnapshot, vectorResults, conversationHistory, currentMessage }) {
   let prompt = '';
 
-  if (pet) {
-    prompt += `Pet: ${pet.species_name || 'Unknown'} | Age: ${pet.birth_year ? new Date().getFullYear() - pet.birth_year + ' years' : 'Unknown'} | Gender: ${pet.gender || 'Unknown'}\n`;
-  }
-
+  // Use questionnaire answers as the primary source of pet info (most recent),
+  // only fall back to database pet record when no questionnaire data exists.
   if (jsonAnswers && Object.keys(jsonAnswers).length > 0) {
     prompt += '\n--- QUESTIONNAIRE SUMMARY ---\n';
     if (jsonAnswers.pet) {
@@ -53,6 +51,9 @@ function buildUserPrompt({ pet, jsonAnswers, imageSnapshot, vectorResults, conve
       prompt += `Emergency Flags: ${jsonAnswers.emergency_flags.join(', ')}\n`;
     }
     prompt += '--- END QUESTIONNAIRE ---\n\n';
+  } else if (pet) {
+    // Fallback: no questionnaire data, use database pet record
+    prompt += `Pet: ${pet.species_name || 'Unknown'} | Breed: ${pet.breed_name || 'Unknown'} | Age: ${pet.birth_year ? new Date().getFullYear() - pet.birth_year + ' years' : 'Unknown'} | Gender: ${pet.gender || 'Unknown'}\n`;
   }
 
   if (imageSnapshot && Object.keys(imageSnapshot).length > 0) {

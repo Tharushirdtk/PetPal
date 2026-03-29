@@ -73,7 +73,7 @@ const Navbar = ({ variant = 'default' }) => {
           </Link>
           <div className="hidden md:flex items-center gap-8">
             <Link to="/" className={`text-sm font-medium no-underline ${isActive('/') ? 'text-[#7C3AED]' : 'text-gray-600 hover:text-[#7C3AED]'} transition-colors`}>{t('nav_aboutus')}</Link>
-            <Link to="/chat" className="text-sm font-medium text-gray-600 hover:text-[#7C3AED] transition-colors no-underline">{t('nav_diagnosis')}</Link>
+            <Link to="/questionnaire" className="text-sm font-medium text-gray-600 hover:text-[#7C3AED] transition-colors no-underline">{t('nav_diagnosis')}</Link>
             <Link to="/" className="text-sm font-medium text-gray-600 hover:text-[#7C3AED] transition-colors no-underline">{t('nav_contact')}</Link>
           </div>
           <div className="flex items-center gap-3">
@@ -94,7 +94,7 @@ const Navbar = ({ variant = 'default' }) => {
         {mobileOpen && (
           <div className="md:hidden border-t border-[#E5E7EB] bg-white px-6 py-4 flex flex-col gap-3">
             <Link to="/" className="text-sm font-medium text-gray-600 no-underline">{t('nav_aboutus')}</Link>
-            <Link to="/chat" className="text-sm font-medium text-gray-600 no-underline">{t('nav_diagnosis')}</Link>
+            <Link to="/questionnaire" className="text-sm font-medium text-gray-600 no-underline">{t('nav_diagnosis')}</Link>
             <Link to="/" className="text-sm font-medium text-gray-600 no-underline">{t('nav_contact')}</Link>
             {isAuthenticated ? (
               <button onClick={handleLogout} className="text-sm font-medium text-red-600 no-underline text-left cursor-pointer flex items-center gap-2">
@@ -142,7 +142,7 @@ const Navbar = ({ variant = 'default' }) => {
           </Link>
           <div className="hidden md:flex items-center gap-8">
             <Link to="/" className="text-sm font-medium text-gray-600 hover:text-[#7C3AED] transition-colors no-underline">Home</Link>
-            <Link to="/chat" className="text-sm font-medium text-gray-600 hover:text-[#7C3AED] transition-colors no-underline">{t('nav_diagnosis')}</Link>
+            <Link to="/questionnaire" className="text-sm font-medium text-gray-600 hover:text-[#7C3AED] transition-colors no-underline">{t('nav_diagnosis')}</Link>
             <Link to="/dashboard" className="text-sm font-medium text-gray-600 hover:text-[#7C3AED] transition-colors no-underline">My Account</Link>
           </div>
           <div className="flex items-center gap-3">
