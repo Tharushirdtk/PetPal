@@ -11,6 +11,11 @@ const ContactModel = {
 
   async findAll({ status, page = 1, limit = 20 }) {
     const offset = (page - 1) * limit;
+
+    // Ensure limit and offset are safe integers
+    const safeLimit = Math.max(1, Math.min(100, parseInt(limit) || 20));
+    const safeOffset = Math.max(0, parseInt(offset) || 0);
+
     let sql = 'SELECT * FROM contact_message';
     const params = [];
 
@@ -24,11 +29,11 @@ const ContactModel = {
     const [countResult] = await query(countSql, params);
     const total = countResult.total;
 
-    sql += ' ORDER BY created_at DESC LIMIT ? OFFSET ?';
-    params.push(limit, offset);
+    // Use literal values for LIMIT/OFFSET to avoid prepared statement issues
+    sql += ` ORDER BY created_at DESC LIMIT ${safeLimit} OFFSET ${safeOffset}`;
 
     const rows = await query(sql, params);
-    return { contacts: rows, pagination: { page, limit, total } };
+    return { contacts: rows, pagination: { page, limit: safeLimit, total } };
   },
 
   async updateStatus(id, status) {

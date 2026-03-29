@@ -2,8 +2,21 @@ function notFoundHandler(_req, res) {
   res.status(404).json({ success: false, error: 'Route not found' });
 }
 
-function globalErrorHandler(err, _req, res, _next) {
-  console.error('Unhandled error:', err.stack || err);
+function globalErrorHandler(err, req, res, _next) {
+  console.error('[ErrorHandler] unhandled-error', {
+    message: err.message,
+    code: err.code,
+    status: err.status,
+    stack: err.stack || err,
+    request: {
+      method: req.method,
+      originalUrl: req.originalUrl,
+      query: req.query,
+      params: req.params,
+      body: req.body,
+      user: req.user ? { id: req.user.id, role: req.user.role, email: req.user.email } : null,
+    },
+  });
 
   // MySQL duplicate entry
   if (err.code === 'ER_DUP_ENTRY') {
