@@ -4,8 +4,11 @@ const AdminModel = {
   // --- Questions ---
   async listQuestions() {
     const questions = await query(
-      'SELECT * FROM question ORDER BY display_order ASC'
+      'SELECT * FROM question ORDER BY display_order ASC',
+      []
     );
+
+    // Add options and rules for each question
     for (const q of questions) {
       q.options = await query(
         'SELECT id, value_key, label, is_active FROM question_option WHERE question_id = ? ORDER BY id ASC',
@@ -26,6 +29,7 @@ const AdminModel = {
     );
     const questionId = result.insertId;
 
+    // Add options if provided
     if (options && options.length > 0) {
       for (const opt of options) {
         await query(
@@ -41,6 +45,7 @@ const AdminModel = {
   async getQuestionById(id) {
     const rows = await query('SELECT * FROM question WHERE id = ?', [id]);
     if (!rows[0]) return null;
+
     const q = rows[0];
     q.options = await query(
       'SELECT id, value_key, label, is_active FROM question_option WHERE question_id = ?',
@@ -56,6 +61,7 @@ const AdminModel = {
   async updateQuestion(id, { text, question_type, display_order, is_active }) {
     const fields = [];
     const params = [];
+
     if (text !== undefined) { fields.push('text = ?'); params.push(text); }
     if (question_type !== undefined) { fields.push('question_type = ?'); params.push(question_type); }
     if (display_order !== undefined) { fields.push('display_order = ?'); params.push(display_order); }
@@ -97,10 +103,12 @@ const AdminModel = {
       params.push(status);
     }
 
+    // Get total count
     const countSql = sql.replace('SELECT *', 'SELECT COUNT(*) as total');
-    const [countResult] = await query(countSql, params);
-    const total = countResult.total;
+    const countResult = await query(countSql, params);
+    const total = countResult[0]?.total || 0;
 
+    // Get paginated results
     sql += ' ORDER BY created_at DESC LIMIT ? OFFSET ?';
     params.push(limit, offset);
     const rows = await query(sql, params);
@@ -114,54 +122,68 @@ const AdminModel = {
     return rows[0];
   },
 
+  // --- Statistics ---
   async getStats() {
     try {
-      // All query calls need empty array as second parameter
-      const questions = await query('SELECT COUNT(*) as total FROM question', []);
-      const activeQuestions = await query('SELECT COUNT(*) as active FROM question WHERE is_active = 1', []);
-      const inactiveQuestions = await query('SELECT COUNT(*) as inactive FROM question WHERE is_active = 0', []);
+      // Get question counts
+      const totalQuestions = await query('SELECT COUNT(*) as count FROM question', []);
+      const activeQuestions = await query('SELECT COUNT(*) as count FROM question WHERE is_active = 1', []);
+      const inactiveQuestions = await query('SELECT COUNT(*) as count FROM question WHERE is_active = 0', []);
 
-      const rules = await query('SELECT COUNT(*) as total FROM visibility_rules', []);
+      // Get rules count
+      const totalRules = await query('SELECT COUNT(*) as count FROM visibility_rules', []);
 
-      const contacts = await query('SELECT COUNT(*) as total FROM contact_message', []);
-      const newContacts = await query("SELECT COUNT(*) as new FROM contact_message WHERE status = 'new'", []);
-      const readContacts = await query("SELECT COUNT(*) as read FROM contact_message WHERE status = 'read'", []);
-      const resolvedContacts = await query("SELECT COUNT(*) as resolved FROM contact_message WHERE status = 'resolved'", []);
+      // Get contact counts by status
+      const contactsByStatus = await query(
+        'SELECT status, COUNT(*) as count FROM contact_message GROUP BY status',
+        []
+      );
 
-      const consultations = await query('SELECT COUNT(*) as total FROM consultation', []);
-      const diagnoses = await query('SELECT COUNT(*) as total FROM diagnosis', []);
-      const users = await query('SELECT COUNT(*) as total FROM mast_user', []);
+      // Process contact results
+      const contacts = { total: 0, new: 0, read: 0, resolved: 0 };
+      for (const row of contactsByStatus) {
+        contacts[row.status] = row.count;
+        contacts.total += row.count;
+      }
+
+      // Get other counts
+      const totalConsultations = await query('SELECT COUNT(*) as count FROM consultation', []);
+      const totalDiagnoses = await query('SELECT COUNT(*) as count FROM diagnosis', []);
+      const totalUsers = await query('SELECT COUNT(*) as count FROM mast_user', []);
 
       return {
         questions: {
-          total: questions[0]?.total || 0,
-          active: activeQuestions[0]?.active || 0,
-          inactive: inactiveQuestions[0]?.inactive || 0
+          total: totalQuestions[0]?.count || 0,
+          active: activeQuestions[0]?.count || 0,
+          inactive: inactiveQuestions[0]?.count || 0
         },
-        rules: { total: rules[0]?.total || 0 },
-        contacts: {
-          total: contacts[0]?.total || 0,
-          new: newContacts[0]?.new || 0,
-          read: readContacts[0]?.read || 0,
-          resolved: resolvedContacts[0]?.resolved || 0
+        rules: {
+          total: totalRules[0]?.count || 0
         },
-        consultations: { total: consultations[0]?.total || 0 },
-        diagnoses: { total: diagnoses[0]?.total || 0 },
-        users: { total: users[0]?.total || 0 },
+        contacts: contacts,
+        consultations: {
+          total: totalConsultations[0]?.count || 0
+        },
+        diagnoses: {
+          total: totalDiagnoses[0]?.count || 0
+        },
+        users: {
+          total: totalUsers[0]?.count || 0
+        }
       };
     } catch (error) {
       console.error('Error in getStats:', error);
-      // Return safe defaults if there's any DB error
+      // Return safe defaults on any error
       return {
         questions: { total: 0, active: 0, inactive: 0 },
         rules: { total: 0 },
         contacts: { total: 0, new: 0, read: 0, resolved: 0 },
         consultations: { total: 0 },
         diagnoses: { total: 0 },
-        users: { total: 0 },
+        users: { total: 0 }
       };
     }
-  },
+  }
 };
 
 module.exports = AdminModel;

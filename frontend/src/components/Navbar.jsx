@@ -139,6 +139,14 @@ const Navbar = ({ variant = 'default' }) => {
             <span className="font-display font-bold text-lg text-gray-900">PetPal</span>
             <span className="text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded-full font-medium">Admin</span>
           </Link>
+
+          {/* Admin Navigation Links */}
+          <div className="hidden md:flex items-center gap-6">
+            <Link to="/" className={linkClass(isActive('/'))}>{t('nav_home') || 'Home'}</Link>
+            <Link to="/dashboard" className={linkClass(isActive('/dashboard'))}>{t('nav_dashboard') || 'Dashboard'}</Link>
+            <Link to="/admin" className={linkClass(isActive('/admin'))}>Admin Panel</Link>
+          </div>
+
           <div className="flex items-center gap-3">
             <LangToggle />
             {isAuthenticated ? (
@@ -146,8 +154,26 @@ const Navbar = ({ variant = 'default' }) => {
             ) : (
               <div className="w-8 h-8 rounded-full bg-[#7C3AED] text-white flex items-center justify-center text-sm font-semibold">A</div>
             )}
+            <button onClick={() => setMobileOpen(!mobileOpen)} className="md:hidden p-2 cursor-pointer">
+              {mobileOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+            </button>
           </div>
         </div>
+
+        {/* Mobile Navigation */}
+        {mobileOpen && (
+          <div className="md:hidden border-t border-[#E5E7EB] bg-white px-6 py-4 flex flex-col gap-3">
+            <Link to="/" onClick={closeMobile} className="text-sm font-medium text-gray-600 no-underline">{t('nav_home') || 'Home'}</Link>
+            <Link to="/dashboard" onClick={closeMobile} className="text-sm font-medium text-gray-600 no-underline">{t('nav_dashboard') || 'Dashboard'}</Link>
+            <Link to="/admin" onClick={closeMobile} className="text-sm font-medium text-gray-600 no-underline">Admin Panel</Link>
+            {isAuthenticated && (
+              <button onClick={handleLogout} className="text-sm font-medium text-red-600 no-underline text-left cursor-pointer flex items-center gap-2">
+                <LogOut className="w-4 h-4" />
+                {t('nav_logout') || 'Logout'}
+              </button>
+            )}
+          </div>
+        )}
       </nav>
     );
   }
@@ -164,6 +190,14 @@ const Navbar = ({ variant = 'default' }) => {
           <Link to="/" className={linkClass(isActive('/'))}>{t('nav_home')}</Link>
           <Link to="/dashboard" className={linkClass(isActive('/dashboard'))}>{t('nav_dashboard')}</Link>
           <Link to="/records" className={linkClass(isActive('/records'))}>{t('nav_records')}</Link>
+          {user?.role === 'admin' && (
+            <Link to="/admin" className={linkClass(isActive('/admin'))}>
+              <span className="flex items-center gap-1">
+                Admin Panel
+                <span className="text-xs bg-[#7C3AED] text-white px-2 py-0.5 rounded-full font-medium">Admin</span>
+              </span>
+            </Link>
+          )}
         </div>
         <div className="flex items-center gap-3">
           <LangToggle />
@@ -182,6 +216,12 @@ const Navbar = ({ variant = 'default' }) => {
           <Link to="/" onClick={closeMobile} className="text-sm font-medium text-gray-600 no-underline">{t('nav_home')}</Link>
           <Link to="/dashboard" onClick={closeMobile} className="text-sm font-medium text-gray-600 no-underline">{t('nav_dashboard')}</Link>
           <Link to="/records" onClick={closeMobile} className="text-sm font-medium text-gray-600 no-underline">{t('nav_records')}</Link>
+          {user?.role === 'admin' && (
+            <Link to="/admin" onClick={closeMobile} className="text-sm font-medium text-[#7C3AED] no-underline flex items-center gap-2">
+              Admin Panel
+              <span className="text-xs bg-[#7C3AED] text-white px-2 py-0.5 rounded-full font-medium">Admin</span>
+            </Link>
+          )}
           {isAuthenticated ? (
             <button onClick={handleLogout} className="text-sm font-medium text-red-600 no-underline text-left cursor-pointer flex items-center gap-2">
               <LogOut className="w-4 h-4" />
