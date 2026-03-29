@@ -44,8 +44,8 @@ exports.uploadImage = asyncHandler(async (req, res) => {
     let species = null;
     if (pet_id) {
       const petRows = await query(
-        `SELECT s.name AS species_name FROM pet p
-         JOIN species s ON p.species_id = s.id
+        `SELECT s.name AS species_name FROM mast_pet p
+         JOIN mast_species s ON p.species_id = s.id
          WHERE p.id = ?`,
         [pet_id]
       );
