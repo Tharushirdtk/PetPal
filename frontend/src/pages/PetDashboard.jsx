@@ -273,7 +273,7 @@ const PetDashboard = () => {
                       {/* Secondary actions row */}
                       <div className="flex items-center justify-between">
                         <button
-                          onClick={() => setEditingPet(pet)}
+                          onClick={() => navigate(`/pet/${pet.id}`)}
                           className="text-sm font-semibold text-[#7C3AED] hover:text-[#6D28D9] transition-colors cursor-pointer bg-transparent border-none p-0"
                         >
                           {t('dashboard_view_profile')}

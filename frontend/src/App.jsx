@@ -13,6 +13,7 @@ import QuestionnairePage from './pages/QuestionnairePage';
 import PetSelectorPage from './pages/PetSelectorPage';
 import ImageUploadStep from './pages/ImageUploadStep';
 import DiagnosisReportPage from './pages/DiagnosisReportPage';
+import PetProfilePage from './pages/PetProfilePage';
 import AdminDashboard from './pages/AdminDashboard';
 
 function App() {
@@ -32,6 +33,7 @@ function App() {
               <Route path="/questionnaire" element={<QuestionnairePage />} />
               <Route path="/image-upload" element={<ImageUploadStep />} />
               <Route path="/report" element={<DiagnosisReportPage />} />
+              <Route path="/pet/:id" element={<ProtectedRoute><PetProfilePage /></ProtectedRoute>} />
               <Route path="/admin" element={<ProtectedRoute adminOnly><AdminDashboard /></ProtectedRoute>} />
             </Routes>
           </BrowserRouter>

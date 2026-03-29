@@ -344,6 +344,21 @@ export const translations = {
 
     // Contact Form
     contact_title: "Get in Touch",
+
+    // Pet Profile
+    pet_profile_back: "Back to Dashboard",
+    pet_profile_wellness: "Wellness Score",
+    pet_profile_total_diagnoses: "Total Diagnoses",
+    pet_profile_last_checkup: "Last Checkup",
+    pet_profile_latest_result: "Latest Result",
+    pet_profile_no_checkups: "No checkups yet",
+    pet_profile_ai_title: "AI-Powered Health Insights",
+    pet_profile_ai_desc: "Get instant diagnosis with our ML image classification and Gemini AI analysis.",
+    pet_profile_start_diagnosis: "Start AI Diagnosis",
+    pet_profile_history_title: "Diagnosis History",
+    pet_profile_no_history: "No Diagnosis History Yet",
+    pet_profile_no_history_desc: "Start your pet's first AI-powered health checkup to build their medical profile.",
+    pet_profile_first_diagnosis: "Run First Diagnosis",
     contact_subtitle: "Have a question or feedback? We would love to hear from you.",
     contact_heading: "Subject",
     contact_heading_placeholder: "What is this about?",
@@ -700,6 +715,21 @@ export const translations = {
 
     // Contact Form
     contact_title: "අප හා සම්බන්ධ වන්න",
+
+    // Pet Profile
+    pet_profile_back: "උපකරණ පුවරුවට ආපසු",
+    pet_profile_wellness: "සෞඛ්‍ය ලකුණු",
+    pet_profile_total_diagnoses: "මුළු රෝග විනිශ්චය",
+    pet_profile_last_checkup: "අවසාන පරීක්ෂාව",
+    pet_profile_latest_result: "නවතම ප්‍රතිඵලය",
+    pet_profile_no_checkups: "තවම පරීක්ෂා නැත",
+    pet_profile_ai_title: "AI බලයෙන් සෞඛ්‍ය තොරතුරු",
+    pet_profile_ai_desc: "අපගේ ML රූප වර්ගීකරණය සහ Gemini AI විශ්ලේෂණය මඟින් ක්ෂණික රෝග විනිශ්චය ලබා ගන්න.",
+    pet_profile_start_diagnosis: "AI රෝග විනිශ්චය ආරම්භ කරන්න",
+    pet_profile_history_title: "රෝග විනිශ්චය ඉතිහාසය",
+    pet_profile_no_history: "තවම රෝග විනිශ්චය ඉතිහාසයක් නැත",
+    pet_profile_no_history_desc: "ඔබේ සතාගේ වෛද්‍ය පැතිකඩ ගොඩනැඟීමට පළමු AI සෞඛ්‍ය පරීක්ෂාව ආරම්භ කරන්න.",
+    pet_profile_first_diagnosis: "පළමු රෝග විනිශ්චය කරන්න",
     contact_subtitle: "ප්‍රශ්නයක් හෝ ප්‍රතිචාරයක් තිබේද? අපට ඔබෙන් ඇසීමට කැමතිය.",
     contact_heading: "මාතෘකාව",
     contact_heading_placeholder: "මේ ගැන කුමක්ද?",
