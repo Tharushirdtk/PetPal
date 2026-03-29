@@ -2,12 +2,13 @@ import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Plus,
-  Calendar,
-  Activity,
-  Shield,
   ArrowRight,
   MessageCircle,
   AlertTriangle,
+  ChevronDown,
+  ChevronRight,
+  FileText,
+  CheckCircle2,
 } from 'lucide-react';
 import { useLang } from '../i18n/LanguageContext';
 import { useConsultation } from '../context/ConsultationContext';
@@ -29,13 +30,14 @@ const ChatbotPage = () => {
 
   const [inputText, setInputText] = useState('');
   const [messages, setMessages] = useState([]);
-  const [chatHistoryList, setChatHistoryList] = useState([]);
   const [isTyping, setIsTyping] = useState(false);
   const [error, setError] = useState(null);
   const [loadingHistory, setLoadingHistory] = useState(true);
   const [noConsultation, setNoConsultation] = useState(false);
   const [showEmergency, setShowEmergency] = useState(false);
   const [diagnosisData, setDiagnosisData] = useState(null);
+  const [expandedPets, setExpandedPets] = useState(new Set());
+  const [petGroups, setPetGroups] = useState([]);
 
   const messagesEndRef = useRef(null);
   const welcomeSentRef = useRef(false);
@@ -138,7 +140,7 @@ const ChatbotPage = () => {
     sendWelcome();
   }, [noConsultation, loadingHistory, consultationId, conversationId, messages.length]);
 
-  /* ── Load consultation history for sidebar ── */
+  /* ── Load consultation history for sidebar (grouped by pet) ── */
   useEffect(() => {
     let cancelled = false;
     const loadConsultationHistory = async () => {
@@ -146,14 +148,32 @@ const ChatbotPage = () => {
         const res = await getConsultationHistory();
         if (cancelled) return;
         const list = res.data?.consultations || res.data || [];
-        setChatHistoryList(
-          list.map((item) => ({
+
+        // Group by pet_name
+        const grouped = {};
+        list.forEach((item) => {
+          const pet = item.pet_name || `Consultation #${item.id}`;
+          if (!grouped[pet]) grouped[pet] = [];
+          grouped[pet].push({
             id: item.id,
-            title: item.title || item.pet_name || `Consultation #${item.id}`,
             date: item.created_at ? new Date(item.created_at).toLocaleDateString() : '',
+            statusName: item.status_name || '',
+            primaryLabel: item.primary_label || '',
             active: item.id === consultationId,
-          }))
-        );
+          });
+        });
+
+        const groups = Object.entries(grouped).map(([petName, consultations]) => ({
+          petName,
+          consultations,
+        }));
+        setPetGroups(groups);
+
+        // Auto-expand the group containing the active consultation
+        const activeGroup = groups.find((g) => g.consultations.some((c) => c.active));
+        if (activeGroup) {
+          setExpandedPets((prev) => new Set([...prev, activeGroup.petName]));
+        }
       } catch { /* non-critical */ }
     };
     loadConsultationHistory();
@@ -198,6 +218,7 @@ const ChatbotPage = () => {
           confidence: data.diagnosis_data.confidence ? Math.round(data.diagnosis_data.confidence * 100) : null,
           reportId: data.diagnosis_id || null,
         });
+        setTimeout(() => navigate('/report'), 3000);
       }
     } catch {
       setError('Failed to send message. Please try again.');
@@ -247,6 +268,59 @@ const ChatbotPage = () => {
   const petVaccinated = petInfo?.vaccinated;
   const petEmoji = petType === 'cat' ? '\u{1F431}' : petType === 'dog' ? '\u{1F436}' : '\u{1F43E}';
 
+  const togglePetGroup = (petName) => {
+    setExpandedPets((prev) => {
+      const next = new Set(prev);
+      if (next.has(petName)) next.delete(petName);
+      else next.add(petName);
+      return next;
+    });
+  };
+
+  const handleFinishAndReport = async () => {
+    if (!conversationId || !consultationId || isTyping) return;
+    const finishMsg = 'Based on our conversation so far, please provide your final diagnosis and recommendations for my pet.';
+    setInputText('');
+    const userMsg = {
+      id: Date.now(),
+      role: 'user',
+      text: finishMsg,
+      time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+    };
+    setMessages((prev) => [...prev, userMsg]);
+    setIsTyping(true);
+    setError(null);
+    try {
+      const res = await sendMessage({
+        conversation_id: conversationId,
+        message: finishMsg,
+        consultation_id: consultationId,
+      });
+      const data = res.data;
+      const aiMsg = {
+        id: Date.now() + 1,
+        role: 'ai',
+        text: data.reply || data.message || data.content || '',
+        time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+      };
+      setMessages((prev) => [...prev, aiMsg]);
+      if (data.is_emergency) setShowEmergency(true);
+      if (data.is_final && data.diagnosis_data) {
+        setDiagnosisData({
+          condition: data.diagnosis_data.primary_label || 'Diagnosis Ready',
+          description: data.diagnosis_data.explanation || '',
+          confidence: data.diagnosis_data.confidence ? Math.round(data.diagnosis_data.confidence * 100) : null,
+          reportId: data.diagnosis_id || null,
+        });
+        setTimeout(() => navigate('/report'), 2000);
+      }
+    } catch {
+      setError('Failed to get report. Please try again.');
+    } finally {
+      setIsTyping(false);
+    }
+  };
+
   /* ───────── RENDER ───────── */
   return (
     <div className="flex flex-col h-screen overflow-hidden">
@@ -277,25 +351,56 @@ const ChatbotPage = () => {
         </p>
 
         <nav className="mt-2 flex-1 px-2 space-y-1">
-          {chatHistoryList.length === 0 && (
+          {petGroups.length === 0 && (
             <p className="px-3 py-3 text-sm text-gray-400">{t('chat_no_history') || 'No consultation history yet'}</p>
           )}
-          {chatHistoryList.map((item) => (
-            <button
-              key={item.id}
-              onClick={() => handleSwitchConsultation(item.id)}
-              className={`w-full text-left px-3 py-3 rounded-lg text-sm transition-colors cursor-pointer ${
-                item.active
-                  ? 'bg-[#F5F3FF] text-[#7C3AED] border-l-2 border-[#7C3AED] font-medium'
-                  : 'text-gray-600 hover:bg-gray-50'
-              }`}
-            >
-              <p className={`truncate ${item.active ? 'text-[#7C3AED]' : 'text-gray-800'}`}>
-                {item.title}
-              </p>
-              <p className="text-xs text-gray-400 mt-0.5">{item.date}</p>
-            </button>
-          ))}
+          {petGroups.map((group) => {
+            const isExpanded = expandedPets.has(group.petName);
+            const hasActive = group.consultations.some((c) => c.active);
+            return (
+              <div key={group.petName}>
+                <button
+                  onClick={() => togglePetGroup(group.petName)}
+                  className={`w-full flex items-center gap-2 px-3 py-2.5 rounded-lg text-sm transition-colors cursor-pointer ${
+                    hasActive ? 'bg-[#F5F3FF] text-[#7C3AED] font-semibold' : 'text-gray-700 hover:bg-gray-50'
+                  }`}
+                >
+                  {isExpanded ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
+                  <span className="truncate flex-1 text-left">{group.petName}</span>
+                  <span className="text-xs text-gray-400 bg-gray-100 rounded-full px-2 py-0.5">
+                    {group.consultations.length}
+                  </span>
+                </button>
+                {isExpanded && (
+                  <div className="ml-4 pl-3 border-l border-gray-200 space-y-0.5 mt-0.5 mb-1">
+                    {group.consultations.map((item) => (
+                      <button
+                        key={item.id}
+                        onClick={() => handleSwitchConsultation(item.id)}
+                        className={`w-full text-left px-3 py-2 rounded-lg text-xs transition-colors cursor-pointer ${
+                          item.active
+                            ? 'bg-[#F5F3FF] text-[#7C3AED] font-medium'
+                            : 'text-gray-500 hover:bg-gray-50'
+                        }`}
+                      >
+                        <div className="flex items-center gap-2">
+                          <span className={`h-1.5 w-1.5 rounded-full flex-shrink-0 ${
+                            item.statusName === 'completed' ? 'bg-green-400' : 'bg-amber-400'
+                          }`} />
+                          <span className="truncate">
+                            {item.primaryLabel || item.date}
+                          </span>
+                        </div>
+                        {item.primaryLabel && (
+                          <p className="text-gray-400 mt-0.5 ml-3.5">{item.date}</p>
+                        )}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+            );
+          })}
         </nav>
       </aside>
 
@@ -415,10 +520,11 @@ const ChatbotPage = () => {
 
             {/* Diagnosis card */}
             {diagnosisData && (
-              <div className="max-w-lg ml-12 mt-2 bg-white border border-gray-200 rounded-2xl p-5 shadow-sm">
+              <div className="max-w-lg ml-12 mt-2 bg-gradient-to-br from-white to-purple-50 border border-purple-200 rounded-2xl p-5 shadow-md">
                 <div className="flex items-center gap-3 mb-3">
-                  <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-orange-100 text-orange-700">
-                    {t('chat_potential_match')}
+                  <CheckCircle2 size={20} className="text-green-500" />
+                  <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-green-100 text-green-700">
+                    {t('chat_completed')}
                   </span>
                   {diagnosisData.confidence && (
                     <span className="text-sm font-semibold text-[#7C3AED]">
@@ -428,20 +534,14 @@ const ChatbotPage = () => {
                 </div>
                 <h4 className="text-base font-bold text-gray-900 mb-1">{diagnosisData.condition}</h4>
                 {diagnosisData.description && <p className="text-sm text-gray-500 mb-4">{diagnosisData.description}</p>}
-                <div className="flex items-center gap-3">
-                  <button
-                    onClick={() => diagnosisData.reportId ? navigate(`/report/${diagnosisData.reportId}`) : navigate('/report')}
-                    className="px-4 py-2 rounded-lg bg-[#7C3AED] text-white text-sm font-medium hover:bg-[#6D28D9] transition-colors"
-                  >
-                    {t('chat_view_clinical')}
-                  </button>
-                  <button
-                    onClick={() => setDiagnosisData(null)}
-                    className="px-4 py-2 rounded-lg text-gray-500 text-sm font-medium hover:text-gray-700 transition-colors"
-                  >
-                    {t('chat_not_this')} &#x2715;
-                  </button>
-                </div>
+                <button
+                  onClick={() => diagnosisData.reportId ? navigate(`/report/${diagnosisData.reportId}`) : navigate('/report')}
+                  className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-[#7C3AED] text-white text-sm font-semibold hover:bg-[#6D28D9] transition-colors shadow-sm"
+                >
+                  <FileText size={16} />
+                  {t('chat_view_full_report')}
+                </button>
+                <p className="text-xs text-gray-400 text-center mt-2">{t('chat_auto_redirect')}</p>
               </div>
             )}
 
@@ -454,21 +554,28 @@ const ChatbotPage = () => {
 
           {/* Bottom input area */}
           <div className="bg-[#F9FAFB] px-6 pb-5">
-            {/* Quick action pills */}
-            <div className="flex flex-wrap gap-2 mb-3">
-              <button className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full border border-gray-200 bg-white text-sm text-gray-600 hover:border-[#7C3AED] hover:text-[#7C3AED] transition-colors">
-                <Activity size={14} />
-                {t('chat_check_symptoms')}
-              </button>
-              <button className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full border border-gray-200 bg-white text-sm text-gray-600 hover:border-[#7C3AED] hover:text-[#7C3AED] transition-colors">
-                <Shield size={14} />
-                {t('chat_past_reports')}
-              </button>
-              <button className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full border border-gray-200 bg-white text-sm text-gray-600 hover:border-[#7C3AED] hover:text-[#7C3AED] transition-colors">
-                <Calendar size={14} />
-                {t('chat_book_vet')}
-              </button>
-            </div>
+            {/* Finish & Get Report button */}
+            {!diagnosisData && consultationId && messages.length > 0 && (
+              <div className="mb-3">
+                <button
+                  onClick={handleFinishAndReport}
+                  disabled={isTyping}
+                  className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-gradient-to-r from-[#7C3AED] to-[#9333EA] text-white text-sm font-semibold hover:from-[#6D28D9] hover:to-[#7C3AED] transition-all shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {isTyping ? (
+                    <>
+                      <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                      {t('chat_finishing')}
+                    </>
+                  ) : (
+                    <>
+                      <FileText size={16} />
+                      {t('chat_finish_report')}
+                    </>
+                  )}
+                </button>
+              </div>
+            )}
 
             {/* Input bar */}
             <div className="flex items-center gap-3 bg-white rounded-xl border border-gray-200 px-4 py-3 shadow-sm">

@@ -189,6 +189,14 @@ export const translations = {
     chat_img_complete: "Image analysis complete! The AI can now see your image results.",
     chat_img_upload_title: "Upload pet photo for AI analysis (optional)",
     chat_img_hint: "Upload a photo of your pet's condition for AI-powered visual analysis (optional)",
+    chat_finish_report: "Finish & Get Report",
+    chat_finishing: "Getting your report...",
+    chat_consultations_count: "consultations",
+    chat_view_full_report: "View Full Report",
+    chat_active: "Active",
+    chat_completed: "Completed",
+    chat_auto_redirect: "Redirecting to report...",
+    chat_neutered: "Neutered",
 
     // Image Upload Step
     img_step_title: "Photo Upload",
@@ -565,6 +573,14 @@ export const translations = {
     chat_img_complete: "රූප විශ්ලේෂණය සම්පූර්ණයි! AI ට දැන් ඔබේ රූප ප්‍රතිඵල දැකිය හැකිය.",
     chat_img_upload_title: "AI විශ්ලේෂණය සඳහා සතා ඡායාරූපයක් උඩුගත කරන්න (විකල්ප)",
     chat_img_hint: "AI බලයෙන් ක්‍රියා කරන දෘශ්‍ය විශ්ලේෂණය සඳහා ඔබේ සතාගේ තත්ත්වයේ ඡායාරූපයක් උඩුගත කරන්න (විකල්ප)",
+    chat_finish_report: "අවසන් කර වාර්තාව ලබන්න",
+    chat_finishing: "ඔබේ වාර්තාව ලබා ගනිමින්...",
+    chat_consultations_count: "උපදේශන",
+    chat_view_full_report: "සම්පූර්ණ වාර්තාව බලන්න",
+    chat_active: "සක්‍රිය",
+    chat_completed: "සම්පූර්ණයි",
+    chat_auto_redirect: "වාර්තාවට හරවා යවමින්...",
+    chat_neutered: "සෝදන ශල්‍යකර්ම",
 
     // Image Upload Step
     img_step_title: "ඡායාරූප උඩුගත කිරීම",
