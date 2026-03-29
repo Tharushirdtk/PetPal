@@ -15,6 +15,18 @@ export const translations = {
     nav_my_pets: "My Pets",
     nav_logout: "Logout",
 
+    // Diagnosis Selector
+    diagnosis_selector_title: "Start a Diagnosis",
+    diagnosis_selector_subtitle: "Select which pet you would like to diagnose, or start a new diagnosis for a different pet.",
+    diagnosis_selector_my_pets: "Your Pets",
+    diagnosis_selector_diagnose_btn: "Diagnose this Pet",
+    diagnosis_selector_no_pets_title: "No Pets Yet",
+    diagnosis_selector_no_pets_desc: "You haven't added any pets to your account yet. Start your first diagnosis to get health insights for your pet.",
+    diagnosis_selector_start_first: "Start First Diagnosis",
+    diagnosis_selector_different_pet_title: "Diagnosing a Different Pet?",
+    diagnosis_selector_different_pet_desc: "Start a diagnosis for a pet that is not in your account.",
+    diagnosis_selector_new_diagnosis: "New Diagnosis",
+
     // Landing Page
     landing_hero_title: "Healthy Pets,",
     landing_hero_title2: "Happy Hearts",
@@ -98,6 +110,7 @@ export const translations = {
     dashboard_add_another_desc: "Every pet deserves the best care. Add their details here.",
     dashboard_get_started: "Get Started",
     dashboard_last_diagnosis: "Last Diagnosis",
+    dashboard_diagnose_pet: "Diagnose Pet",
     dashboard_next_checkup: "Next Check-up",
     dashboard_action_required: "Action Required",
     dashboard_view_profile: "View Profile",
@@ -321,6 +334,7 @@ export const translations = {
     common_next: "Next",
     common_yes: "Yes",
     common_no: "No",
+    common_no_data: "No data",
 
     // Contact Form
     contact_title: "Get in Touch",
@@ -350,6 +364,18 @@ export const translations = {
     nav_register: "නොමිලේ ලියාපදිංචි වන්න",
     nav_my_pets: "මගේ සතුන්",
     nav_logout: "පිටවීම",
+
+    // Diagnosis Selector
+    diagnosis_selector_title: "රෝග විනිශ්චයක් ආරම්භ කරන්න",
+    diagnosis_selector_subtitle: "ඔබ රෝග විනිශ්චය කිරීමට කැමති සතා තෝරන්න, හෝ වෙනත් සතෙකු සඳහා නව රෝග විනිශ්චයක් ආරම්භ කරන්න.",
+    diagnosis_selector_my_pets: "ඔබේ සතුන්",
+    diagnosis_selector_diagnose_btn: "මෙම සතා රෝග විනිශ්චය කරන්න",
+    diagnosis_selector_no_pets_title: "තවම සතුන් නැත",
+    diagnosis_selector_no_pets_desc: "ඔබ තවමත් ඔබේ ගිණුමට සතුන් එක් කර නැත. ඔබේ සතාට සෞඛ්‍ය තොරතුරු ලබා ගැනීමට ඔබේ පළමු රෝග විනිශ්චය ආරම්භ කරන්න.",
+    diagnosis_selector_start_first: "පළමු රෝග විනිශ්චය ආරම්භ කරන්න",
+    diagnosis_selector_different_pet_title: "වෙනත් සතෙකු රෝග විනිශ්චය කරනවාද?",
+    diagnosis_selector_different_pet_desc: "ඔබේ ගිණුමේ නොමැති සතෙකු සඳහා රෝග විනිශ්චයක් ආරම්භ කරන්න.",
+    diagnosis_selector_new_diagnosis: "නව රෝග විනිශ්චය",
 
     // Landing Page
     landing_hero_title: "සෞඛ්‍ය සම්පන්න සතුන්,",
@@ -434,6 +460,7 @@ export const translations = {
     dashboard_add_another_desc: "සෑම සතෙකුම හොඳම සත්කාර ලැබිය යුතුයි. ඔවුන්ගේ විස්තර මෙහි එකතු කරන්න.",
     dashboard_get_started: "ආරම්භ කරන්න",
     dashboard_last_diagnosis: "අවසාන රෝග විනිශ්චය",
+    dashboard_diagnose_pet: "සතා රෝග විනිශ්චය කරන්න",
     dashboard_next_checkup: "ඊළඟ පරීක්ෂාව",
     dashboard_action_required: "ක්‍රියාමාර්ගය අවශ්‍යයි",
     dashboard_view_profile: "පැතිකඩ බලන්න",
@@ -657,6 +684,7 @@ export const translations = {
     common_next: "ඊළඟ",
     common_yes: "ඔව්",
     common_no: "නැත",
+    common_no_data: "දත්ත නැත",
 
     // Contact Form
     contact_title: "අප හා සම්බන්ධ වන්න",

@@ -202,29 +202,27 @@ const PetDashboard = () => {
                           <span className="text-gray-700 font-medium">{pet.weight} kg</span>
                         </div>
                       )}
-                      {pet.microchip_id && (
-                        <div className="flex items-center justify-between text-sm">
-                          <span className="text-gray-500 flex items-center gap-1.5">
-                            <FileText className="w-4 h-4" />
-                            Microchip
-                          </span>
-                          <span className="text-gray-700 font-medium">{pet.microchip_id}</span>
-                        </div>
-                      )}
+                      <div className="flex items-center justify-between text-sm">
+                        <span className="text-gray-500 flex items-center gap-1.5">
+                          <FileText className="w-4 h-4" />
+                          {t('dashboard_last_diagnosis') || 'Last Diagnosis'}
+                        </span>
+                        <span className="text-gray-400 text-xs">{t('common_no_data') || 'No data'}</span>
+                      </div>
                     </div>
 
                     {/* Bottom actions */}
-                    <div className="space-y-3 pt-3 border-t border-[#E5E7EB]">
-                      {/* Prominent Diagnose Button */}
+                    <div className="pt-3 border-t border-[#E5E7EB] space-y-3">
+                      {/* Primary action: Diagnose */}
                       <button
                         onClick={() => navigate(`/questionnaire?pet_id=${pet.id}`)}
-                        className="w-full flex items-center justify-center gap-2 bg-[#7C3AED] text-white rounded-lg px-4 py-2.5 font-semibold hover:bg-[#6D28D9] transition-colors"
+                        className="w-full flex items-center justify-center gap-2 bg-[#7C3AED] text-white rounded-lg px-4 py-2.5 font-semibold hover:bg-[#6D28D9] transition-colors shadow-sm hover:shadow-md"
                       >
                         <Stethoscope className="w-4 h-4" />
-                        {t('diagnosis_selector_diagnose_btn') || 'Diagnose this Pet'}
+                        {t('dashboard_diagnose_pet') || 'Diagnose Pet'}
                       </button>
 
-                      {/* Secondary actions */}
+                      {/* Secondary actions row */}
                       <div className="flex items-center justify-between">
                         <Link
                           to={`/pet/${pet.id}`}
@@ -232,29 +230,29 @@ const PetDashboard = () => {
                         >
                           {t('dashboard_view_profile')}
                         </Link>
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-1.5">
                           <button
                             onClick={() => setEditingPet(pet)}
-                            className="w-8 h-8 rounded-full border border-[#E5E7EB] flex items-center justify-center text-gray-400 hover:text-[#7C3AED] hover:border-[#7C3AED] transition-colors cursor-pointer"
+                            className="w-8 h-8 rounded-lg border border-[#E5E7EB] flex items-center justify-center text-gray-400 hover:text-[#7C3AED] hover:border-[#7C3AED] hover:bg-purple-50 transition-colors cursor-pointer"
                             title="Edit pet"
                           >
-                            <Pencil className="w-4 h-4" />
-                          </button>
-                          <button
-                            onClick={() => handleDeletePet(pet)}
-                            disabled={deletingPet === pet.id}
-                            className="w-8 h-8 rounded-full border border-[#E5E7EB] flex items-center justify-center text-gray-400 hover:text-red-500 hover:border-red-300 transition-colors cursor-pointer disabled:opacity-50"
-                            title="Delete pet"
-                          >
-                            <Trash2 className="w-4 h-4" />
+                            <Pencil className="w-3.5 h-3.5" />
                           </button>
                           <button
                             onClick={() => handleCameraClick(pet)}
                             disabled={uploadingImage === pet.id}
-                            className="w-8 h-8 rounded-full border border-[#E5E7EB] flex items-center justify-center text-gray-400 hover:text-[#7C3AED] hover:border-[#7C3AED] transition-colors cursor-pointer disabled:opacity-50"
+                            className="w-8 h-8 rounded-lg border border-[#E5E7EB] flex items-center justify-center text-gray-400 hover:text-[#7C3AED] hover:border-[#7C3AED] hover:bg-purple-50 transition-colors cursor-pointer disabled:opacity-50"
                             title="Upload photo"
                           >
-                            <Camera className="w-4 h-4" />
+                            <Camera className="w-3.5 h-3.5" />
+                          </button>
+                          <button
+                            onClick={() => handleDeletePet(pet)}
+                            disabled={deletingPet === pet.id}
+                            className="w-8 h-8 rounded-lg border border-[#E5E7EB] flex items-center justify-center text-gray-400 hover:text-red-500 hover:border-red-300 hover:bg-red-50 transition-colors cursor-pointer disabled:opacity-50"
+                            title="Delete pet"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
                           </button>
                         </div>
                       </div>
@@ -281,6 +279,29 @@ const PetDashboard = () => {
               <span className="text-sm font-semibold text-[#7C3AED] hover:text-[#6D28D9] transition-colors no-underline">
                 {t('dashboard_get_started')}
               </span>
+            </div>
+          </div>
+        )}
+
+        {/* Diagnosing a Different Pet Section */}
+        {!loading && pets.length > 0 && (
+          <div className="mt-8 bg-white rounded-2xl border border-[#E5E7EB] shadow-sm p-6">
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+              <div className="flex-1 text-center sm:text-left">
+                <h3 className="font-display font-semibold text-base text-gray-900 mb-1">
+                  {t('diagnosis_selector_different_pet_title') || 'Diagnosing a Different Pet?'}
+                </h3>
+                <p className="text-sm text-gray-500">
+                  {t('diagnosis_selector_different_pet_desc') || 'Start a diagnosis for a pet that is not in your account.'}
+                </p>
+              </div>
+              <button
+                onClick={() => navigate('/questionnaire')}
+                className="inline-flex items-center gap-2 bg-gray-900 text-white rounded-full px-6 py-2.5 font-semibold hover:bg-gray-800 transition-colors whitespace-nowrap"
+              >
+                <Plus className="w-4 h-4" />
+                {t('diagnosis_selector_new_diagnosis') || 'New Diagnosis'}
+              </button>
             </div>
           </div>
         )}

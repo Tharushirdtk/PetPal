@@ -10,6 +10,7 @@ import PetDashboard from './pages/PetDashboard';
 import MedicalHistory from './pages/MedicalHistory';
 import ChatbotPage from './pages/ChatbotPage';
 import QuestionnairePage from './pages/QuestionnairePage';
+import PetSelectorPage from './pages/PetSelectorPage';
 import ImageUploadStep from './pages/ImageUploadStep';
 import DiagnosisReportPage from './pages/DiagnosisReportPage';
 import AdminDashboard from './pages/AdminDashboard';
@@ -26,6 +27,7 @@ function App() {
               <Route path="/register" element={<RegisterPage />} />
               <Route path="/dashboard" element={<ProtectedRoute><PetDashboard /></ProtectedRoute>} />
               <Route path="/records" element={<ProtectedRoute><MedicalHistory /></ProtectedRoute>} />
+              <Route path="/diagnosis" element={<PetSelectorPage />} />
               <Route path="/chat" element={<ChatbotPage />} />
               <Route path="/questionnaire" element={<QuestionnairePage />} />
               <Route path="/image-upload" element={<ImageUploadStep />} />

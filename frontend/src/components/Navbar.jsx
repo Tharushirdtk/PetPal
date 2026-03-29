@@ -84,7 +84,11 @@ const Navbar = ({ variant = 'default' }) => {
           </Link>
           <div className="hidden md:flex items-center gap-8">
             <Link to="/" className={linkClass(isActive('/'))}>{t('nav_home')}</Link>
-            <Link to="/questionnaire" className={linkClass(isActive('/questionnaire'))}>{t('nav_diagnosis')}</Link>
+            {isAuthenticated ? (
+              <Link to="/dashboard" className={linkClass(isActive('/dashboard'))}>{t('nav_dashboard')}</Link>
+            ) : (
+              <Link to="/diagnosis" className={linkClass(isActive('/diagnosis'))}>{t('nav_diagnosis')}</Link>
+            )}
             <a href="#contact" className={linkClass(false)}>{t('nav_contact')}</a>
           </div>
           <div className="flex items-center gap-3">
@@ -105,7 +109,11 @@ const Navbar = ({ variant = 'default' }) => {
         {mobileOpen && (
           <div className="md:hidden border-t border-[#E5E7EB] bg-white px-6 py-4 flex flex-col gap-3">
             <Link to="/" onClick={closeMobile} className="text-sm font-medium text-gray-600 no-underline">{t('nav_home')}</Link>
-            <Link to="/questionnaire" onClick={closeMobile} className="text-sm font-medium text-gray-600 no-underline">{t('nav_diagnosis')}</Link>
+            {isAuthenticated ? (
+              <Link to="/dashboard" onClick={closeMobile} className="text-sm font-medium text-gray-600 no-underline">{t('nav_dashboard')}</Link>
+            ) : (
+              <Link to="/diagnosis" onClick={closeMobile} className="text-sm font-medium text-gray-600 no-underline">{t('nav_diagnosis')}</Link>
+            )}
             <a href="#contact" onClick={closeMobile} className="text-sm font-medium text-gray-600 no-underline">{t('nav_contact')}</a>
             {isAuthenticated ? (
               <button onClick={handleLogout} className="text-sm font-medium text-red-600 no-underline text-left cursor-pointer flex items-center gap-2">
@@ -155,7 +163,6 @@ const Navbar = ({ variant = 'default' }) => {
         <div className="hidden md:flex items-center gap-8">
           <Link to="/" className={linkClass(isActive('/'))}>{t('nav_home')}</Link>
           <Link to="/dashboard" className={linkClass(isActive('/dashboard'))}>{t('nav_dashboard')}</Link>
-          <Link to="/questionnaire" className={linkClass(isActive(['/questionnaire', '/chat', '/image-upload', '/report']))}>{t('nav_diagnosis')}</Link>
           <Link to="/records" className={linkClass(isActive('/records'))}>{t('nav_records')}</Link>
         </div>
         <div className="flex items-center gap-3">
@@ -174,7 +181,6 @@ const Navbar = ({ variant = 'default' }) => {
         <div className="md:hidden border-t border-[#E5E7EB] bg-white px-6 py-4 flex flex-col gap-3">
           <Link to="/" onClick={closeMobile} className="text-sm font-medium text-gray-600 no-underline">{t('nav_home')}</Link>
           <Link to="/dashboard" onClick={closeMobile} className="text-sm font-medium text-gray-600 no-underline">{t('nav_dashboard')}</Link>
-          <Link to="/questionnaire" onClick={closeMobile} className="text-sm font-medium text-gray-600 no-underline">{t('nav_diagnosis')}</Link>
           <Link to="/records" onClick={closeMobile} className="text-sm font-medium text-gray-600 no-underline">{t('nav_records')}</Link>
           {isAuthenticated ? (
             <button onClick={handleLogout} className="text-sm font-medium text-red-600 no-underline text-left cursor-pointer flex items-center gap-2">

@@ -72,7 +72,7 @@ const LandingPage = () => {
             {/* CTA Buttons */}
             <div className="flex flex-wrap gap-4 mt-2">
               <Link
-                to="/questionnaire"
+                to="/diagnosis"
                 className="bg-[#7C3AED] text-white rounded-full px-6 py-3 font-semibold hover:bg-[#6D28D9] transition-colors no-underline inline-flex items-center gap-2"
               >
                 {t('landing_cta_start')}
@@ -228,7 +228,7 @@ const LandingPage = () => {
 
           {/* Explore link */}
           <Link
-            to="/questionnaire"
+            to="/diagnosis"
             className="inline-flex items-center gap-1 mt-12 text-[#7C3AED] font-semibold text-sm hover:underline no-underline"
           >
             {t('landing_explore_tech')}
@@ -395,7 +395,7 @@ const LandingPage = () => {
                   {t('nav_home')}
                 </Link>
                 <Link
-                  to="/questionnaire"
+                  to="/diagnosis"
                   className="text-gray-300 hover:text-white text-sm transition-colors no-underline"
                 >
                   {t('nav_diagnosis')}
