@@ -90,7 +90,7 @@ export const translations = {
     auth_feature_community_desc: "Join thousands of pet parents",
 
     // Pet Dashboard
-    dashboard_greeting: "Hi, Sarah!",
+    dashboard_greeting: "Hi",
     dashboard_subtitle: "Everything looks great with your furry family today.",
     dashboard_add_pet: "+ Add New Pet",
     dashboard_add_another: "Add another pet",
@@ -425,7 +425,7 @@ export const translations = {
     auth_feature_community_desc: "දහස් ගණන් සතා හිමියන් හා එක්වන්න",
 
     // Pet Dashboard
-    dashboard_greeting: "හෙලෝ, Sarah!",
+    dashboard_greeting: "හෙලෝ",
     dashboard_subtitle: "ඔබේ ලොම් පවුල අද හොඳින් සිටිනවා.",
     dashboard_add_pet: "+ නව සතෙකු එකතු කරන්න",
     dashboard_add_another: "තවත් සතෙකු එකතු කරන්න",

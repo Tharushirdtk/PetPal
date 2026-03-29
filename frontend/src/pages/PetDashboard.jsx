@@ -120,7 +120,7 @@ const PetDashboard = () => {
         <div className="flex justify-between items-center">
           <div>
             <h1 className="font-display font-bold text-2xl text-gray-900">
-              {t('dashboard_greeting')}{user?.first_name ? `, ${user.first_name}` : ''}
+              {t('dashboard_greeting')}{user?.first_name ? `, ${user.first_name}!` : '!'}
             </h1>
             <p className="text-gray-500 mt-1">{t('dashboard_subtitle')}</p>
           </div>
