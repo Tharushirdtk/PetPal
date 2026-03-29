@@ -5,6 +5,8 @@ const ctrl = require('../controllers/admin.controller');
 // All admin routes require auth + admin role
 router.use(requireAuth, ctrl.requireAdmin);
 
+router.get('/stats', ctrl.getStats);
+
 /**
  * @swagger
  * /admin/questions:

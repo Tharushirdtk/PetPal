@@ -113,6 +113,40 @@ const AdminModel = {
     const rows = await query('SELECT * FROM contact_message WHERE id = ?', [id]);
     return rows[0];
   },
+
+  async getStats() {
+    const [questions] = await query(
+      'SELECT COUNT(*) as total, SUM(is_active = 1) as active, SUM(is_active = 0) as inactive FROM question'
+    );
+    const [rules] = await query(
+      'SELECT COUNT(*) as total FROM visibility_rules'
+    );
+    const contactRows = await query(
+      "SELECT status, COUNT(*) as count FROM contact_message GROUP BY status"
+    );
+    const contacts = { total: 0, new: 0, read: 0, resolved: 0 };
+    for (const r of contactRows) {
+      contacts[r.status] = r.count;
+      contacts.total += r.count;
+    }
+    const [consultations] = await query(
+      'SELECT COUNT(*) as total FROM consultation'
+    );
+    const [diagnoses] = await query(
+      'SELECT COUNT(*) as total FROM diagnosis'
+    );
+    const [users] = await query(
+      'SELECT COUNT(*) as total FROM mast_user'
+    );
+    return {
+      questions: { total: questions.total, active: questions.active || 0, inactive: questions.inactive || 0 },
+      rules: { total: rules.total },
+      contacts,
+      consultations: { total: consultations.total },
+      diagnoses: { total: diagnoses.total },
+      users: { total: users.total },
+    };
+  },
 };
 
 module.exports = AdminModel;

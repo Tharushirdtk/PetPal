@@ -71,3 +71,8 @@ exports.updateContactStatus = asyncHandler(async (req, res) => {
   if (!contact) return fail(res, 'Contact not found', 404);
   return ok(res, { contact });
 });
+
+exports.getStats = asyncHandler(async (req, res) => {
+  const stats = await AdminModel.getStats();
+  return ok(res, { stats });
+});
