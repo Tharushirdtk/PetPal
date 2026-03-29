@@ -1,6 +1,9 @@
-import { useState, useEffect } from 'react';
-import { getSpecies, getBreeds } from '../../api/pets';
+import { useState, useEffect, useRef } from 'react';
+import { getSpecies, getBreeds, uploadPetImage } from '../../api/pets';
 import ErrorAlert from '../ErrorAlert';
+
+const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api';
+const SERVER_BASE = API_BASE.replace(/\/api\/?$/, '');
 
 export default function EditPetForm({ pet, onSubmit, onClose, loading: externalLoading }) {
   const [form, setForm] = useState({
@@ -17,6 +20,11 @@ export default function EditPetForm({ pet, onSubmit, onClose, loading: externalL
   const [species, setSpecies] = useState([]);
   const [breeds, setBreeds] = useState([]);
   const [error, setError] = useState(null);
+  const [imageFile, setImageFile] = useState(null);
+  const [imagePreview, setImagePreview] = useState(
+    pet.image_url ? `${SERVER_BASE}${pet.image_url}` : null
+  );
+  const fileRef = useRef(null);
 
   useEffect(() => {
     getSpecies().then(res => setSpecies(res.data.species || [])).catch(() => {});
@@ -33,6 +41,13 @@ export default function EditPetForm({ pet, onSubmit, onClose, loading: externalL
   const handleChange = (e) => {
     const { name, value } = e.target;
     setForm(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleImageChange = (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setImageFile(file);
+    setImagePreview(URL.createObjectURL(file));
   };
 
   const handleSubmit = async (e) => {
@@ -54,6 +69,11 @@ export default function EditPetForm({ pet, onSubmit, onClose, loading: externalL
       if (!data.microchip_id) delete data.microchip_id;
 
       await onSubmit(pet.id, data);
+
+      // Upload image after saving pet data
+      if (imageFile) {
+        await uploadPetImage(pet.id, imageFile);
+      }
     } catch (err) {
       setError(err.error || 'Failed to update pet');
     }
@@ -70,6 +90,34 @@ export default function EditPetForm({ pet, onSubmit, onClose, loading: externalL
         <ErrorAlert message={error} onClose={() => setError(null)} />
 
         <form onSubmit={handleSubmit} className="space-y-4">
+          {/* Profile Image */}
+          <div className="flex flex-col items-center gap-2">
+            <div
+              onClick={() => fileRef.current?.click()}
+              className="w-24 h-24 rounded-full bg-gray-100 flex items-center justify-center overflow-hidden cursor-pointer border-2 border-dashed border-gray-300 hover:border-[#7C3AED] transition-colors"
+            >
+              {imagePreview ? (
+                <img src={imagePreview} alt="Pet" className="w-full h-full object-cover" />
+              ) : (
+                <span className="text-3xl">📷</span>
+              )}
+            </div>
+            <button
+              type="button"
+              onClick={() => fileRef.current?.click()}
+              className="text-xs text-[#7C3AED] font-medium cursor-pointer"
+            >
+              Change Photo
+            </button>
+            <input
+              ref={fileRef}
+              type="file"
+              accept="image/jpeg,image/png,image/webp,image/gif"
+              className="hidden"
+              onChange={handleImageChange}
+            />
+          </div>
+
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Name *</label>
             <input name="name" value={form.name} onChange={handleChange} required

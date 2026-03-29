@@ -134,7 +134,7 @@ const QuestionnairePage = () => {
   const [error, setError] = useState(null);
   const [submitting, setSubmitting] = useState(false);
 
-  const [currentStep, setCurrentStep] = useState(1);
+  const [currentStep, setCurrentStep] = useState(petIdFromUrl ? 2 : 1);
   const [answers, setAnswers] = useState({});
   const [showEmergency, setShowEmergency] = useState(false);
   const [emergencyMsg, setEmergencyMsg] = useState('');
@@ -256,8 +256,11 @@ const QuestionnairePage = () => {
     const species = speciesList.find((s) => s.name.toLowerCase() === petType.toLowerCase());
     if (!species) return;
     setLoadingBreeds(true);
-    setPetBreedId('');
-    setPetBreedName('');
+    // Don't wipe pre-filled breed when pet comes from URL
+    if (!petIdFromUrl || !petBreedId) {
+      setPetBreedId('');
+      setPetBreedName('');
+    }
     getBreeds(species.id)
       .then((res) => {
         const breeds = res.data?.breeds || (Array.isArray(res.data) ? res.data : []);
@@ -265,7 +268,7 @@ const QuestionnairePage = () => {
       })
       .catch(() => setBreedList([]))
       .finally(() => setLoadingBreeds(false));
-  }, [petType, speciesList]);
+  }, [petType, speciesList]); // eslint-disable-line react-hooks/exhaustive-deps
 
   /* ── Get questions for a step ── */
   const getStepQuestions = useCallback((step) => {
@@ -299,6 +302,8 @@ const QuestionnairePage = () => {
   const isStepValid = () => {
     const qs = getStepQuestions(currentStep);
     if (currentStep === 1) {
+      // Registered pet — already filled, always valid
+      if (selectedPet) return true;
       if (!answers.P1) return false;
       if (!answers.P2) return false;
       if (!answers.P3) return false;
@@ -330,6 +335,11 @@ const QuestionnairePage = () => {
       let prev = currentStep - 1;
       // Auto-skip step 3 back if no visible branch questions
       if (prev === 3 && getStepQuestions(3).length === 0) prev = 2;
+      // Skip step 1 for registered pets — go back to dashboard
+      if (prev === 1 && selectedPet) {
+        navigate('/dashboard');
+        return;
+      }
       setCurrentStep(prev);
     }
   };
@@ -420,7 +430,9 @@ const QuestionnairePage = () => {
   };
 
   /* ── Progress ── */
-  const progress = Math.round((currentStep / TOTAL_STEPS) * 100);
+  const progress = selectedPet
+    ? Math.round(((currentStep - 1) / (TOTAL_STEPS - 1)) * 100)
+    : Math.round((currentStep / TOTAL_STEPS) * 100);
   const stepTitle = STEP_TITLES[currentStep]?.[lang] || STEP_TITLES[currentStep]?.en || '';
 
   /* ── Render helpers ── */
@@ -730,7 +742,10 @@ const QuestionnairePage = () => {
             <div className="px-6 pt-5 pb-0">
               <div className="flex items-center justify-between mb-2">
                 <span className="text-xs font-semibold text-gray-500 tracking-wide">
-                  {t('quest_step') || 'STEP'} {currentStep} {t('quest_of') || 'OF'} {TOTAL_STEPS}
+                  {selectedPet
+                    ? `${t('quest_step') || 'STEP'} ${currentStep - 1} ${t('quest_of') || 'OF'} ${TOTAL_STEPS - 1}`
+                    : `${t('quest_step') || 'STEP'} ${currentStep} ${t('quest_of') || 'OF'} ${TOTAL_STEPS}`
+                  }
                 </span>
                 <span className="text-xs font-semibold text-[#7C3AED]">
                   {progress}% {t('quest_complete') || 'Complete'}

@@ -1,15 +1,19 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Plus, Camera, ChevronRight, Calendar, Activity, FileText, Pencil, Trash2, Stethoscope } from 'lucide-react';
 import { useLang } from '../i18n/LanguageContext';
 import { useAuth } from '../context/AuthContext';
 import { usePets } from '../hooks/usePets';
+import { uploadPetImage } from '../api/pets';
 import Navbar from '../components/Navbar';
 import StatusBadge from '../components/StatusBadge';
 import LoadingSpinner from '../components/LoadingSpinner';
 import ErrorAlert from '../components/ErrorAlert';
 import AddPetForm from '../components/forms/AddPetForm';
 import EditPetForm from '../components/forms/EditPetForm';
+
+const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api';
+const SERVER_BASE = API_BASE.replace(/\/api\/?$/, '');
 
 const speciesEmoji = (speciesName) => {
   const map = {
@@ -43,19 +47,23 @@ const getAge = (birthYear) => {
 const PetDashboard = () => {
   const { t } = useLang();
   const { user } = useAuth();
-  const { pets, loading, error, addPet, editPet, removePet } = usePets();
+  const { pets, loading, error, refetch, addPet, editPet, removePet } = usePets();
 
   const [showAddPet, setShowAddPet] = useState(false);
   const [editingPet, setEditingPet] = useState(null);
   const [deletingPet, setDeletingPet] = useState(null);
+  const [uploadingImage, setUploadingImage] = useState(null);
   const [formLoading, setFormLoading] = useState(false);
   const navigate = useNavigate();
+  const imageInputRef = useRef(null);
+  const imageTargetPetRef = useRef(null);
 
   const handleAddPet = async (data) => {
     setFormLoading(true);
     try {
-      await addPet(data);
+      const newPet = await addPet(data);
       setShowAddPet(false);
+      return newPet;
     } finally {
       setFormLoading(false);
     }
@@ -78,6 +86,28 @@ const PetDashboard = () => {
       await removePet(pet.id);
     } finally {
       setDeletingPet(null);
+    }
+  };
+
+  const handleCameraClick = (pet) => {
+    imageTargetPetRef.current = pet.id;
+    imageInputRef.current?.click();
+  };
+
+  const handleImageSelected = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file || !imageTargetPetRef.current) return;
+    const petId = imageTargetPetRef.current;
+    setUploadingImage(petId);
+    try {
+      await uploadPetImage(petId, file);
+      await refetch();
+    } catch {
+      /* silently fail — user sees no change */
+    } finally {
+      setUploadingImage(null);
+      imageTargetPetRef.current = null;
+      if (imageInputRef.current) imageInputRef.current.value = '';
     }
   };
 
@@ -121,10 +151,18 @@ const PetDashboard = () => {
                   className="bg-white rounded-2xl border border-[#E5E7EB] shadow-sm hover:shadow-md transition-shadow overflow-hidden"
                 >
                   {/* Cover image area */}
-                  <div className={`bg-gradient-to-br ${gradient} h-36 flex items-center justify-center`}>
-                    <div className="w-20 h-20 rounded-full bg-white/80 flex items-center justify-center text-4xl shadow-sm">
-                      {emoji}
-                    </div>
+                  <div className={`bg-gradient-to-br ${gradient} h-36 flex items-center justify-center relative overflow-hidden`}>
+                    {pet.image_url ? (
+                      <img
+                        src={`${SERVER_BASE}${pet.image_url}`}
+                        alt={pet.name}
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <div className="w-20 h-20 rounded-full bg-white/80 flex items-center justify-center text-4xl shadow-sm">
+                        {emoji}
+                      </div>
+                    )}
                   </div>
                   {/* Body */}
                   <div className="p-5">
@@ -200,7 +238,12 @@ const PetDashboard = () => {
                         >
                           <Trash2 className="w-4 h-4" />
                         </button>
-                        <button className="w-9 h-9 rounded-full border border-[#E5E7EB] flex items-center justify-center text-gray-400 hover:text-[#7C3AED] hover:border-[#7C3AED] transition-colors cursor-pointer">
+                        <button
+                          onClick={() => handleCameraClick(pet)}
+                          disabled={uploadingImage === pet.id}
+                          className="w-9 h-9 rounded-full border border-[#E5E7EB] flex items-center justify-center text-gray-400 hover:text-[#7C3AED] hover:border-[#7C3AED] transition-colors cursor-pointer disabled:opacity-50"
+                          title="Upload photo"
+                        >
                           <Camera className="w-4 h-4" />
                         </button>
                       </div>
@@ -294,6 +337,15 @@ const PetDashboard = () => {
           </div>
         </div>
       </div>
+
+      {/* Hidden file input for pet image upload */}
+      <input
+        ref={imageInputRef}
+        type="file"
+        accept="image/jpeg,image/png,image/webp,image/gif"
+        className="hidden"
+        onChange={handleImageSelected}
+      />
 
       {/* Modals */}
       {showAddPet && (

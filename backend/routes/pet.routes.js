@@ -1,5 +1,6 @@
 const router = require('express').Router();
 const { requireAuth } = require('../middleware/auth');
+const upload = require('../middleware/upload');
 const ctrl = require('../controllers/pet.controller');
 const diagCtrl = require('../controllers/diagnosis.controller');
 
@@ -242,6 +243,43 @@ router.post('/', requireAuth, ctrl.createPet);
  *         description: Pet not found
  */
 router.put('/:id', requireAuth, ctrl.updatePet);
+
+/**
+ * @swagger
+ * /pets/{id}/image:
+ *   post:
+ *     summary: Upload a profile image for a pet
+ *     tags: [Pets]
+ *     security:
+ *       - BearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: The pet ID
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         multipart/form-data:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               image:
+ *                 type: string
+ *                 format: binary
+ *     responses:
+ *       200:
+ *         description: Image uploaded and pet updated
+ *       401:
+ *         description: Unauthorized
+ *       403:
+ *         description: Forbidden - user does not own this pet
+ *       404:
+ *         description: Pet not found
+ */
+router.post('/:id/image', requireAuth, upload.single('image'), ctrl.uploadPetImage);
 
 /**
  * @swagger

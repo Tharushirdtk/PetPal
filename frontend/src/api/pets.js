@@ -7,3 +7,11 @@ export const deletePet = (id) => client.delete(`/pets/${id}`);
 export const getSpecies = () => client.get('/pets/species');
 export const getBreeds = (speciesId) => client.get(`/pets/breeds?species_id=${speciesId}`);
 export const getPetHistory = (petId) => client.get(`/pets/${petId}/history`);
+
+export const uploadPetImage = (petId, file) => {
+  const form = new FormData();
+  form.append('image', file);
+  return client.post(`/pets/${petId}/image`, form, {
+    headers: { 'Content-Type': 'multipart/form-data' },
+  });
+};

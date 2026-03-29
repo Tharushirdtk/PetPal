@@ -3,10 +3,12 @@ const { query } = require('../config/db');
 const PetModel = {
   async findByOwner(ownerId) {
     return query(
-      `SELECT p.*, s.name AS species_name, b.name AS breed_name
+      `SELECT p.*, s.name AS species_name, b.name AS breed_name,
+              ia.file_url AS image_url
        FROM mast_pet p
        LEFT JOIN mast_species s ON p.species_id = s.id
        LEFT JOIN mast_breed b ON p.breed_id = b.id
+       LEFT JOIN image_asset ia ON p.primary_image_id = ia.id
        WHERE p.owner_id = ? AND p.is_active = TRUE
        ORDER BY p.created_at DESC`,
       [ownerId]
@@ -15,10 +17,12 @@ const PetModel = {
 
   async findById(id) {
     const rows = await query(
-      `SELECT p.*, s.name AS species_name, b.name AS breed_name
+      `SELECT p.*, s.name AS species_name, b.name AS breed_name,
+              ia.file_url AS image_url
        FROM mast_pet p
        LEFT JOIN mast_species s ON p.species_id = s.id
        LEFT JOIN mast_breed b ON p.breed_id = b.id
+       LEFT JOIN image_asset ia ON p.primary_image_id = ia.id
        WHERE p.id = ?`,
       [id]
     );
@@ -45,7 +49,7 @@ const PetModel = {
   async update(id, data, userId) {
     const fields = [];
     const params = [];
-    const allowed = ['name', 'species_id', 'breed_id', 'dob', 'birth_year', 'birth_month', 'birth_day', 'weight', 'gender', 'medical_tags', 'microchip_id'];
+    const allowed = ['name', 'species_id', 'breed_id', 'dob', 'birth_year', 'birth_month', 'birth_day', 'weight', 'gender', 'medical_tags', 'microchip_id', 'primary_image_id'];
     for (const key of allowed) {
       if (data[key] !== undefined) {
         fields.push(`${key} = ?`);
