@@ -104,6 +104,28 @@ const PetDashboard = () => {
     return map;
   })();
 
+  // Build a per-pet health status map from real diagnosis data
+  const petHealthMap = (() => {
+    const map = {};
+    for (const r of recentActivity) {
+      if (!r.pet_id || map[r.pet_id]) continue; // take most recent only
+      const status = (r.status_name || '').toLowerCase();
+      const flags = r.severity_flags
+        ? (typeof r.severity_flags === 'string' ? r.severity_flags : '')
+        : '';
+      const hasSeverity = flags.length > 0;
+
+      if (hasSeverity) {
+        map[r.pet_id] = 'emergency';
+      } else if (status === 'completed' && r.primary_label) {
+        map[r.pet_id] = 'completed';
+      } else if (status === 'active' || status === 'in_progress' || status === 'pending') {
+        map[r.pet_id] = 'pending';
+      }
+    }
+    return map;
+  })();
+
   const handleAddPet = async (data) => {
     setFormLoading(true);
     try {
@@ -222,7 +244,7 @@ const PetDashboard = () => {
                       <h3 className="font-display font-bold text-lg text-gray-900">
                         {pet.name}
                       </h3>
-                      <StatusBadge status="healthy" />
+                      <StatusBadge status={petHealthMap[pet.id] || 'healthy'} />
                     </div>
                     <p className="text-sm text-gray-500 mb-4">
                       {breedDisplay}{age !== null ? ` \u2022 ${age}y` : ''}
@@ -391,14 +413,17 @@ const PetDashboard = () => {
                   </Link>
                 </div>
               ) : (
-                recentActivity.slice(0, 4).map((record) => {
+                recentActivity
+                  .filter((record) => record.primary_label || record.message_count > 0)
+                  .slice(0, 4)
+                  .map((record) => {
                   const petName = record.pet_name || record.petName || 'Unknown Pet';
                   const diagnosis = record.primary_label || null;
                   const status = (record.status_name || '').toLowerCase();
                   const date = record.created_at ? new Date(record.created_at) : null;
                   const emoji = speciesEmoji(record.species_name);
                   const isCompleted = status === 'completed';
-                  const isPending = status === 'in_progress' || status === 'pending';
+                  const isPending = status === 'in_progress' || status === 'pending' || status === 'active';
 
                   return (
                     <div key={record.id} className="flex items-center gap-4 py-3.5 first:pt-0 last:pb-0">
@@ -412,7 +437,7 @@ const PetDashboard = () => {
                         <p className="text-sm font-semibold text-gray-900 truncate">
                           {diagnosis
                             ? `${petName} — ${diagnosis}`
-                            : `${petName} — ${t('dashboard_diagnosis_started') || 'Diagnosis started'}`
+                            : `${petName} — ${t('dashboard_diagnosis_in_progress') || 'Diagnosis in progress'}`
                           }
                         </p>
                         <p className="text-xs text-gray-400 mt-0.5">

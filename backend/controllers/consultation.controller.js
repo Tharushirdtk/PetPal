@@ -62,6 +62,15 @@ exports.getById = asyncHandler(async (req, res) => {
   return ok(res, { consultation, diagnoses });
 });
 
+exports.getActiveForPet = asyncHandler(async (req, res) => {
+  const petId = req.params.petId;
+  const userId = req.user?.id;
+  if (!userId) return fail(res, 'Authentication required', 401);
+
+  const active = await ConsultationModel.findActiveByPet(petId, userId);
+  return ok(res, { active });
+});
+
 exports.getHistory = asyncHandler(async (req, res) => {
   const consultations = await ConsultationModel.findByUser(req.user.id);
   return ok(res, { consultations });

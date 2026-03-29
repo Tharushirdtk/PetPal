@@ -23,7 +23,7 @@ import LoadingSpinner from '../components/LoadingSpinner';
 const ChatbotPage = () => {
   const { t } = useLang();
   const navigate = useNavigate();
-  const { consultationId, conversationId, petInfo } = useConsultation();
+  const { consultationId, conversationId, petInfo, startSession } = useConsultation();
   const { user } = useAuth();
   const { start: startNewConsultation } = useStartConsultation();
 
@@ -222,6 +222,22 @@ const ChatbotPage = () => {
     }
   };
 
+  const handleSwitchConsultation = async (targetConsultationId) => {
+    if (targetConsultationId === consultationId) return;
+    try {
+      const res = await getChatHistory(targetConsultationId);
+      const convId = res.data?.conversation_id;
+      if (convId) {
+        startSession({
+          consultation_id: targetConsultationId,
+          conversation_id: convId,
+        });
+      }
+    } catch {
+      // Failed to switch — ignore
+    }
+  };
+
   /* ── Pet info for right sidebar (from questionnaire context) ── */
   const petName = petInfo?.breed || petInfo?.type || 'Your Pet';
   const petType = petInfo?.type || '';
@@ -267,7 +283,8 @@ const ChatbotPage = () => {
           {chatHistoryList.map((item) => (
             <button
               key={item.id}
-              className={`w-full text-left px-3 py-3 rounded-lg text-sm transition-colors ${
+              onClick={() => handleSwitchConsultation(item.id)}
+              className={`w-full text-left px-3 py-3 rounded-lg text-sm transition-colors cursor-pointer ${
                 item.active
                   ? 'bg-[#F5F3FF] text-[#7C3AED] border-l-2 border-[#7C3AED] font-medium'
                   : 'text-gray-600 hover:bg-gray-50'

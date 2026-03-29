@@ -7,6 +7,7 @@ import {
   AlertTriangle,
   Dog,
   Cat,
+  MessageCircle,
 } from 'lucide-react';
 import jsonLogic from 'json-logic-js';
 import { useLang } from '../i18n/LanguageContext';
@@ -14,6 +15,7 @@ import { useAuth } from '../context/AuthContext';
 import { useConsultation } from '../context/ConsultationContext';
 import { useStartConsultation } from '../hooks/useConsultation';
 import { getActiveQuestionnaire, submitResponse, saveContext } from '../api/questionnaire';
+import { getActiveConsultation } from '../api/consultation';
 import { getSpecies, getBreeds, getMyPets } from '../api/pets';
 import { questionFlow, EMERGENCY_RULES } from '../data/mockData';
 import Navbar from '../components/Navbar';
@@ -120,7 +122,7 @@ const QuestionnairePage = () => {
   const { t, lang } = useLang();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const { consultationId, savePetInfo, clearSession } = useConsultation();
+  const { consultationId, savePetInfo, clearSession, startSession } = useConsultation();
   const { isAuthenticated } = useAuth(); // eslint-disable-line no-unused-vars
   const { start: startNewConsultation } = useStartConsultation();
 
@@ -147,16 +149,60 @@ const QuestionnairePage = () => {
   const [petBreedName, setPetBreedName] = useState('');
   const [selectedPet, setSelectedPet] = useState(null);
 
+  /* ── Resume prompt state ── */
+  const [showResumePrompt, setShowResumePrompt] = useState(false);
+  const [activeConsultationData, setActiveConsultationData] = useState(null);
+
   /* ── Auto-create consultation if needed ── */
   useEffect(() => {
-    // Always start a fresh consultation when pet_id is specified (new diagnosis flow)
-    if (petIdFromUrl) {
-      clearSession();
-      startNewConsultation({ pet_id: Number(petIdFromUrl) }).catch(() => {});
-    } else if (!consultationId) {
-      startNewConsultation({ guest_handle: `guest_${Date.now()}` }).catch(() => {});
+    if (!petIdFromUrl) {
+      if (!consultationId) {
+        startNewConsultation({ guest_handle: `guest_${Date.now()}` }).catch(() => {});
+      }
+      return;
     }
+
+    // For registered pets, check if there's an active (in-progress) consultation
+    let cancelled = false;
+    const checkActive = async () => {
+      try {
+        const res = await getActiveConsultation(petIdFromUrl);
+        if (cancelled) return;
+        const active = res.data?.active;
+        if (active?.consultation_id) {
+          setActiveConsultationData(active);
+          setShowResumePrompt(true);
+          return;
+        }
+      } catch {
+        // No active consultation or endpoint error — proceed with new
+      }
+      if (!cancelled) {
+        clearSession();
+        startNewConsultation({ pet_id: Number(petIdFromUrl) }).catch(() => {});
+      }
+    };
+    checkActive();
+    return () => { cancelled = true; };
   }, [petIdFromUrl]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const handleResumePrevious = () => {
+    if (activeConsultationData) {
+      startSession({
+        consultation_id: activeConsultationData.consultation_id,
+        conversation_id: activeConsultationData.conversation_id,
+        pet_id: Number(petIdFromUrl),
+      });
+      navigate('/chat');
+    }
+  };
+
+  const handleStartNew = () => {
+    setShowResumePrompt(false);
+    setActiveConsultationData(null);
+    clearSession();
+    startNewConsultation({ pet_id: Number(petIdFromUrl) }).catch(() => {});
+  };
 
   /* ── Fetch selected pet data and pre-fill answers ── */
   useEffect(() => {
@@ -677,6 +723,41 @@ const QuestionnairePage = () => {
             >
               &times;
             </button>
+          </div>
+        </div>
+      )}
+
+      {/* Resume Previous Diagnosis Prompt */}
+      {showResumePrompt && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+          <div className="bg-white rounded-2xl shadow-xl max-w-md w-full mx-4 p-6">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="h-10 w-10 rounded-full bg-[#F5F3FF] flex items-center justify-center">
+                <MessageCircle className="w-5 h-5 text-[#7C3AED]" />
+              </div>
+              <h3 className="text-lg font-bold text-gray-900">
+                {t('quest_resume_title') || 'Continue Previous Diagnosis?'}
+              </h3>
+            </div>
+            <p className="text-sm text-gray-500 mb-6">
+              {t('quest_resume_desc') || 'You have an active diagnosis in progress for this pet. Would you like to continue where you left off or start a new diagnosis?'}
+            </p>
+            <div className="flex flex-col gap-3">
+              <button
+                onClick={handleResumePrevious}
+                className="w-full flex items-center justify-center gap-2 bg-[#7C3AED] text-white rounded-xl px-4 py-3 font-semibold hover:bg-[#6D28D9] transition-colors"
+              >
+                <MessageCircle className="w-4 h-4" />
+                {t('quest_resume_continue') || 'Continue Previous Diagnosis'}
+              </button>
+              <button
+                onClick={handleStartNew}
+                className="w-full flex items-center justify-center gap-2 bg-white text-gray-700 border border-gray-200 rounded-xl px-4 py-3 font-semibold hover:bg-gray-50 transition-colors"
+              >
+                <ClipboardList className="w-4 h-4" />
+                {t('quest_resume_new') || 'Start New Diagnosis'}
+              </button>
+            </div>
           </div>
         </div>
       )}

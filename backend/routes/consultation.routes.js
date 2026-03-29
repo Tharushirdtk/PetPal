@@ -79,6 +79,7 @@ router.post('/start', optionalAuth, ctrl.startConsultation);
  *       401:
  *         description: Unauthorized - invalid or missing token
  */
+router.get('/active/:petId', requireAuth, ctrl.getActiveForPet);
 router.get('/history', requireAuth, ctrl.getHistory);
 
 /**
