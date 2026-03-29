@@ -154,15 +154,21 @@ const PetDashboard = () => {
                   <div className={`bg-gradient-to-br ${gradient} h-36 flex items-center justify-center relative overflow-hidden`}>
                     {pet.image_url ? (
                       <img
-                        src={`${SERVER_BASE}${pet.image_url}`}
+                        src={pet.image_url.startsWith('http') ? pet.image_url : `${SERVER_BASE}${pet.image_url}`}
                         alt={pet.name}
                         className="w-full h-full object-cover"
+                        onError={(e) => {
+                          e.target.style.display = 'none';
+                          e.target.nextSibling.style.display = 'flex';
+                        }}
                       />
-                    ) : (
-                      <div className="w-20 h-20 rounded-full bg-white/80 flex items-center justify-center text-4xl shadow-sm">
-                        {emoji}
-                      </div>
-                    )}
+                    ) : null}
+                    <div
+                      className="w-20 h-20 rounded-full bg-white/80 flex items-center justify-center text-4xl shadow-sm"
+                      style={{ display: pet.image_url ? 'none' : 'flex' }}
+                    >
+                      {emoji}
+                    </div>
                   </div>
                   {/* Body */}
                   <div className="p-5">
@@ -208,44 +214,49 @@ const PetDashboard = () => {
                     </div>
 
                     {/* Bottom actions */}
-                    <div className="flex items-center justify-between pt-3 border-t border-[#E5E7EB]">
-                      <Link
-                        to={`/pet/${pet.id}`}
-                        className="text-sm font-semibold text-[#7C3AED] hover:text-[#6D28D9] transition-colors no-underline"
+                    <div className="space-y-3 pt-3 border-t border-[#E5E7EB]">
+                      {/* Prominent Diagnose Button */}
+                      <button
+                        onClick={() => navigate(`/questionnaire?pet_id=${pet.id}`)}
+                        className="w-full flex items-center justify-center gap-2 bg-[#7C3AED] text-white rounded-lg px-4 py-2.5 font-semibold hover:bg-[#6D28D9] transition-colors"
                       >
-                        {t('dashboard_view_profile')}
-                      </Link>
-                      <div className="flex items-center gap-2">
-                        <button
-                          onClick={() => navigate(`/questionnaire?pet_id=${pet.id}`)}
-                          className="w-9 h-9 rounded-full border border-[#E5E7EB] flex items-center justify-center text-gray-400 hover:text-green-600 hover:border-green-400 transition-colors cursor-pointer"
-                          title="Diagnose pet"
+                        <Stethoscope className="w-4 h-4" />
+                        {t('diagnosis_selector_diagnose_btn') || 'Diagnose this Pet'}
+                      </button>
+
+                      {/* Secondary actions */}
+                      <div className="flex items-center justify-between">
+                        <Link
+                          to={`/pet/${pet.id}`}
+                          className="text-sm font-semibold text-[#7C3AED] hover:text-[#6D28D9] transition-colors no-underline"
                         >
-                          <Stethoscope className="w-4 h-4" />
-                        </button>
-                        <button
-                          onClick={() => setEditingPet(pet)}
-                          className="w-9 h-9 rounded-full border border-[#E5E7EB] flex items-center justify-center text-gray-400 hover:text-[#7C3AED] hover:border-[#7C3AED] transition-colors cursor-pointer"
-                          title="Edit pet"
-                        >
-                          <Pencil className="w-4 h-4" />
-                        </button>
-                        <button
-                          onClick={() => handleDeletePet(pet)}
-                          disabled={deletingPet === pet.id}
-                          className="w-9 h-9 rounded-full border border-[#E5E7EB] flex items-center justify-center text-gray-400 hover:text-red-500 hover:border-red-300 transition-colors cursor-pointer disabled:opacity-50"
-                          title="Delete pet"
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </button>
-                        <button
-                          onClick={() => handleCameraClick(pet)}
-                          disabled={uploadingImage === pet.id}
-                          className="w-9 h-9 rounded-full border border-[#E5E7EB] flex items-center justify-center text-gray-400 hover:text-[#7C3AED] hover:border-[#7C3AED] transition-colors cursor-pointer disabled:opacity-50"
-                          title="Upload photo"
-                        >
-                          <Camera className="w-4 h-4" />
-                        </button>
+                          {t('dashboard_view_profile')}
+                        </Link>
+                        <div className="flex items-center gap-2">
+                          <button
+                            onClick={() => setEditingPet(pet)}
+                            className="w-8 h-8 rounded-full border border-[#E5E7EB] flex items-center justify-center text-gray-400 hover:text-[#7C3AED] hover:border-[#7C3AED] transition-colors cursor-pointer"
+                            title="Edit pet"
+                          >
+                            <Pencil className="w-4 h-4" />
+                          </button>
+                          <button
+                            onClick={() => handleDeletePet(pet)}
+                            disabled={deletingPet === pet.id}
+                            className="w-8 h-8 rounded-full border border-[#E5E7EB] flex items-center justify-center text-gray-400 hover:text-red-500 hover:border-red-300 transition-colors cursor-pointer disabled:opacity-50"
+                            title="Delete pet"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                          <button
+                            onClick={() => handleCameraClick(pet)}
+                            disabled={uploadingImage === pet.id}
+                            className="w-8 h-8 rounded-full border border-[#E5E7EB] flex items-center justify-center text-gray-400 hover:text-[#7C3AED] hover:border-[#7C3AED] transition-colors cursor-pointer disabled:opacity-50"
+                            title="Upload photo"
+                          >
+                            <Camera className="w-4 h-4" />
+                          </button>
+                        </div>
                       </div>
                     </div>
                   </div>
