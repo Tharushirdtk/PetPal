@@ -392,7 +392,7 @@ const LandingPage = () => {
                   to="/"
                   className="text-gray-300 hover:text-white text-sm transition-colors no-underline"
                 >
-                  {t('nav_aboutus')}
+                  {t('nav_home')}
                 </Link>
                 <Link
                   to="/questionnaire"
@@ -400,12 +400,12 @@ const LandingPage = () => {
                 >
                   {t('nav_diagnosis')}
                 </Link>
-                <Link
-                  to="/"
+                <a
+                  href="#contact"
                   className="text-gray-300 hover:text-white text-sm transition-colors no-underline"
                 >
                   {t('nav_contact')}
-                </Link>
+                </a>
                 <Link
                   to="/register"
                   className="text-gray-300 hover:text-white text-sm transition-colors no-underline"

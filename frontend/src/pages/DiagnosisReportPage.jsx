@@ -70,7 +70,7 @@ const DiagnosisReportPage = () => {
   if (loading) {
     return (
       <div className="min-h-screen flex flex-col bg-[#F9FAFB]">
-        <Navbar variant="report" />
+        <Navbar variant="default" />
         <LoadingSpinner />
       </div>
     );
@@ -79,7 +79,7 @@ const DiagnosisReportPage = () => {
   if (error) {
     return (
       <div className="min-h-screen flex flex-col bg-[#F9FAFB]">
-        <Navbar variant="report" />
+        <Navbar variant="default" />
         <div className="max-w-2xl mx-auto px-6 py-12 w-full">
           <ErrorAlert message={error} onClose={() => setError(null)} />
         </div>
@@ -122,7 +122,7 @@ const DiagnosisReportPage = () => {
 
   return (
     <div className="min-h-screen flex flex-col bg-[#F9FAFB]">
-      <Navbar variant="report" />
+      <Navbar variant="default" />
 
       {/* Hero Section */}
       <section className="relative bg-[#1a1a2e] w-full py-16 overflow-hidden">

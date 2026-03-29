@@ -1,6 +1,7 @@
 export const translations = {
   en: {
     // Nav
+    nav_home: "Home",
     nav_dashboard: "Dashboard",
     nav_diagnosis: "Diagnosis",
     nav_vets: "Vets",
@@ -336,6 +337,7 @@ export const translations = {
   },
   si: {
     // Nav
+    nav_home: "මුල් පිටුව",
     nav_dashboard: "උපකරණ පුවරුව",
     nav_diagnosis: "රෝග විනිශ්චය",
     nav_vets: "පශු වෛද්‍ය",

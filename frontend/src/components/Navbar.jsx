@@ -1,5 +1,5 @@
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { Search, Bell, Menu, X, LogOut } from 'lucide-react';
+import { Menu, X, LogOut } from 'lucide-react';
 import { useState } from 'react';
 import { useLang } from '../i18n/LanguageContext';
 import LangToggle from './LangToggle';
@@ -21,7 +21,10 @@ const Navbar = ({ variant = 'default' }) => {
 
   const { user, isAuthenticated, logoutUser } = useAuth();
 
-  const isActive = (path) => location.pathname === path;
+  const isActive = (paths) => {
+    if (Array.isArray(paths)) return paths.some((p) => location.pathname === p);
+    return location.pathname === paths;
+  };
 
   const userInitial = user?.name?.charAt(0)?.toUpperCase() || user?.email?.charAt(0)?.toUpperCase() || 'U';
 
@@ -35,6 +38,13 @@ const Navbar = ({ variant = 'default' }) => {
     setDropdownOpen(false);
     navigate('/');
   };
+
+  const closeMobile = () => setMobileOpen(false);
+
+  const linkClass = (active) =>
+    `text-sm font-medium no-underline transition-colors ${
+      active ? 'text-[#7C3AED]' : 'text-gray-600 hover:text-[#7C3AED]'
+    }`;
 
   // User avatar + dropdown (reusable across variants)
   const UserMenu = () => (
@@ -63,6 +73,7 @@ const Navbar = ({ variant = 'default' }) => {
     </div>
   );
 
+  /* ═══════ LANDING VARIANT ═══════ */
   if (variant === 'landing') {
     return (
       <nav className="bg-white/80 backdrop-blur-md border-b border-[#E5E7EB] sticky top-0 z-40">
@@ -72,9 +83,9 @@ const Navbar = ({ variant = 'default' }) => {
             <span className="font-display font-bold text-lg text-gray-900">PetPal</span>
           </Link>
           <div className="hidden md:flex items-center gap-8">
-            <Link to="/" className={`text-sm font-medium no-underline ${isActive('/') ? 'text-[#7C3AED]' : 'text-gray-600 hover:text-[#7C3AED]'} transition-colors`}>{t('nav_aboutus')}</Link>
-            <Link to="/questionnaire" className="text-sm font-medium text-gray-600 hover:text-[#7C3AED] transition-colors no-underline">{t('nav_diagnosis')}</Link>
-            <Link to="/" className="text-sm font-medium text-gray-600 hover:text-[#7C3AED] transition-colors no-underline">{t('nav_contact')}</Link>
+            <Link to="/" className={linkClass(isActive('/'))}>{t('nav_home')}</Link>
+            <Link to="/questionnaire" className={linkClass(isActive('/questionnaire'))}>{t('nav_diagnosis')}</Link>
+            <a href="#contact" className={linkClass(false)}>{t('nav_contact')}</a>
           </div>
           <div className="flex items-center gap-3">
             <LangToggle />
@@ -93,16 +104,16 @@ const Navbar = ({ variant = 'default' }) => {
         </div>
         {mobileOpen && (
           <div className="md:hidden border-t border-[#E5E7EB] bg-white px-6 py-4 flex flex-col gap-3">
-            <Link to="/" className="text-sm font-medium text-gray-600 no-underline">{t('nav_aboutus')}</Link>
-            <Link to="/questionnaire" className="text-sm font-medium text-gray-600 no-underline">{t('nav_diagnosis')}</Link>
-            <Link to="/" className="text-sm font-medium text-gray-600 no-underline">{t('nav_contact')}</Link>
+            <Link to="/" onClick={closeMobile} className="text-sm font-medium text-gray-600 no-underline">{t('nav_home')}</Link>
+            <Link to="/questionnaire" onClick={closeMobile} className="text-sm font-medium text-gray-600 no-underline">{t('nav_diagnosis')}</Link>
+            <a href="#contact" onClick={closeMobile} className="text-sm font-medium text-gray-600 no-underline">{t('nav_contact')}</a>
             {isAuthenticated ? (
               <button onClick={handleLogout} className="text-sm font-medium text-red-600 no-underline text-left cursor-pointer flex items-center gap-2">
                 <LogOut className="w-4 h-4" />
                 {t('nav_logout') || 'Logout'}
               </button>
             ) : (
-              <Link to="/login" className="text-sm font-medium text-gray-600 no-underline">{t('nav_login')}</Link>
+              <Link to="/login" onClick={closeMobile} className="text-sm font-medium text-gray-600 no-underline">{t('nav_login')}</Link>
             )}
           </div>
         )}
@@ -110,6 +121,7 @@ const Navbar = ({ variant = 'default' }) => {
     );
   }
 
+  /* ═══════ ADMIN VARIANT ═══════ */
   if (variant === 'admin') {
     return (
       <nav className="bg-white border-b border-[#E5E7EB] sticky top-0 z-40">
@@ -132,55 +144,22 @@ const Navbar = ({ variant = 'default' }) => {
     );
   }
 
-  if (variant === 'report') {
-    return (
-      <nav className="bg-white/80 backdrop-blur-md border-b border-[#E5E7EB] sticky top-0 z-40">
-        <div className="max-w-7xl mx-auto px-6 flex items-center justify-between h-16">
-          <Link to="/" className="flex items-center gap-2 no-underline">
-            <PawIcon />
-            <span className="font-display font-bold text-lg text-gray-900">PetPal</span>
-          </Link>
-          <div className="hidden md:flex items-center gap-8">
-            <Link to="/" className="text-sm font-medium text-gray-600 hover:text-[#7C3AED] transition-colors no-underline">Home</Link>
-            <Link to="/questionnaire" className="text-sm font-medium text-gray-600 hover:text-[#7C3AED] transition-colors no-underline">{t('nav_diagnosis')}</Link>
-            <Link to="/dashboard" className="text-sm font-medium text-gray-600 hover:text-[#7C3AED] transition-colors no-underline">My Account</Link>
-          </div>
-          <div className="flex items-center gap-3">
-            <LangToggle />
-            {isAuthenticated ? (
-              <UserMenu />
-            ) : (
-              <Link to="/login" className="text-sm font-medium text-gray-600 hover:text-[#7C3AED] transition-colors no-underline">{t('nav_login')}</Link>
-            )}
-          </div>
-        </div>
-      </nav>
-    );
-  }
-
-  // Default variant for authenticated pages
+  /* ═══════ DEFAULT VARIANT — all app pages ═══════ */
   return (
     <nav className="bg-white border-b border-[#E5E7EB] sticky top-0 z-40">
       <div className="max-w-7xl mx-auto px-6 flex items-center justify-between h-16">
-        <Link to="/dashboard" className="flex items-center gap-2 no-underline">
+        <Link to={isAuthenticated ? '/dashboard' : '/'} className="flex items-center gap-2 no-underline">
           <PawIcon />
           <span className="font-display font-bold text-lg text-gray-900">PetPal</span>
         </Link>
         <div className="hidden md:flex items-center gap-8">
-          <Link to="/dashboard" className={`text-sm font-medium no-underline ${isActive('/dashboard') ? 'text-[#7C3AED]' : 'text-gray-600 hover:text-[#7C3AED]'} transition-colors`}>{t('nav_my_pets')}</Link>
-          <Link to="/questionnaire" className={`text-sm font-medium no-underline ${isActive('/questionnaire') || isActive('/chat') ? 'text-[#7C3AED]' : 'text-gray-600 hover:text-[#7C3AED]'} transition-colors`}>{t('nav_diagnosis')}</Link>
-          <Link to="/" className={`text-sm font-medium no-underline ${isActive('/vets') ? 'text-[#7C3AED]' : 'text-gray-600 hover:text-[#7C3AED]'} transition-colors`}>{t('nav_vets')}</Link>
-          <Link to="/" className={`text-sm font-medium no-underline ${isActive('/library') ? 'text-[#7C3AED]' : 'text-gray-600 hover:text-[#7C3AED]'} transition-colors`}>{t('nav_library')}</Link>
+          <Link to="/" className={linkClass(isActive('/'))}>{t('nav_home')}</Link>
+          <Link to="/dashboard" className={linkClass(isActive('/dashboard'))}>{t('nav_dashboard')}</Link>
+          <Link to="/questionnaire" className={linkClass(isActive(['/questionnaire', '/chat', '/image-upload', '/report']))}>{t('nav_diagnosis')}</Link>
+          <Link to="/records" className={linkClass(isActive('/records'))}>{t('nav_records')}</Link>
         </div>
         <div className="flex items-center gap-3">
           <LangToggle />
-          <button className="p-2 text-gray-400 hover:text-[#7C3AED] transition-colors cursor-pointer">
-            <Search className="w-5 h-5" />
-          </button>
-          <button className="p-2 text-gray-400 hover:text-[#7C3AED] transition-colors relative cursor-pointer">
-            <Bell className="w-5 h-5" />
-            <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-[#EF4444] rounded-full" />
-          </button>
           {isAuthenticated ? (
             <UserMenu />
           ) : (
@@ -193,15 +172,17 @@ const Navbar = ({ variant = 'default' }) => {
       </div>
       {mobileOpen && (
         <div className="md:hidden border-t border-[#E5E7EB] bg-white px-6 py-4 flex flex-col gap-3">
-          <Link to="/dashboard" className="text-sm font-medium text-gray-600 no-underline">{t('nav_my_pets')}</Link>
-          <Link to="/questionnaire" className="text-sm font-medium text-gray-600 no-underline">{t('nav_diagnosis')}</Link>
-          <Link to="/" className="text-sm font-medium text-gray-600 no-underline">{t('nav_vets')}</Link>
-          <Link to="/" className="text-sm font-medium text-gray-600 no-underline">{t('nav_library')}</Link>
-          {isAuthenticated && (
+          <Link to="/" onClick={closeMobile} className="text-sm font-medium text-gray-600 no-underline">{t('nav_home')}</Link>
+          <Link to="/dashboard" onClick={closeMobile} className="text-sm font-medium text-gray-600 no-underline">{t('nav_dashboard')}</Link>
+          <Link to="/questionnaire" onClick={closeMobile} className="text-sm font-medium text-gray-600 no-underline">{t('nav_diagnosis')}</Link>
+          <Link to="/records" onClick={closeMobile} className="text-sm font-medium text-gray-600 no-underline">{t('nav_records')}</Link>
+          {isAuthenticated ? (
             <button onClick={handleLogout} className="text-sm font-medium text-red-600 no-underline text-left cursor-pointer flex items-center gap-2">
               <LogOut className="w-4 h-4" />
               {t('nav_logout') || 'Logout'}
             </button>
+          ) : (
+            <Link to="/login" onClick={closeMobile} className="text-sm font-medium text-gray-600 no-underline">{t('nav_login')}</Link>
           )}
         </div>
       )}

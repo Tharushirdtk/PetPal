@@ -10,7 +10,6 @@ import PetDashboard from './pages/PetDashboard';
 import MedicalHistory from './pages/MedicalHistory';
 import ChatbotPage from './pages/ChatbotPage';
 import QuestionnairePage from './pages/QuestionnairePage';
-import ImageAnalysisPage from './pages/ImageAnalysisPage';
 import ImageUploadStep from './pages/ImageUploadStep';
 import DiagnosisReportPage from './pages/DiagnosisReportPage';
 import AdminDashboard from './pages/AdminDashboard';
@@ -29,7 +28,6 @@ function App() {
               <Route path="/records" element={<ProtectedRoute><MedicalHistory /></ProtectedRoute>} />
               <Route path="/chat" element={<ChatbotPage />} />
               <Route path="/questionnaire" element={<QuestionnairePage />} />
-              <Route path="/image-analysis" element={<ImageAnalysisPage />} />
               <Route path="/image-upload" element={<ImageUploadStep />} />
               <Route path="/report" element={<DiagnosisReportPage />} />
               <Route path="/admin" element={<ProtectedRoute adminOnly><AdminDashboard /></ProtectedRoute>} />

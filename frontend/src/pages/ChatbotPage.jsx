@@ -15,6 +15,7 @@ import { useAuth } from '../context/AuthContext';
 import { sendMessage, getChatHistory } from '../api/chat';
 import { getConsultationHistory } from '../api/consultation';
 import { useStartConsultation } from '../hooks/useConsultation';
+import Navbar from '../components/Navbar';
 import StatusBadge from '../components/StatusBadge';
 import ErrorAlert from '../components/ErrorAlert';
 import LoadingSpinner from '../components/LoadingSpinner';
@@ -232,10 +233,12 @@ const ChatbotPage = () => {
 
   /* ───────── RENDER ───────── */
   return (
-    <div className="flex h-screen overflow-hidden">
+    <div className="flex flex-col h-screen overflow-hidden">
+      <Navbar />
+      <div className="flex flex-1 overflow-hidden">
 
       {/* ═══════ LEFT SIDEBAR ═══════ */}
-      <aside className="hidden lg:flex flex-col w-64 bg-white border-r border-[#E5E7EB] h-screen overflow-y-auto">
+      <aside className="hidden lg:flex flex-col w-64 bg-white border-r border-[#E5E7EB] overflow-y-auto">
         <div className="flex items-center gap-2 px-5 py-5">
           <div className="relative">
             <span className="text-xl font-bold text-[#7C3AED]">PetPal</span>
@@ -280,7 +283,7 @@ const ChatbotPage = () => {
       </aside>
 
       {/* ═══════ CENTER CHAT ═══════ */}
-      <section className="flex-1 flex flex-col bg-[#F9FAFB] h-screen">
+      <section className="flex-1 flex flex-col bg-[#F9FAFB]">
         {/* Top bar */}
         <div className="flex items-center gap-3 bg-white border-b border-[#E5E7EB] px-6 py-4">
           <div className="h-9 w-9 rounded-full bg-[#7C3AED] flex items-center justify-center text-white text-sm font-bold">
@@ -475,7 +478,7 @@ const ChatbotPage = () => {
       </section>
 
       {/* ═══════ RIGHT PANEL — dynamic pet info ═══════ */}
-      <aside className="hidden xl:flex flex-col w-72 bg-white border-l border-[#E5E7EB] h-screen overflow-y-auto p-4">
+      <aside className="hidden xl:flex flex-col w-72 bg-white border-l border-[#E5E7EB] overflow-y-auto p-4">
         {/* Pet avatar */}
         <div className="h-44 rounded-2xl bg-gradient-to-br from-purple-100 to-pink-100 flex items-center justify-center text-5xl mb-4">
           {petEmoji}
@@ -550,6 +553,7 @@ const ChatbotPage = () => {
         </>
         )}
       </aside>
+      </div>
     </div>
   );
 };
