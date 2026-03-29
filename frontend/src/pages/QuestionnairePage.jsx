@@ -80,10 +80,17 @@ const mapMockQuestion = (mq, lang) => ({
 
 /* ── Determine step from question code ── */
 const getStepForCode = (code) => {
+  // Mock data patterns (original)
   if (/^P\d+$/.test(code)) return 1;
   if (code === 'SD1') return 2;
   if (/^SD[234]/.test(code)) return 3;
   if (/^SD[567]$/.test(code)) return 4;
+
+  // API data patterns (new)
+  if (code === 'q_pet_type') return 1; // Pet Details
+  if (code === 'q_c') return 2; // Main symptom (Which symptoms are present?)
+  if (/^q_[bdfg]$/.test(code)) return 3; // Follow-up questions
+
   return 0;
 };
 
@@ -264,9 +271,21 @@ const QuestionnairePage = () => {
         if (usable.length > 0) {
           /* Assign step based on code */
           usable.forEach((q) => { q.step = getStepForCode(q.code); });
-          setQuestionnaireId(data.questionnaire?.id);
-          setAllQuestions(usable);
-          setUsingMock(false);
+
+          /* The 4-step wizard needs P1-P5 for Step 1.
+             If API questions don't include them, fall back to mock
+             which has the full question flow. */
+          const hasStep1 = usable.some((q) => /^P\d+$/.test(q.code));
+          const hasStep2 = usable.some((q) => q.step === 2);
+          const hasStep4 = usable.some((q) => q.step === 4);
+
+          if (hasStep1 && hasStep2 && hasStep4) {
+            setQuestionnaireId(data.questionnaire?.id);
+            setAllQuestions(usable);
+            setUsingMock(false);
+          } else {
+            loadMock();
+          }
         } else {
           loadMock();
         }
@@ -602,7 +621,7 @@ const QuestionnairePage = () => {
                   setPetBreedName('Mixed / Unknown');
                 } else {
                   const breed = breedList.find((b) => String(b.id) === id);
-                  setPetBreedName(breed?.name || '');
+                  setPetBreedName(breed?.description || breed?.name || '');
                 }
               }}
               disabled={loadingBreeds}
@@ -612,7 +631,7 @@ const QuestionnairePage = () => {
                 {loadingBreeds ? '...' : t('quest_pet_breed_placeholder') || 'Select breed'}
               </option>
               {breedList.map((breed) => (
-                <option key={breed.id} value={breed.id}>{breed.name}</option>
+                <option key={breed.id} value={breed.id}>{breed.description || breed.name}</option>
               ))}
               <option value="mixed">{t('quest_pet_breed_mixed') || 'Mixed / Unknown'}</option>
             </select>
@@ -649,7 +668,7 @@ const QuestionnairePage = () => {
 
   /* ── Render Step 2: Main Symptom ── */
   const renderStep2 = () => {
-    const sd1 = allQuestions.find((q) => q.code === 'SD1');
+    const sd1 = allQuestions.find((q) => q.step === 2);
     if (!sd1) return null;
     return (
       <div>
@@ -657,12 +676,12 @@ const QuestionnairePage = () => {
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           {sd1.options.map((opt) => {
             const icon = SD1_ICONS[opt.value] || opt.icon || '❓';
-            const isSelected = answers.SD1 === opt.value;
+            const isSelected = answers[sd1.code] === opt.value;
             return (
               <button
                 key={opt.value}
                 type="button"
-                onClick={() => handleAnswer('SD1', opt.value)}
+                onClick={() => handleAnswer(sd1.code, opt.value)}
                 className={`rounded-xl border-2 p-4 flex items-center gap-3 text-left cursor-pointer transition-all duration-200
                   ${getOptionBg(opt.color)}
                   ${isSelected
