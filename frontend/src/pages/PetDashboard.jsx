@@ -1,10 +1,11 @@
-import { useState, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Plus, Camera, ChevronRight, Calendar, Activity, FileText, Pencil, Trash2, Stethoscope } from 'lucide-react';
+import { Plus, Camera, ChevronRight, Calendar, Activity, FileText, Pencil, Trash2, Stethoscope, AlertTriangle, CheckCircle, Clock } from 'lucide-react';
 import { useLang } from '../i18n/LanguageContext';
 import { useAuth } from '../context/AuthContext';
 import { usePets } from '../hooks/usePets';
 import { uploadPetImage } from '../api/pets';
+import { getConsultationHistory } from '../api/consultation';
 import Navbar from '../components/Navbar';
 import StatusBadge from '../components/StatusBadge';
 import LoadingSpinner from '../components/LoadingSpinner';
@@ -54,9 +55,54 @@ const PetDashboard = () => {
   const [deletingPet, setDeletingPet] = useState(null);
   const [uploadingImage, setUploadingImage] = useState(null);
   const [formLoading, setFormLoading] = useState(false);
+  const [recentActivity, setRecentActivity] = useState([]);
+  const [activityLoading, setActivityLoading] = useState(true);
   const navigate = useNavigate();
   const imageInputRef = useRef(null);
   const imageTargetPetRef = useRef(null);
+
+  // Fetch consultation history for activity feed & wellness
+  useEffect(() => {
+    const fetchActivity = async () => {
+      try {
+        setActivityLoading(true);
+        const res = await getConsultationHistory();
+        const data = res.data;
+        const list = Array.isArray(data) ? data : (data.consultations || data.history || []);
+        setRecentActivity(list);
+      } catch {
+        // Silently fail — activity is non-critical
+        setRecentActivity([]);
+      } finally {
+        setActivityLoading(false);
+      }
+    };
+    fetchActivity();
+  }, []);
+
+  // Compute wellness score from real diagnosis data
+  const wellnessScore = (() => {
+    if (recentActivity.length === 0) return null;
+    const scored = recentActivity.filter(r => r.severity_flags);
+    if (scored.length === 0) return 100;
+    const severityPenalty = scored.reduce((sum, r) => {
+      const flags = typeof r.severity_flags === 'string' ? r.severity_flags : '';
+      const flagCount = flags ? flags.split(',').length : 0;
+      return sum + (flagCount * 15);
+    }, 0);
+    return Math.max(0, Math.min(100, 100 - Math.round(severityPenalty / scored.length)));
+  })();
+
+  // Build a per-pet last diagnosis map
+  const lastDiagnosisMap = (() => {
+    const map = {};
+    for (const r of recentActivity) {
+      if (r.pet_id && !map[r.pet_id] && r.primary_label) {
+        map[r.pet_id] = r.primary_label;
+      }
+    }
+    return map;
+  })();
 
   const handleAddPet = async (data) => {
     setFormLoading(true);
@@ -207,7 +253,9 @@ const PetDashboard = () => {
                           <FileText className="w-4 h-4" />
                           {t('dashboard_last_diagnosis') || 'Last Diagnosis'}
                         </span>
-                        <span className="text-gray-400 text-xs">{t('common_no_data') || 'No data'}</span>
+                        <span className={`text-xs font-medium ${lastDiagnosisMap[pet.id] ? 'text-gray-700' : 'text-gray-400'}`}>
+                          {lastDiagnosisMap[pet.id] || (t('common_no_data') || 'No data')}
+                        </span>
                       </div>
                     </div>
 
@@ -224,12 +272,12 @@ const PetDashboard = () => {
 
                       {/* Secondary actions row */}
                       <div className="flex items-center justify-between">
-                        <Link
-                          to={`/pet/${pet.id}`}
-                          className="text-sm font-semibold text-[#7C3AED] hover:text-[#6D28D9] transition-colors no-underline"
+                        <button
+                          onClick={() => setEditingPet(pet)}
+                          className="text-sm font-semibold text-[#7C3AED] hover:text-[#6D28D9] transition-colors cursor-pointer bg-transparent border-none p-0"
                         >
                           {t('dashboard_view_profile')}
-                        </Link>
+                        </button>
                         <div className="flex items-center gap-1.5">
                           <button
                             onClick={() => setEditingPet(pet)}
@@ -316,7 +364,7 @@ const PetDashboard = () => {
                 {t('dashboard_recent_activity')}
               </h2>
               <Link
-                to="/activity"
+                to="/records"
                 className="text-sm font-semibold text-[#7C3AED] hover:text-[#6D28D9] transition-colors no-underline flex items-center gap-1"
               >
                 {t('dashboard_see_all')}
@@ -326,9 +374,66 @@ const PetDashboard = () => {
 
             {/* Activity list */}
             <div className="divide-y divide-[#E5E7EB]">
-              <p className="text-sm text-gray-400 text-center py-8">
-                No recent activity
-              </p>
+              {activityLoading ? (
+                <div className="flex justify-center py-8">
+                  <div className="w-5 h-5 border-2 border-[#7C3AED] border-t-transparent rounded-full animate-spin" />
+                </div>
+              ) : recentActivity.length === 0 ? (
+                <div className="text-center py-8">
+                  <p className="text-sm text-gray-400 mb-3">
+                    {t('dashboard_no_activity') || 'No recent activity'}
+                  </p>
+                  <Link
+                    to="/diagnosis"
+                    className="text-sm font-semibold text-[#7C3AED] hover:text-[#6D28D9] transition-colors no-underline"
+                  >
+                    {t('dashboard_diagnose_pet') || 'Start a Diagnosis'}
+                  </Link>
+                </div>
+              ) : (
+                recentActivity.slice(0, 4).map((record) => {
+                  const petName = record.pet_name || record.petName || 'Unknown Pet';
+                  const diagnosis = record.primary_label || null;
+                  const status = (record.status_name || '').toLowerCase();
+                  const date = record.created_at ? new Date(record.created_at) : null;
+                  const emoji = speciesEmoji(record.species_name);
+                  const isCompleted = status === 'completed';
+                  const isPending = status === 'in_progress' || status === 'pending';
+
+                  return (
+                    <div key={record.id} className="flex items-center gap-4 py-3.5 first:pt-0 last:pb-0">
+                      {/* Pet avatar */}
+                      <div className="w-10 h-10 rounded-full bg-purple-50 flex items-center justify-center text-lg flex-shrink-0">
+                        {emoji}
+                      </div>
+
+                      {/* Details */}
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-semibold text-gray-900 truncate">
+                          {diagnosis
+                            ? `${petName} — ${diagnosis}`
+                            : `${petName} — ${t('dashboard_diagnosis_started') || 'Diagnosis started'}`
+                          }
+                        </p>
+                        <p className="text-xs text-gray-400 mt-0.5">
+                          {date ? date.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' }) : ''}
+                        </p>
+                      </div>
+
+                      {/* Status icon */}
+                      <div className="flex-shrink-0">
+                        {isCompleted ? (
+                          <CheckCircle className="w-5 h-5 text-green-500" />
+                        ) : isPending ? (
+                          <Clock className="w-5 h-5 text-amber-500" />
+                        ) : (
+                          <AlertTriangle className="w-5 h-5 text-gray-300" />
+                        )}
+                      </div>
+                    </div>
+                  );
+                })
+              )}
             </div>
           </div>
 
@@ -342,25 +447,41 @@ const PetDashboard = () => {
             </p>
 
             {/* Score */}
-            <div className="text-5xl font-display font-bold mb-4">94%</div>
+            {wellnessScore !== null ? (
+              <>
+                <div className="text-5xl font-display font-bold mb-4">{wellnessScore}%</div>
 
-            {/* Progress bar */}
-            <div className="w-full h-3 rounded-full bg-white/20 mb-4">
-              <div
-                className="h-full rounded-full bg-white/90"
-                style={{ width: '94%' }}
-              />
-            </div>
+                {/* Progress bar */}
+                <div className="w-full h-3 rounded-full bg-white/20 mb-4">
+                  <div
+                    className="h-full rounded-full bg-white/90 transition-all duration-500"
+                    style={{ width: `${wellnessScore}%` }}
+                  />
+                </div>
 
-            {/* Description */}
-            <p className="text-sm text-white/80 mb-6 leading-relaxed">
-              {t('dashboard_wellness_desc')}
-            </p>
+                {/* Description */}
+                <p className="text-sm text-white/80 mb-6 leading-relaxed">
+                  {wellnessScore >= 80
+                    ? (t('dashboard_wellness_great') || 'Your pets are doing great! Keep up the excellent care.')
+                    : wellnessScore >= 50
+                      ? (t('dashboard_wellness_ok') || 'Some health concerns detected. Consider a follow-up check.')
+                      : (t('dashboard_wellness_low') || 'Multiple health flags found. Please consult a veterinarian.')
+                  }
+                </p>
+              </>
+            ) : (
+              <>
+                <div className="text-4xl font-display font-bold mb-4">—</div>
+                <p className="text-sm text-white/80 mb-6 leading-relaxed">
+                  {t('dashboard_wellness_no_data') || 'Complete a diagnosis to see your pet wellness score.'}
+                </p>
+              </>
+            )}
 
             {/* Button */}
             <div className="mt-auto">
               <Link
-                to="/wellness"
+                to="/records"
                 className="inline-block bg-white text-[#7C3AED] rounded-full px-5 py-2.5 text-sm font-semibold hover:bg-white/90 transition-colors no-underline"
               >
                 {t('dashboard_wellness_reports')}
