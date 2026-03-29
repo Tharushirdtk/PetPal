@@ -49,3 +49,10 @@ body {
 #root {
   min-height: 100vh;
 }
+
+/* Print styles for report PDF download */
+@media print {
+  nav { display: none !important; }
+  body { background: #fff !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  section, div { break-inside: avoid; }
+}

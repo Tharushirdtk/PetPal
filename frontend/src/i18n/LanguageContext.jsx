@@ -11,7 +11,11 @@ export const LanguageProvider = ({ children }) => {
     document.documentElement.lang = l;
   };
 
-  const t = (key) => translations[lang][key] || key;
+  const t = (key, vars) => {
+    let str = translations[lang][key] || key;
+    if (vars) Object.entries(vars).forEach(([k, v]) => { str = str.replace(new RegExp(`\\{\\{${k}\\}\\}`, 'g'), v); });
+    return str;
+  };
 
   return (
     <LangContext.Provider value={{ lang, setLang, t }}>
