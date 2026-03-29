@@ -115,37 +115,55 @@ const AdminModel = {
   },
 
   async getStats() {
-    const [questions] = await query(
-      'SELECT COUNT(*) as total, SUM(is_active = 1) as active, SUM(is_active = 0) as inactive FROM question'
-    );
-    const [rules] = await query(
-      'SELECT COUNT(*) as total FROM visibility_rules'
-    );
-    const contactRows = await query(
-      "SELECT status, COUNT(*) as count FROM contact_message GROUP BY status"
-    );
-    const contacts = { total: 0, new: 0, read: 0, resolved: 0 };
-    for (const r of contactRows) {
-      contacts[r.status] = r.count;
-      contacts.total += r.count;
+    try {
+      const [questions] = await query(
+        'SELECT COUNT(*) as total, COALESCE(SUM(CASE WHEN is_active = 1 THEN 1 ELSE 0 END), 0) as active, COALESCE(SUM(CASE WHEN is_active = 0 THEN 1 ELSE 0 END), 0) as inactive FROM question'
+      );
+      const [rules] = await query(
+        'SELECT COUNT(*) as total FROM visibility_rules'
+      );
+      const contactRows = await query(
+        "SELECT status, COUNT(*) as count FROM contact_message GROUP BY status"
+      );
+      const contacts = { total: 0, new: 0, read: 0, resolved: 0 };
+      if (contactRows && contactRows.length > 0) {
+        for (const r of contactRows) {
+          contacts[r.status] = r.count;
+          contacts.total += r.count;
+        }
+      }
+      const [consultations] = await query(
+        'SELECT COUNT(*) as total FROM consultation'
+      );
+      const [diagnoses] = await query(
+        'SELECT COUNT(*) as total FROM diagnosis'
+      );
+      const [users] = await query(
+        'SELECT COUNT(*) as total FROM mast_user'
+      );
+      return {
+        questions: {
+          total: questions?.total || 0,
+          active: questions?.active || 0,
+          inactive: questions?.inactive || 0
+        },
+        rules: { total: rules?.total || 0 },
+        contacts,
+        consultations: { total: consultations?.total || 0 },
+        diagnoses: { total: diagnoses?.total || 0 },
+        users: { total: users?.total || 0 },
+      };
+    } catch (error) {
+      console.error('Error in getStats:', error);
+      return {
+        questions: { total: 0, active: 0, inactive: 0 },
+        rules: { total: 0 },
+        contacts: { total: 0, new: 0, read: 0, resolved: 0 },
+        consultations: { total: 0 },
+        diagnoses: { total: 0 },
+        users: { total: 0 },
+      };
     }
-    const [consultations] = await query(
-      'SELECT COUNT(*) as total FROM consultation'
-    );
-    const [diagnoses] = await query(
-      'SELECT COUNT(*) as total FROM diagnosis'
-    );
-    const [users] = await query(
-      'SELECT COUNT(*) as total FROM mast_user'
-    );
-    return {
-      questions: { total: questions.total, active: questions.active || 0, inactive: questions.inactive || 0 },
-      rules: { total: rules.total },
-      contacts,
-      consultations: { total: consultations.total },
-      diagnoses: { total: diagnoses.total },
-      users: { total: users.total },
-    };
   },
 };
 

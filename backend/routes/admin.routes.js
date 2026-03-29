@@ -5,6 +5,62 @@ const ctrl = require('../controllers/admin.controller');
 // All admin routes require auth + admin role
 router.use(requireAuth, ctrl.requireAdmin);
 
+/**
+ * @swagger
+ * /admin/stats:
+ *   get:
+ *     summary: Get admin dashboard statistics
+ *     tags: [Admin]
+ *     security:
+ *       - BearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Dashboard statistics
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     stats:
+ *                       type: object
+ *                       properties:
+ *                         questions:
+ *                           type: object
+ *                           properties:
+ *                             total: { type: integer }
+ *                             active: { type: integer }
+ *                             inactive: { type: integer }
+ *                         rules:
+ *                           type: object
+ *                           properties:
+ *                             total: { type: integer }
+ *                         contacts:
+ *                           type: object
+ *                           properties:
+ *                             total: { type: integer }
+ *                             new: { type: integer }
+ *                             read: { type: integer }
+ *                             resolved: { type: integer }
+ *                         consultations:
+ *                           type: object
+ *                           properties:
+ *                             total: { type: integer }
+ *                         diagnoses:
+ *                           type: object
+ *                           properties:
+ *                             total: { type: integer }
+ *                         users:
+ *                           type: object
+ *                           properties:
+ *                             total: { type: integer }
+ *       403:
+ *         description: Admin access required
+ */
 router.get('/stats', ctrl.getStats);
 
 /**
