@@ -92,6 +92,10 @@ export const translations = {
     auth_pet_community_desc: "Join thousands of pet parents",
     auth_social_proof: "Join 10k+ pet parents",
     auth_social_proof_sub: "Professional care for your furry best friends.",
+    auth_welcome_back: "Welcome back to PetPal",
+    auth_stat_users: "Pet Parents",
+    auth_stat_diagnoses: "Diagnoses",
+    auth_stat_satisfaction: "Satisfaction",
     auth_no_account: "Don't have an account?",
     auth_feature_health_title: "AI Health Checks",
     auth_feature_health_desc: "Smart diagnosis powered by AI",
@@ -371,6 +375,21 @@ export const translations = {
     admin_tab_rules: "Rules",
     admin_tab_contacts: "Contacts",
     admin_tab_analytics: "Analytics",
+    admin_tab_users: "Users",
+
+    // Admin Users Tab
+    admin_users_title: "Registered Users",
+    admin_users_total: "users total",
+    admin_search_users: "Search by name or email...",
+    admin_user_role: "Role",
+    admin_user_status: "Status",
+    admin_user_joined: "Joined",
+    admin_user_active: "Active",
+    admin_user_inactive: "Inactive",
+    admin_user_admin: "Admin",
+    admin_user_user: "User",
+    admin_pagination_page: "Page",
+    admin_pagination_of: "of",
 
     // Admin Overview
     admin_welcome: "Admin Dashboard",
@@ -385,6 +404,27 @@ export const translations = {
     admin_total_diagnoses: "Diagnoses",
     admin_active: "Active",
     admin_inactive: "Inactive",
+
+    // Question Types
+    question_type_single: "Single Choice",
+    question_type_multiple: "Multiple Choice",
+    question_type_text: "Text",
+    question_type_number: "Number",
+    question_type_date: "Date",
+    question_type_boolean: "Yes / No",
+    question_type_image: "Image",
+
+    // Admin Error Messages
+    admin_error_load_dashboard: "Failed to load dashboard data",
+    admin_error_load_analytics: "Failed to load analytics",
+    admin_error_load_questions: "Failed to load questions",
+    admin_error_load_rules: "Failed to load rules",
+    admin_error_create_rule: "Create failed",
+    admin_error_delete_rule: "Delete failed",
+    admin_error_save_question: "Save failed",
+    admin_error_load_contacts: "Failed to load contacts",
+    admin_error_update_contact: "Update failed",
+    admin_error_load_users: "Failed to load users",
     admin_recent_contacts: "Recent Contact Messages",
     admin_no_new_contacts: "No new contact messages.",
     admin_system_health: "System Health",
@@ -470,24 +510,67 @@ export const translations = {
     emergency_call: "Call Emergency Vet",
     emergency_nearest: "Find Nearest Clinic",
 
-    // Common
-    common_healthy: "HEALTHY",
-    common_pending: "PENDING",
-    common_scheduled: "Scheduled",
-    common_completed: "Completed",
-    common_loading: "Loading...",
-    common_error: "Something went wrong.",
-    common_retry: "Retry",
-    common_close: "Close",
-    common_save: "Save",
-    common_cancel: "Cancel",
-    common_edit: "Edit",
-    common_delete: "Delete",
-    common_back: "Back",
-    common_next: "Next",
-    common_yes: "Yes",
-    common_no: "No",
-    common_no_data: "No data",
+    // Pet Form Labels
+    form_pet_name: "Name",
+    form_pet_species: "Species",
+    form_pet_select_species: "Select species",
+    form_pet_breed: "Breed",
+    form_pet_select_breed: "Select breed",
+    form_pet_gender: "Gender",
+    form_pet_gender_unknown: "Unknown",
+    form_pet_gender_male: "Male",
+    form_pet_gender_female: "Female",
+    form_pet_weight: "Weight (kg)",
+    form_pet_birth_date: "Birth Date",
+    form_pet_birth_year: "Birth Year",
+    form_pet_birth_month: "Month",
+    form_pet_birth_day: "Day",
+    form_pet_microchip: "Microchip ID",
+    form_pet_add_photo: "Add Photo (optional)",
+    form_pet_change_photo: "Change Photo",
+    form_add_pet_title: "Add New Pet",
+    form_edit_pet_title: "Edit Pet",
+    form_error_required: "This field is required",
+    form_error_name_species_required: "Name and species are required",
+    form_error_add_pet_failed: "Failed to add pet",
+    form_error_update_pet_failed: "Failed to update pet",
+    form_button_cancel: "Cancel",
+    form_button_add_pet: "Add Pet",
+    form_button_adding: "Adding...",
+    form_button_save_changes: "Save Changes",
+    form_button_saving: "Saving...",
+
+    // Medical History
+    history_error_load: "Failed to load consultation history.",
+    history_no_match: "No records match your search.",
+    history_no_records: "No consultation history found.",
+    history_default_status: "Pending",
+    history_default_clinician: "AI Diagnosis",
+
+    // Chat/Consultation
+    chat_error_load_history: "Failed to load chat history.",
+    chat_error_unable_connect: "Unable to connect to PetPal AI right now...",
+
+    // Pet Dashboard
+    pet_confirm_remove: "Are you sure you want to remove {{petName}}? This action cannot be undone.",
+    pet_dashboard_gender: "Gender",
+    pet_dashboard_weight: "Weight",
+
+    // Age Units
+    age_unit_year: "year",
+    age_unit_years: "years",
+    age_unit_month: "month",
+    age_unit_months: "months",
+    age_unit_week: "week",
+    age_unit_weeks: "weeks",
+    age_unit_day: "day",
+    age_unit_days: "days",
+
+    // Rules
+    admin_target_type_question: "Question",
+    admin_target_type_option: "Option",
+    admin_no_match_search: "No users match your search.",
+    admin_no_users_found: "No users found."
 
     // Contact Form
     contact_title: "Get in Touch",
@@ -610,6 +693,10 @@ export const translations = {
     auth_pet_community_desc: "දහස් ගණන් සතා හිමියන් හා එක්වන්න",
     auth_social_proof: "10k+ සතා හිමියන් හා එක්වන්න",
     auth_social_proof_sub: "ඔබේ ලොම් යහලුවන් සඳහා වෘත්තීය සත්කාර.",
+    auth_welcome_back: "PetPal වෙත නැවත සාදරයෙන් පිළිගනිමු",
+    auth_stat_users: "සතා හිමියන්",
+    auth_stat_diagnoses: "රෝග විනිශ්චය",
+    auth_stat_satisfaction: "සෑහීම",
     auth_no_account: "ගිණුමක් නැද්ද?",
     auth_feature_health_title: "AI සෞඛ්‍ය පරීක්ෂා",
     auth_feature_health_desc: "AI මගින් බලගැන්වෙන රෝග විනිශ්චය",
@@ -888,6 +975,7 @@ export const translations = {
     admin_tab_questions: "ප්‍රශ්න",
     admin_tab_rules: "නීති",
     admin_tab_contacts: "සම්බන්ධතා",
+    admin_tab_users: "පරිශීලකයන්",
     admin_tab_analytics: "විශ්ලේෂණ",
 
     // Admin Overview
@@ -903,6 +991,49 @@ export const translations = {
     admin_total_diagnoses: "රෝග විනිශ්චය",
     admin_active: "සක්‍රිය",
     admin_inactive: "අක්‍රිය",
+
+    // Question Types (SI)
+    question_type_single: "තනි තේරීම",
+    question_type_multiple: "බහු තේරීම",
+    question_type_text: "පෙළ",
+    question_type_number: "අංකය",
+    question_type_date: "දිනය",
+    question_type_boolean: "ඔව් / නැත",
+    question_type_image: "රූපය",
+
+    // Admin Error Messages (SI)
+    admin_error_load_dashboard: "උපකරණ පුවරුවේ දත්ත පූරණය කිරීමට අසාර්ථකයි",
+    admin_error_load_analytics: "විශ්ලේෂණ පූරණය කිරීමට අසාර්ථකයි",
+    admin_error_load_questions: "ප්‍රශ්න පූරණය කිරීමට අසාර්ථකයි",
+    admin_error_load_rules: "නීති පූරණය කිරීමට අසාර්ථකයි",
+    admin_error_create_rule: "නිර්මාණය අසාර්ථකයි",
+    admin_error_delete_rule: "මකාදැමීම අසාර්ථකයි",
+    admin_error_save_question: "ඉතිරි කිරීම අසාර්ථකයි",
+    admin_error_load_contacts: "සම්බන්ධතා පූරණය කිරීමට අසාර්ථකයි",
+    admin_error_update_contact: "යාවත්කාලීනතාවයි අසාර්ථකයි",
+    admin_error_load_users: "පරිශීලකයන් පූරණය කිරීමට අසාර්ථකයි",
+
+    // Admin Dashboard Tabs (SI)
+    admin_tab_overview: "දළ විසින්දුව",
+    admin_tab_questions: "ප්‍රශ්න",
+    admin_tab_rules: "නීති",
+    admin_tab_contacts: "සම්බන්ධතා",
+    admin_tab_analytics: "විශ්ලේෂණ",
+    admin_tab_users: "පරිශීලකයන්",
+
+    // Admin Users Tab (SI)
+    admin_users_title: "ලියාපදිංචි කර ඇති පරිශීලකයන්",
+    admin_users_total: "පරිශීලකයන් සම්පූර්ණ",
+    admin_search_users: "නම හෝ විද්‍යුත් තැපෑල අනුව සොයන්න...",
+    admin_user_role: "භූමිකාව",
+    admin_user_status: "තත්ත්වය",
+    admin_user_joined: "එක්වුණු",
+    admin_user_active: "සක්‍රිය",
+    admin_user_inactive: "අක්‍රිය",
+    admin_user_admin: "පරිපාලක",
+    admin_user_user: "පරිශීලක",
+    admin_pagination_page: "පිටුව",
+    admin_pagination_of: "ගෙන්",
     admin_recent_contacts: "මෑත සම්බන්ධතා පණිවිඩ",
     admin_no_new_contacts: "නව සම්බන්ධතා පණිවිඩ නැත.",
     admin_system_health: "පද්ධති සෞඛ්‍යය",
@@ -1009,6 +1140,83 @@ export const translations = {
 
     // Contact Form
     contact_title: "අප හා සම්බන්ධ වන්න",
+
+    // Pet Profile (SI)
+    pet_profile_back: "උපකරණ පුවරුවට ආපසු",
+    pet_profile_wellness: "සෞඛ්‍ය ලකුණු",
+    pet_profile_total_diagnoses: "මුළු රෝග විනිශ්චය",
+    pet_profile_last_checkup: "අවසාන පරීක්ෂාව",
+    pet_profile_latest_result: "නවතම ප්‍රතිඵලය",
+    pet_profile_no_checkups: "තවම පරීක්ෂා නැත",
+    pet_profile_ai_title: "AI බලයෙන් සෞඛ්‍ය තොරතුරු",
+    pet_profile_ai_desc: "අපගේ ML රූප වර්ගීකරණය සහ Gemini AI විශ්ලේෂණය මඟින් ක්ෂණික රෝග විනිශ්චය ලබා ගන්න.",
+    pet_profile_start_diagnosis: "AI රෝග විනිශ්චය ආරම්භ කරන්න",
+    pet_profile_history_title: "රෝග විනිශ්චය ඉතිහාසය",
+    pet_profile_no_history: "තවම රෝග විනිශ්චය ඉතිහාසයක් නැත",
+    pet_profile_no_history_desc: "ඔබේ සතාගේ වෛද්‍ය පැතිකඩ ගොඩනැඟීමට පළමු AI සෞඛ්‍ය පරීක්ෂාව ආරම්භ කරන්න.",
+    pet_profile_first_diagnosis: "පළමු රෝග විනිශ්චය කරන්න",
+
+    // Pet Form Labels (SI)
+    form_pet_name: "නම",
+    form_pet_species: "විශේෂය",
+    form_pet_select_species: "විශේෂය තෝරන්න",
+    form_pet_breed: "වර්ගය",
+    form_pet_select_breed: "වර්ගය තෝරන්න",
+    form_pet_gender: "ස්ත්‍රී පුරුෂ භාවය",
+    form_pet_gender_unknown: "නොදන්නා",
+    form_pet_gender_male: "පුරුෂ",
+    form_pet_gender_female: "ස්ත්‍රී",
+    form_pet_weight: "බර (kg)",
+    form_pet_birth_date: "උපන් දිනය",
+    form_pet_birth_year: "උපන් වර්ෂය",
+    form_pet_birth_month: "මාසය",
+    form_pet_birth_day: "දිනය",
+    form_pet_microchip: "Microchip ID",
+    form_pet_add_photo: "ඡායාරූපය එකතු කරන්න (විකල්ප)",
+    form_pet_change_photo: "ඡායාරූපය වෙනස් කරන්න",
+    form_add_pet_title: "නව සතෙකු එකතු කරන්න",
+    form_edit_pet_title: "සතෙකු සංස්කරණය කරන්න",
+    form_error_required: "මෙම ක්ෂේත්‍ර අවශ්‍යයි",
+    form_error_name_species_required: "නම සහ විශේෂය අවශ්‍යයි",
+    form_error_add_pet_failed: "සතෙකු එකතු කිරීමට අසාර්ථකයි",
+    form_error_update_pet_failed: "සතෙකු යාවත්කාලීන කිරීමට අසාර්ථකයි",
+    form_button_cancel: "අවලංගු කරන්න",
+    form_button_add_pet: "සතෙකු එකතු කරන්න",
+    form_button_adding: "එකතු කරමින්...",
+    form_button_save_changes: "වෙනස්කම් සුරකින්න",
+    form_button_saving: "සුරකිමින්...",
+
+    // Medical History (SI)
+    history_error_load: "උපදේශන ඉතිහාසය පූරණය කිරීමට අසාර්ථකයි.",
+    history_no_match: "ඔබේ සෙවුමට ගැළපෙන වාර්තා නැත.",
+    history_no_records: "උපදේශන ඉතිහාසයක් හමු නොවීය.",
+    history_default_status: "අපේක්ෂිත",
+    history_default_clinician: "AI රෝග විනිශ්චය",
+
+    // Chat/Consultation (SI)
+    chat_error_load_history: "චැට් ඉතිහාසය පූරණය කිරීමට අසාර්ථකයි.",
+    chat_error_unable_connect: "දැනට PetPal AI සමඟ සම්බන්ධ වීමට නොහැක...",
+
+    // Pet Dashboard (SI)
+    pet_confirm_remove: "{{petName}} ඉවත් කිරීමට ඔබ විශ්වාසයි ද? මෙම ක්‍රියාව අපෝහිත කළ නොහැක.",
+    pet_dashboard_gender: "ස්ත්‍රී පුරුෂ භාවය",
+    pet_dashboard_weight: "බර",
+
+    // Age Units (SI)
+    age_unit_year: "වසර",
+    age_unit_years: "වසර",
+    age_unit_month: "මාසය",
+    age_unit_months: "මාස",
+    age_unit_week: "සතිය",
+    age_unit_weeks: "සති",
+    age_unit_day: "දිනය",
+    age_unit_days: "දින",
+
+    // Rules (SI)
+    admin_target_type_question: "ප්‍රශ්නය",
+    admin_target_type_option: "විකල්පය",
+    admin_no_match_search: "ඔබේ සෙවුමට ගැළපෙන පරිශීලකයන් නැත.",
+    admin_no_users_found: "පරිශීලකයන් හමු නොවීය."
 
     // Pet Profile
     pet_profile_back: "උපකරණ පුවරුවට ආපසු",

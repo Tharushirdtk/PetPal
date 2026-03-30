@@ -40,7 +40,7 @@ const MedicalHistory = () => {
         const list = Array.isArray(data) ? data : (data.consultations || data.history || []);
         setRecords(list);
       } catch (err) {
-        setError(err.error || 'Failed to load consultation history.');
+        setError(err.error || t('history_error_load'));
       } finally {
         setLoading(false);
       }
@@ -154,18 +154,19 @@ const MedicalHistory = () => {
                   {filteredRecords.length === 0 ? (
                     <tr>
                       <td colSpan={6} className="px-6 py-12 text-center text-gray-400">
-                        {searchQuery ? 'No records match your search.' : 'No consultation history found.'}
+                        {searchQuery ? t('history_no_match') : t('history_no_records')}
                       </td>
                     </tr>
                   ) : (
                     filteredRecords.map((record) => {
                       const petName = record.pet_name || record.petName || 'Pet';
                       const petAvatar = petName.charAt(0).toUpperCase();
-                      const date = record.date || record.created_at || record.consultation_date || '';
+                      const rawDate = record.date || record.created_at || record.consultation_date || '';
+                      const date = rawDate ? new Date(rawDate).toLocaleDateString() : '';
                       const diagnosis = record.diagnosis || record.primary_label || 'Pending';
                       const diagnosisSub = record.diagnosis_sub || record.diagnosisSub || record.secondary_label || '';
                       const clinician = record.clinician || record.vet_name || 'AI Diagnosis';
-                      const status = record.status || 'completed';
+                      const status = record.status_name?.toLowerCase() || record.status || 'completed';
                       const consultationId = record.consultation_id || record.id;
 
                       return (

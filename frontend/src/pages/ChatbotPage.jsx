@@ -21,6 +21,9 @@ import StatusBadge from '../components/StatusBadge';
 import ErrorAlert from '../components/ErrorAlert';
 import LoadingSpinner from '../components/LoadingSpinner';
 
+const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api';
+const SERVER_BASE = API_BASE.replace(/\/api\/?$/, '');
+
 const ChatbotPage = () => {
   const { t } = useLang();
   const navigate = useNavigate();
@@ -84,7 +87,7 @@ const ChatbotPage = () => {
       } catch (err) {
         if (!cancelled) {
           if (err?.response?.status !== 404 && err?.status !== 404) {
-            setError('Failed to load chat history.');
+            setError(t('chat_error_load_history'));
           }
         }
       } finally {
@@ -134,7 +137,7 @@ const ChatbotPage = () => {
           });
         }
       } catch {
-        setError('Unable to connect to PetPal AI right now. Please try again in a moment.');
+        setError(t('chat_error_unable_connect'));
       } finally {
         setIsTyping(false);
       }
@@ -173,6 +176,7 @@ const ChatbotPage = () => {
             species: item.species_name || '',
             statusName: item.status_name || '',
             primaryLabel: item.primary_label || '',
+            imageUrl: item.pet_image_url || '',
           };
         });
 
@@ -587,20 +591,25 @@ const ChatbotPage = () => {
           {/* Bottom input area */}
           <div className="bg-[#F9FAFB] px-6 pb-5">
             {/* Input bar */}
-            <div className="flex items-center gap-3 bg-white rounded-xl border border-gray-200 px-4 py-3 shadow-sm">
-              <input
-                type="text"
+            <div className="flex items-end gap-3 bg-white rounded-xl border border-gray-200 px-4 py-3 shadow-sm">
+              <textarea
                 value={inputText}
                 onChange={(e) => setInputText(e.target.value)}
                 onKeyDown={handleKeyDown}
                 placeholder={t('chat_placeholder')}
-                className="flex-1 text-sm outline-none bg-transparent text-gray-700 placeholder-gray-400"
+                rows={1}
+                className="flex-1 text-sm outline-none bg-transparent text-gray-700 placeholder-gray-400 resize-none max-h-[4.5rem] overflow-y-auto leading-[1.5]"
+                style={{ minHeight: '1.5rem' }}
                 disabled={isTyping}
+                onInput={(e) => {
+                  e.target.style.height = '1.5rem';
+                  e.target.style.height = Math.min(e.target.scrollHeight, 72) + 'px';
+                }}
               />
               <button
                 onClick={handleSend}
                 disabled={!inputText.trim() || isTyping}
-                className="h-9 w-9 rounded-full bg-[#7C3AED] flex items-center justify-center text-white hover:bg-[#6D28D9] transition-colors flex-shrink-0 disabled:opacity-40 disabled:cursor-not-allowed"
+                className="h-9 w-9 rounded-full bg-[#7C3AED] flex items-center justify-center text-white hover:bg-[#6D28D9] transition-colors flex-shrink-0 disabled:opacity-40 disabled:cursor-not-allowed mb-0.5"
               >
                 <ArrowRight size={16} />
               </button>
@@ -634,8 +643,24 @@ const ChatbotPage = () => {
       {/* ═══════ RIGHT PANEL — pet info ═══════ */}
       <aside className="hidden xl:flex flex-col w-72 bg-white border-l border-[#E5E7EB] overflow-y-auto p-4">
         {/* Pet avatar */}
-        <div className="h-36 rounded-2xl bg-gradient-to-br from-purple-100 to-pink-100 flex items-center justify-center text-5xl mb-4">
-          {petEmoji}
+        <div className="h-36 rounded-2xl bg-gradient-to-br from-purple-100 to-pink-100 flex items-center justify-center text-5xl mb-4 overflow-hidden">
+          {selectedPetData?.imageUrl ? (
+            <img
+              src={selectedPetData.imageUrl.startsWith('http') ? selectedPetData.imageUrl : `${SERVER_BASE}${selectedPetData.imageUrl}`}
+              alt={displayPetName}
+              className="w-full h-full object-cover"
+              onError={(e) => {
+                e.target.style.display = 'none';
+                e.target.nextSibling.style.display = 'flex';
+              }}
+            />
+          ) : null}
+          <div
+            className="w-full h-full flex items-center justify-center text-5xl"
+            style={{ display: selectedPetData?.imageUrl ? 'none' : 'flex' }}
+          >
+            {petEmoji}
+          </div>
         </div>
 
         {/* Pet info */}
@@ -654,7 +679,7 @@ const ChatbotPage = () => {
         <div className="flex flex-wrap gap-1.5 mt-2">
           {displayAge && (
             <span className="inline-flex items-center px-3 py-1 rounded-full bg-purple-50 text-purple-600 text-xs font-medium">
-              {displayAge} {displayAge === '1' ? 'year' : 'years'}
+              {displayAge} {!isNaN(displayAge) ? (displayAge === '1' ? 'year' : 'years') : ''}
             </span>
           )}
           {displayGender && (

@@ -1,11 +1,13 @@
 import { useState, useEffect, useRef } from 'react';
 import { getSpecies, getBreeds, uploadPetImage } from '../../api/pets';
+import { useLang } from '../../i18n/LanguageContext';
 import ErrorAlert from '../ErrorAlert';
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api';
 const SERVER_BASE = API_BASE.replace(/\/api\/?$/, '');
 
 export default function EditPetForm({ pet, onSubmit, onClose, loading: externalLoading }) {
+  const { t } = useLang();
   const [form, setForm] = useState({
     name: pet.name || '',
     species_id: pet.species?.id || pet.species_id || '',
@@ -75,7 +77,7 @@ export default function EditPetForm({ pet, onSubmit, onClose, loading: externalL
         await uploadPetImage(pet.id, imageFile);
       }
     } catch (err) {
-      setError(err.error || 'Failed to update pet');
+      setError(err.error || t('form_error_update_pet_failed'));
     }
   };
 
@@ -83,7 +85,7 @@ export default function EditPetForm({ pet, onSubmit, onClose, loading: externalL
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
       <div className="bg-white rounded-2xl p-6 w-full max-w-md max-h-[90vh] overflow-y-auto">
         <div className="flex justify-between items-center mb-4">
-          <h2 className="text-xl font-bold text-gray-800">Edit {pet.name}</h2>
+          <h2 className="text-xl font-bold text-gray-800">{t('form_edit_pet_title')} {pet.name}</h2>
           <button onClick={onClose} className="text-gray-400 hover:text-gray-600 text-2xl cursor-pointer">&times;</button>
         </div>
 
@@ -107,7 +109,7 @@ export default function EditPetForm({ pet, onSubmit, onClose, loading: externalL
               onClick={() => fileRef.current?.click()}
               className="text-xs text-[#7C3AED] font-medium cursor-pointer"
             >
-              Change Photo
+              {t('form_pet_change_photo')}
             </button>
             <input
               ref={fileRef}
@@ -119,67 +121,67 @@ export default function EditPetForm({ pet, onSubmit, onClose, loading: externalL
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Name *</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">{t('form_pet_name')} *</label>
             <input name="name" value={form.name} onChange={handleChange} required
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent" />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Species *</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">{t('form_pet_species')} *</label>
             <select name="species_id" value={form.species_id} onChange={handleChange} required
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
-              <option value="">Select species</option>
+              <option value="">{t('form_pet_select_species')}</option>
               {species.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
             </select>
           </div>
 
           {breeds.length > 0 && (
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Breed</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">{t('form_pet_breed')}</label>
               <select name="breed_id" value={form.breed_id} onChange={handleChange}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
-                <option value="">Select breed</option>
+                <option value="">{t('form_pet_select_breed')}</option>
                 {breeds.map(b => <option key={b.id} value={b.id}>{b.name}</option>)}
               </select>
             </div>
           )}
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Gender</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">{t('form_pet_gender')}</label>
             <select name="gender" value={form.gender} onChange={handleChange}
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
-              <option value="Unknown">Unknown</option>
-              <option value="Male">Male</option>
-              <option value="Female">Female</option>
+              <option value="Unknown">{t('form_pet_gender_unknown')}</option>
+              <option value="Male">{t('form_pet_gender_male')}</option>
+              <option value="Female">{t('form_pet_gender_female')}</option>
             </select>
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Weight (kg)</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">{t('form_pet_weight')}</label>
             <input name="weight" type="number" step="0.1" min="0" value={form.weight} onChange={handleChange}
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent" />
           </div>
 
           <div className="grid grid-cols-3 gap-2">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Birth Year</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">{t('form_pet_birth_year')}</label>
               <input name="birth_year" type="number" min="1990" max="2026" value={form.birth_year} onChange={handleChange}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent" />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Month</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">{t('form_pet_birth_month')}</label>
               <input name="birth_month" type="number" min="1" max="12" value={form.birth_month} onChange={handleChange}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent" />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Day</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">{t('form_pet_birth_day')}</label>
               <input name="birth_day" type="number" min="1" max="31" value={form.birth_day} onChange={handleChange}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent" />
             </div>
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Microchip ID</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">{t('form_pet_microchip')}</label>
             <input name="microchip_id" value={form.microchip_id} onChange={handleChange}
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent" />
           </div>
@@ -187,11 +189,11 @@ export default function EditPetForm({ pet, onSubmit, onClose, loading: externalL
           <div className="flex gap-3 pt-2">
             <button type="button" onClick={onClose}
               className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 cursor-pointer">
-              Cancel
+              {t('form_button_cancel')}
             </button>
             <button type="submit" disabled={externalLoading}
               className="flex-1 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 disabled:opacity-50 cursor-pointer">
-              {externalLoading ? 'Saving...' : 'Save Changes'}
+              {externalLoading ? t('form_button_saving') : t('form_button_save_changes')}
             </button>
           </div>
         </form>

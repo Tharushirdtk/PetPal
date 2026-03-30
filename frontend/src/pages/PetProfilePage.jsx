@@ -40,12 +40,31 @@ const speciesGradient = (speciesName) => {
   return map[(speciesName || '').toLowerCase()] || 'from-gray-400 to-slate-300';
 };
 
-const getAge = (birthYear, birthMonth) => {
+const getAge = (birthYear, birthMonth, birthDay, t) => {
   if (!birthYear) return null;
   const now = new Date();
   let years = now.getFullYear() - birthYear;
   if (birthMonth && now.getMonth() + 1 < birthMonth) years--;
-  return Math.max(0, years);
+  else if (birthMonth && now.getMonth() + 1 === birthMonth && birthDay && now.getDate() < birthDay) years--;
+  years = Math.max(0, years);
+
+  if (years > 0) return `${years} ${years === 1 ? t('age_unit_year') : t('age_unit_years')}`;
+
+  // Calculate months
+  let months = (now.getFullYear() - birthYear) * 12 + (now.getMonth() + 1) - (birthMonth || 1);
+  if (birthDay && now.getDate() < birthDay) months--;
+  months = Math.max(0, months);
+
+  if (months > 0) return `${months} ${months === 1 ? t('age_unit_month') : t('age_unit_months')}`;
+
+  // Calculate weeks
+  const birthDate = new Date(birthYear, (birthMonth || 1) - 1, birthDay || 1);
+  const diffMs = now - birthDate;
+  const weeks = Math.floor(diffMs / (7 * 24 * 60 * 60 * 1000));
+  if (weeks > 0) return `${weeks} ${weeks === 1 ? t('age_unit_week') : t('age_unit_weeks')}`;
+
+  const days = Math.max(0, Math.floor(diffMs / (24 * 60 * 60 * 1000)));
+  return `${days} ${days === 1 ? t('age_unit_day') : t('age_unit_days')}`;
 };
 
 const severityColor = (flags) => {
@@ -175,7 +194,7 @@ const PetProfilePage = () => {
     );
   }
 
-  const age = getAge(pet.birth_year, pet.birth_month);
+  const age = getAge(pet.birth_year, pet.birth_month, pet.birth_day, t);
   const emoji = speciesEmoji(pet.species?.name);
   const gradient = speciesGradient(pet.species?.name);
   const breedDisplay = [pet.species?.name, pet.breed?.name].filter(Boolean).join(' \u2022 ');
@@ -264,7 +283,7 @@ const PetProfilePage = () => {
                 {age !== null && (
                   <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white border border-gray-200 text-sm text-gray-600 shadow-sm">
                     <Calendar className="w-3.5 h-3.5 text-[#7C3AED]" />
-                    {age} {age === 1 ? 'year' : 'years'} old
+                    {age} old
                   </div>
                 )}
                 {pet.gender && pet.gender !== 'Unknown' && (

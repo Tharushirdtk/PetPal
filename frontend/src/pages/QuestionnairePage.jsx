@@ -621,7 +621,7 @@ const QuestionnairePage = () => {
                   setPetBreedName('Mixed / Unknown');
                 } else {
                   const breed = breedList.find((b) => String(b.id) === id);
-                  setPetBreedName(breed?.description || breed?.name || '');
+                  setPetBreedName(breed?.name || breed?.description || '');
                 }
               }}
               disabled={loadingBreeds}
@@ -631,7 +631,7 @@ const QuestionnairePage = () => {
                 {loadingBreeds ? '...' : t('quest_pet_breed_placeholder') || 'Select breed'}
               </option>
               {breedList.map((breed) => (
-                <option key={breed.id} value={breed.id}>{breed.description || breed.name}</option>
+                <option key={breed.id} value={breed.id}>{breed.name || breed.description}</option>
               ))}
               <option value="mixed">{t('quest_pet_breed_mixed') || 'Mixed / Unknown'}</option>
             </select>

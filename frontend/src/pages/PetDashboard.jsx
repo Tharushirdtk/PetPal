@@ -40,9 +40,31 @@ const speciesGradient = (speciesName) => {
   return map[(speciesName || '').toLowerCase()] || 'from-gray-100 to-gray-50';
 };
 
-const getAge = (birthYear) => {
+const getAge = (birthYear, birthMonth, birthDay) => {
   if (!birthYear) return null;
-  return new Date().getFullYear() - birthYear;
+  const now = new Date();
+  let years = now.getFullYear() - birthYear;
+  if (birthMonth && now.getMonth() + 1 < birthMonth) years--;
+  else if (birthMonth && now.getMonth() + 1 === birthMonth && birthDay && now.getDate() < birthDay) years--;
+  years = Math.max(0, years);
+
+  if (years > 0) return `${years}y`;
+
+  // Calculate months
+  let months = (now.getFullYear() - birthYear) * 12 + (now.getMonth() + 1) - (birthMonth || 1);
+  if (birthDay && now.getDate() < birthDay) months--;
+  months = Math.max(0, months);
+
+  if (months > 0) return `${months}mo`;
+
+  // Calculate weeks
+  const birthDate = new Date(birthYear, (birthMonth || 1) - 1, birthDay || 1);
+  const diffMs = now - birthDate;
+  const weeks = Math.floor(diffMs / (7 * 24 * 60 * 60 * 1000));
+  if (weeks > 0) return `${weeks}w`;
+
+  const days = Math.max(0, Math.floor(diffMs / (24 * 60 * 60 * 1000)));
+  return `${days}d`;
 };
 
 const PetDashboard = () => {
@@ -208,7 +230,7 @@ const PetDashboard = () => {
         {!loading && (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
             {pets.map((pet) => {
-              const age = getAge(pet.birth_year);
+              const age = getAge(pet.birth_year, pet.birth_month, pet.birth_day);
               const emoji = speciesEmoji(pet.species?.name);
               const gradient = speciesGradient(pet.species?.name);
               const breedDisplay = [pet.species?.name, pet.breed?.name].filter(Boolean).join(' \u2022 ');
@@ -247,7 +269,7 @@ const PetDashboard = () => {
                       <StatusBadge status={petHealthMap[pet.id] || 'healthy'} />
                     </div>
                     <p className="text-sm text-gray-500 mb-4">
-                      {breedDisplay}{age !== null ? ` \u2022 ${age}y` : ''}
+                      {breedDisplay}{age !== null ? ` \u2022 ${age}` : ''}
                     </p>
 
                     {/* Info rows */}

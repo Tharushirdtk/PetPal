@@ -1,5 +1,5 @@
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { Menu, X, LogOut } from 'lucide-react';
+import { Menu, X, LogOut, ArrowLeft } from 'lucide-react';
 import { useState } from 'react';
 import { useLang } from '../i18n/LanguageContext';
 import LangToggle from './LangToggle';
@@ -142,9 +142,11 @@ const Navbar = ({ variant = 'default' }) => {
 
           {/* Admin Navigation Links */}
           <div className="hidden md:flex items-center gap-6">
-            <Link to="/" className={linkClass(isActive('/'))}>{t('nav_home') || 'Home'}</Link>
-            <Link to="/dashboard" className={linkClass(isActive('/dashboard'))}>{t('nav_dashboard') || 'Dashboard'}</Link>
             <Link to="/admin" className={linkClass(isActive('/admin'))}>Admin Panel</Link>
+            <Link to="/dashboard" className="text-xs text-gray-400 hover:text-[#7C3AED] transition-colors no-underline flex items-center gap-1">
+              <ArrowLeft className="w-3 h-3" />
+              Back to App
+            </Link>
           </div>
 
           <div className="flex items-center gap-3">
@@ -163,9 +165,11 @@ const Navbar = ({ variant = 'default' }) => {
         {/* Mobile Navigation */}
         {mobileOpen && (
           <div className="md:hidden border-t border-[#E5E7EB] bg-white px-6 py-4 flex flex-col gap-3">
-            <Link to="/" onClick={closeMobile} className="text-sm font-medium text-gray-600 no-underline">{t('nav_home') || 'Home'}</Link>
-            <Link to="/dashboard" onClick={closeMobile} className="text-sm font-medium text-gray-600 no-underline">{t('nav_dashboard') || 'Dashboard'}</Link>
             <Link to="/admin" onClick={closeMobile} className="text-sm font-medium text-gray-600 no-underline">Admin Panel</Link>
+            <Link to="/dashboard" onClick={closeMobile} className="text-sm font-medium text-gray-400 no-underline flex items-center gap-1">
+              <ArrowLeft className="w-3 h-3" />
+              Back to App
+            </Link>
             {isAuthenticated && (
               <button onClick={handleLogout} className="text-sm font-medium text-red-600 no-underline text-left cursor-pointer flex items-center gap-2">
                 <LogOut className="w-4 h-4" />

@@ -24,7 +24,7 @@ const LoginPage = () => {
     try {
       const res = await login({ email, password });
       loginUser(res.data.user, res.data.token);
-      navigate('/dashboard');
+      navigate(res.data.user?.role === 'admin' ? '/admin' : '/dashboard');
     } catch (err) {
       setError(err.error || err.message || 'Login failed. Please try again.');
     } finally {
@@ -224,56 +224,63 @@ const LoginPage = () => {
       </div>
 
       {/* ── Right Panel ── */}
-      <div className="hidden lg:flex w-1/2 bg-[#F5F3FF] flex-col items-center justify-center p-12 relative overflow-hidden">
-        {/* Placeholder image area — gradient + paw */}
-        <div className="relative w-full max-w-lg">
-          <div className="w-full aspect-square rounded-3xl bg-gradient-to-br from-[#7C3AED] to-[#A78BFA] flex items-center justify-center shadow-2xl">
-            <PawPrint className="w-32 h-32 text-white/30" />
+      <div className="hidden lg:flex w-1/2 bg-gradient-to-br from-[#7C3AED] via-[#6D28D9] to-[#5B21B6] flex-col items-center justify-center p-12 relative overflow-hidden">
+        {/* Background decorative elements */}
+        <div className="absolute top-0 right-0 w-96 h-96 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/3" />
+        <div className="absolute bottom-0 left-0 w-72 h-72 bg-white/5 rounded-full translate-y-1/3 -translate-x-1/4" />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-white/[0.03] rounded-full" />
+
+        <div className="relative z-10 w-full max-w-md text-center">
+          {/* Icon */}
+          <div className="w-20 h-20 rounded-2xl bg-white/15 backdrop-blur-sm flex items-center justify-center mx-auto mb-8 shadow-lg">
+            <PawPrint className="w-10 h-10 text-white" />
           </div>
 
-          {/* Floating card */}
-          <div className="absolute -bottom-4 -left-4 bg-white rounded-2xl shadow-lg p-4 flex items-center gap-3">
-            {/* Avatar row */}
-            <div className="flex -space-x-2">
-              <div className="w-8 h-8 rounded-full bg-[#7C3AED] border-2 border-white flex items-center justify-center text-white text-xs font-bold">
-                A
-              </div>
-              <div className="w-8 h-8 rounded-full bg-[#A78BFA] border-2 border-white flex items-center justify-center text-white text-xs font-bold">
-                B
-              </div>
-              <div className="w-8 h-8 rounded-full bg-[#6D28D9] border-2 border-white flex items-center justify-center text-white text-xs font-bold">
-                C
-              </div>
+          {/* Heading */}
+          <h2 className="text-3xl font-bold text-white mb-3">
+            {t('auth_welcome_back') || 'Welcome back to PetPal'}
+          </h2>
+          <p className="text-white/70 text-base leading-relaxed mb-10">
+            {t('auth_social_proof_sub') || 'Professional care for your furry best friends.'}
+          </p>
+
+          {/* Stats row */}
+          <div className="flex items-center justify-center gap-8 mb-10">
+            <div className="text-center">
+              <p className="text-2xl font-bold text-white">10k+</p>
+              <p className="text-xs text-white/60 mt-1">{t('auth_stat_users') || 'Pet Parents'}</p>
             </div>
-            <div>
-              <p className="text-sm font-semibold text-gray-900">
-                {t('auth_social_proof')}
-              </p>
-              <p className="text-xs text-gray-500">
-                {t('auth_social_proof_sub')}
-              </p>
+            <div className="w-px h-10 bg-white/20" />
+            <div className="text-center">
+              <p className="text-2xl font-bold text-white">50k+</p>
+              <p className="text-xs text-white/60 mt-1">{t('auth_stat_diagnoses') || 'Diagnoses'}</p>
+            </div>
+            <div className="w-px h-10 bg-white/20" />
+            <div className="text-center">
+              <p className="text-2xl font-bold text-white">99%</p>
+              <p className="text-xs text-white/60 mt-1">{t('auth_stat_satisfaction') || 'Satisfaction'}</p>
             </div>
           </div>
-        </div>
 
-        {/* Feature mini-cards 2x2 grid */}
-        <div className="grid grid-cols-2 gap-4 mt-12 w-full max-w-lg">
-          {features.map((f, i) => (
-            <div
-              key={i}
-              className="bg-white rounded-2xl p-4 shadow-sm hover:shadow-md transition-shadow"
-            >
-              <div className="w-10 h-10 rounded-xl bg-[#F5F3FF] flex items-center justify-center mb-3">
-                {f.icon}
+          {/* Feature cards - 2x2 grid */}
+          <div className="grid grid-cols-2 gap-3">
+            {features.map((f, i) => (
+              <div
+                key={i}
+                className="bg-white/10 backdrop-blur-sm rounded-xl p-4 text-left hover:bg-white/15 transition-colors"
+              >
+                <div className="w-9 h-9 rounded-lg bg-white/15 flex items-center justify-center mb-2.5">
+                  <span className="[&>svg]:text-white">{f.icon}</span>
+                </div>
+                <h3 className="text-sm font-semibold text-white mb-1">
+                  {t(f.titleKey)}
+                </h3>
+                <p className="text-xs text-white/60 leading-relaxed">
+                  {t(f.descKey)}
+                </p>
               </div>
-              <h3 className="text-sm font-semibold text-gray-900 mb-1">
-                {t(f.titleKey)}
-              </h3>
-              <p className="text-xs text-gray-500 leading-relaxed">
-                {t(f.descKey)}
-              </p>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
       </div>
     </div>
