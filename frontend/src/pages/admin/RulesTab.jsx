@@ -34,7 +34,7 @@ const RulesTab = () => {
       const res = await getQuestions();
       setQuestions(res.data.questions || []);
     } catch (err) {
-      setError(err.error || 'Failed to load data');
+      setError(err.error || t('admin_error_load_rules'));
     } finally {
       setLoading(false);
     }
@@ -84,7 +84,7 @@ const RulesTab = () => {
       setNewRule({ target_type: 'question', target_id: '', condition_json: '{\n  "==": [{"var": "answers.q_code"}, "value"]\n}', priority: 100 });
       fetchData();
     } catch (err) {
-      showToast(err.error || 'Create failed', 'error');
+      showToast(err.error || t('admin_error_create_rule'), 'error');
     } finally {
       setCreating(false);
     }
@@ -97,7 +97,7 @@ const RulesTab = () => {
       setDeleteConfirm(null);
       fetchData();
     } catch (err) {
-      showToast(err.error || 'Delete failed', 'error');
+      showToast(err.error || t('admin_error_delete_rule'), 'error');
     }
   };
 
@@ -160,8 +160,8 @@ const RulesTab = () => {
                 onChange={(e) => setNewRule((p) => ({ ...p, target_type: e.target.value }))}
                 className="w-full rounded-xl border border-[#E5E7EB] px-3 py-2 text-sm outline-none focus:border-[#7C3AED] cursor-pointer bg-white"
               >
-                <option value="question">Question</option>
-                <option value="option">Option</option>
+                <option value="question">{t('admin_target_type_question')}</option>
+                <option value="option">{t('admin_target_type_option')}</option>
               </select>
             </div>
             <div>

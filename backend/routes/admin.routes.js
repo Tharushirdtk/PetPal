@@ -257,4 +257,6 @@ router.get('/contacts', ctrl.listContacts);
  */
 router.put('/contacts/:id', ctrl.updateContactStatus);
 
+router.get('/users', ctrl.listUsers);
+
 module.exports = router;

@@ -5,6 +5,7 @@ import {
   GitBranch,
   Mail,
   BarChart3,
+  Users,
 } from 'lucide-react';
 import { useLang } from '../i18n/LanguageContext';
 import Navbar from '../components/Navbar';
@@ -13,12 +14,14 @@ import QuestionsTab from './admin/QuestionsTab';
 import RulesTab from './admin/RulesTab';
 import ContactsTab from './admin/ContactsTab';
 import AnalyticsTab from './admin/AnalyticsTab';
+import UsersTab from './admin/UsersTab';
 
 const TABS = [
   { key: 'overview', icon: LayoutDashboard, labelKey: 'admin_tab_overview' },
   { key: 'questions', icon: FileQuestion, labelKey: 'admin_tab_questions' },
   { key: 'rules', icon: GitBranch, labelKey: 'admin_tab_rules' },
   { key: 'contacts', icon: Mail, labelKey: 'admin_tab_contacts' },
+  { key: 'users', icon: Users, labelKey: 'admin_tab_users' },
   { key: 'analytics', icon: BarChart3, labelKey: 'admin_tab_analytics' },
 ];
 
@@ -27,6 +30,7 @@ const TAB_COMPONENTS = {
   questions: QuestionsTab,
   rules: RulesTab,
   contacts: ContactsTab,
+  users: UsersTab,
   analytics: AnalyticsTab,
 };
 
@@ -64,7 +68,7 @@ const AdminDashboard = () => {
 
       {/* Tab Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6">
-        <ActiveComponent />
+        <ActiveComponent onTabChange={setActiveTab} />
       </div>
     </div>
   );

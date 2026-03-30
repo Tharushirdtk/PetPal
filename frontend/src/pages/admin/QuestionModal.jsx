@@ -9,6 +9,16 @@ const QuestionModal = ({ question, onClose, onSaved }) => {
   const { t } = useLang();
   const isEdit = !!question;
 
+  const TYPE_LABELS = {
+    single: t('question_type_single'),
+    multi: t('question_type_multiple'),
+    text: t('question_type_text'),
+    number: t('question_type_number'),
+    date: t('question_type_date'),
+    boolean: t('question_type_boolean'),
+    image: t('question_type_image'),
+  };
+
   const [form, setForm] = useState({
     code: question?.code || '',
     text: question?.text || '',
@@ -66,7 +76,7 @@ const QuestionModal = ({ question, onClose, onSaved }) => {
       }
       onSaved();
     } catch (err) {
-      setError(err.error || 'Save failed');
+      setError(err.error || t('admin_error_save_question'));
     } finally {
       setSaving(false);
     }
@@ -128,7 +138,7 @@ const QuestionModal = ({ question, onClose, onSaved }) => {
                 className="w-full rounded-xl border border-[#E5E7EB] px-3 py-2.5 text-sm outline-none focus:border-[#7C3AED] transition-colors cursor-pointer bg-white"
               >
                 {QUESTION_TYPES.map((tp) => (
-                  <option key={tp} value={tp}>{tp}</option>
+                  <option key={tp} value={tp}>{TYPE_LABELS[tp] || tp}</option>
                 ))}
               </select>
             </div>
@@ -184,7 +194,7 @@ const QuestionModal = ({ question, onClose, onSaved }) => {
                         type="text"
                         value={opt.value_key}
                         onChange={(e) => updateOption(idx, 'value_key', e.target.value)}
-                        placeholder="value_key"
+                        placeholder="Key (e.g. skin)"
                         className="flex-1 rounded-lg border border-[#E5E7EB] px-2.5 py-2 text-sm font-mono outline-none focus:border-[#7C3AED] transition-colors"
                       />
                       <input

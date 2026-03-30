@@ -40,12 +40,14 @@ const ConsultationModel = {
     return query(
       `SELECT c.*, s.name AS status_name,
               p.name AS pet_name, sp.name AS species_name,
+              ia.file_url AS pet_image_url,
               d.primary_label, d.confidence, d.severity_flags,
               COALESCE(mc.msg_count, 0) AS message_count
        FROM consultation c
        LEFT JOIN mast_status s ON c.status_id = s.id
        LEFT JOIN mast_pet p ON c.pet_id = p.id
        LEFT JOIN mast_species sp ON p.species_id = sp.id
+       LEFT JOIN image_asset ia ON p.primary_image_id = ia.id
        LEFT JOIN diagnosis d ON d.consultation_id = c.id
        LEFT JOIN (
          SELECT conv.consultation_id, COUNT(m.id) AS msg_count

@@ -38,13 +38,23 @@ const QuestionsTab = () => {
   const [deleteConfirm, setDeleteConfirm] = useState(null);
   const [toast, setToast] = useState(null);
 
+  const TYPE_LABELS = {
+    single: t('question_type_single'),
+    multi: t('question_type_multiple'),
+    text: t('question_type_text'),
+    number: t('question_type_number'),
+    date: t('question_type_date'),
+    boolean: t('question_type_boolean'),
+    image: t('question_type_image'),
+  };
+
   const fetchQuestions = async () => {
     try {
       setLoading(true);
       const res = await getQuestions();
       setQuestions(res.data.questions || []);
     } catch (err) {
-      setError(err.error || 'Failed to load questions');
+      setError(err.error || t('admin_error_load_questions'));
     } finally {
       setLoading(false);
     }
@@ -160,7 +170,7 @@ const QuestionsTab = () => {
           >
             <option value="all">{t('admin_all_types')}</option>
             {types.map((tp) => (
-              <option key={tp} value={tp}>{tp}</option>
+              <option key={tp} value={tp}>{TYPE_LABELS[tp] || tp}</option>
             ))}
           </select>
           <select
@@ -198,7 +208,7 @@ const QuestionsTab = () => {
                   <span className="font-mono text-xs text-gray-400 w-20 flex-shrink-0 truncate">{q.code}</span>
                   <p className="flex-1 text-sm text-gray-900 font-medium truncate">{q.text}</p>
                   <span className={`text-xs px-2.5 py-1 rounded-full font-medium flex-shrink-0 ${TYPE_STYLES[q.question_type] || 'bg-gray-100 text-gray-600'}`}>
-                    {q.question_type}
+                    {TYPE_LABELS[q.question_type] || q.question_type}
                   </span>
                   <span className="text-xs text-gray-400 flex-shrink-0 hidden sm:block">
                     #{q.display_order}

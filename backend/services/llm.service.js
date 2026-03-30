@@ -1,5 +1,6 @@
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
-const GEMINI_MODEL = 'gemini-2.5-flash';
+// const GEMINI_MODEL = 'gemini-2.5-flash';
+const GEMINI_MODEL = "gemini-2.5-flash-lite";
 const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${GEMINI_API_KEY}`;
 
 const SYSTEM_PROMPT = `You are PetPal, an expert AI veterinary assistant. You help pet owners identify possible health conditions in dogs and cats. You are NOT a replacement for a vet. Always recommend professional veterinary care for serious conditions. Be empathetic, clear, and concise.
@@ -21,21 +22,31 @@ If you need more information, just ask follow-up questions without the <DIAGNOSI
 /**
  * Build the full user context prompt.
  */
-function buildUserPrompt({ pet, jsonAnswers, imageSnapshot, vectorResults, conversationHistory, currentMessage }) {
-  let prompt = '';
+function buildUserPrompt({
+  pet,
+  jsonAnswers,
+  imageSnapshot,
+  vectorResults,
+  conversationHistory,
+  currentMessage,
+}) {
+  let prompt = "";
 
   // Use questionnaire answers as the primary source of pet info (most recent),
   // only fall back to database pet record when no questionnaire data exists.
   if (jsonAnswers && Object.keys(jsonAnswers).length > 0) {
-    prompt += '\n--- QUESTIONNAIRE SUMMARY ---\n';
+    prompt += "\n--- QUESTIONNAIRE SUMMARY ---\n";
     if (jsonAnswers.pet) {
       const p = jsonAnswers.pet;
-      prompt += `Pet Info: ${p.type || 'Unknown'} | Breed: ${p.breed || 'Unknown'} | Age: ${p.age || 'Unknown'} | Gender: ${p.gender || 'Unknown'} | Neutered: ${p.neutered || 'Unknown'} | Vaccinated: ${p.vaccinated || 'Unknown'}\n`;
+      prompt += `Pet Info: ${p.type || "Unknown"} | Breed: ${p.breed || "Unknown"} | Age: ${p.age || "Unknown"} | Gender: ${p.gender || "Unknown"} | Neutered: ${p.neutered || "Unknown"} | Vaccinated: ${p.vaccinated || "Unknown"}\n`;
     }
     if (jsonAnswers.main_symptom) {
       prompt += `Main Symptom: ${jsonAnswers.main_symptom}\n`;
     }
-    if (jsonAnswers.symptom_details && Object.keys(jsonAnswers.symptom_details).length > 0) {
+    if (
+      jsonAnswers.symptom_details &&
+      Object.keys(jsonAnswers.symptom_details).length > 0
+    ) {
       prompt += `Symptom Details:\n`;
       for (const [key, val] of Object.entries(jsonAnswers.symptom_details)) {
         prompt += `  - ${key}: ${val}\n`;
@@ -45,15 +56,16 @@ function buildUserPrompt({ pet, jsonAnswers, imageSnapshot, vectorResults, conve
       const g = jsonAnswers.general;
       if (g.duration) prompt += `Duration: ${g.duration}\n`;
       if (g.severity) prompt += `Severity: ${g.severity}\n`;
-      if (g.behaviour_change) prompt += `Behaviour Change: ${g.behaviour_change}\n`;
+      if (g.behaviour_change)
+        prompt += `Behaviour Change: ${g.behaviour_change}\n`;
     }
     if (jsonAnswers.emergency_flags && jsonAnswers.emergency_flags.length > 0) {
-      prompt += `Emergency Flags: ${jsonAnswers.emergency_flags.join(', ')}\n`;
+      prompt += `Emergency Flags: ${jsonAnswers.emergency_flags.join(", ")}\n`;
     }
-    prompt += '--- END QUESTIONNAIRE ---\n\n';
+    prompt += "--- END QUESTIONNAIRE ---\n\n";
   } else if (pet) {
     // Fallback: no questionnaire data, use database pet record
-    prompt += `Pet: ${pet.species_name || 'Unknown'} | Breed: ${pet.breed_name || 'Unknown'} | Age: ${pet.birth_year ? new Date().getFullYear() - pet.birth_year + ' years' : 'Unknown'} | Gender: ${pet.gender || 'Unknown'}\n`;
+    prompt += `Pet: ${pet.species_name || "Unknown"} | Breed: ${pet.breed_name || "Unknown"} | Age: ${pet.birth_year ? new Date().getFullYear() - pet.birth_year + " years" : "Unknown"} | Gender: ${pet.gender || "Unknown"}\n`;
   }
 
   if (imageSnapshot && Object.keys(imageSnapshot).length > 0) {
@@ -65,16 +77,16 @@ function buildUserPrompt({ pet, jsonAnswers, imageSnapshot, vectorResults, conve
     for (const r of vectorResults) {
       prompt += `- ${r}\n`;
     }
-    prompt += '\n';
+    prompt += "\n";
   }
 
   if (conversationHistory && conversationHistory.length > 0) {
     prompt += `\nCONVERSATION HISTORY:\n`;
     for (const msg of conversationHistory) {
-      const role = msg.sender_type === 'user' ? 'User' : 'AI';
+      const role = msg.sender_type === "user" ? "User" : "AI";
       prompt += `${role}: ${msg.content}\n`;
     }
-    prompt += '\n';
+    prompt += "\n";
   }
 
   prompt += `USER MESSAGE:\n${currentMessage}`;
@@ -89,10 +101,8 @@ async function callGemini(userPrompt) {
   const body = {
     contents: [
       {
-        role: 'user',
-        parts: [
-          { text: `${SYSTEM_PROMPT}\n\n---\n\n${userPrompt}` }
-        ],
+        role: "user",
+        parts: [{ text: `${SYSTEM_PROMPT}\n\n---\n\n${userPrompt}` }],
       },
     ],
     generationConfig: {
@@ -101,19 +111,20 @@ async function callGemini(userPrompt) {
     },
   };
 
-  const MAX_RETRIES = 2;
+  // const MAX_RETRIES = 2;
+  const MAX_RETRIES = 0;
   let lastError;
 
   for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {
     const response = await fetch(GEMINI_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify(body),
     });
 
     if (response.ok) {
       const json = await response.json();
-      const text = json.candidates?.[0]?.content?.parts?.[0]?.text || '';
+      const text = json.candidates?.[0]?.content?.parts?.[0]?.text || "";
       return text;
     }
 
@@ -121,19 +132,24 @@ async function callGemini(userPrompt) {
 
     if (response.status === 429 && attempt < MAX_RETRIES) {
       const waitMs = (attempt + 1) * 5000;
-      console.warn(`Gemini rate-limited (429), retrying in ${waitMs}ms (attempt ${attempt + 1}/${MAX_RETRIES})...`);
+      console.warn(
+        `Gemini rate-limited (429), retrying in ${waitMs}ms (attempt ${attempt + 1}/${MAX_RETRIES})...`,
+      );
       await new Promise((r) => setTimeout(r, waitMs));
-      lastError = new Error('RATE_LIMITED');
+      lastError = new Error("RATE_LIMITED");
       lastError.status = 429;
       continue;
     }
 
     const err = new Error(
       response.status === 429
-        ? 'Our AI service is temporarily busy due to high demand. Please try again in a few moments.'
-        : `Gemini API error ${response.status}`
+        ? "Our AI service is temporarily busy due to high demand. Please try again in a few moments."
+        : `Gemini API error ${response.status}`,
     );
     err.status = response.status;
+    if (err.status === 429) {
+      return "I'm a bit busy right now. Please try again in a few seconds or tommorow.";
+    }
     throw err;
   }
 
@@ -154,7 +170,7 @@ function parseDiagnosisBlock(rawResponse) {
 
   try {
     const diagnosis = JSON.parse(match[1]);
-    const reply = rawResponse.replace(regex, '').trim();
+    const reply = rawResponse.replace(regex, "").trim();
     return { reply, diagnosis };
   } catch {
     return { reply: rawResponse.trim(), diagnosis: null };
@@ -170,4 +186,9 @@ async function getLLMResponse(context) {
   return parseDiagnosisBlock(rawResponse);
 }
 
-module.exports = { getLLMResponse, buildUserPrompt, callGemini, parseDiagnosisBlock };
+module.exports = {
+  getLLMResponse,
+  buildUserPrompt,
+  callGemini,
+  parseDiagnosisBlock,
+};

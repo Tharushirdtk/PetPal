@@ -4,8 +4,11 @@
   "description": "PetPal AI-powered pet health diagnosis backend",
   "main": "server.js",
   "scripts": {
-    "start": "node server.js",
-    "dev": "nodemon server.js"
+    "dev": "nodemon server.js",
+    "start": "node dist/server.js",
+    "build": "robocopy . dist /E /XD dist node_modules && exit 0",
+    "clean": "rmdir /S /Q dist",
+    "rebuild": "npm run clean && npm run build"
   },
   "dependencies": {
     "bcrypt": "^5.1.1",

@@ -34,7 +34,7 @@ const ContactsTab = () => {
       setContacts(res.data.contacts || []);
       setPagination(res.data.pagination || { page, limit: 10, total: 0 });
     } catch (err) {
-      setError(err.error || 'Failed to load contacts');
+      setError(err.error || t('admin_error_load_contacts'));
     } finally {
       setLoading(false);
     }
@@ -53,7 +53,7 @@ const ContactsTab = () => {
       setContacts((prev) => prev.map((c) => c.id === id ? { ...c, status: newStatus } : c));
       showToast(t('admin_status_updated'));
     } catch (err) {
-      showToast(err.error || 'Update failed', 'error');
+      showToast(err.error || t('admin_error_update_contact'), 'error');
     }
   };
 

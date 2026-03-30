@@ -126,6 +126,30 @@ const AdminModel = {
     return rows[0];
   },
 
+  // --- Users ---
+  async listUsers({ page = 1, limit = 20, search }) {
+    const offset = (page - 1) * limit;
+    const safeLimit = Math.max(1, Math.min(100, parseInt(limit) || 20));
+    const safeOffset = Math.max(0, parseInt(offset) || 0);
+
+    let sql = "SELECT id, CONCAT(first_name, ' ', COALESCE(last_name, '')) AS name, email, role, is_verified AS is_active, created_at FROM mast_user";
+    const params = [];
+
+    if (search) {
+      sql += ' WHERE (first_name LIKE ? OR last_name LIKE ? OR email LIKE ?)';
+      params.push(`%${search}%`, `%${search}%`, `%${search}%`);
+    }
+
+    const countSql = sql.replace(/SELECT .+? FROM/, 'SELECT COUNT(*) as total FROM');
+    const countResult = await query(countSql, params);
+    const total = countResult[0]?.total || 0;
+
+    sql += ` ORDER BY created_at DESC LIMIT ${safeLimit} OFFSET ${safeOffset}`;
+    const rows = await query(sql, params);
+
+    return { users: rows, pagination: { page, limit: safeLimit, total } };
+  },
+
   // --- Statistics ---
   async getStats() {
     try {

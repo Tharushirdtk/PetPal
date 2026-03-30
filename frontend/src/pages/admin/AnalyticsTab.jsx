@@ -29,7 +29,7 @@ const AnalyticsTab = () => {
         setStats(statsRes.data.stats);
         setQuestions(qRes.data.questions || []);
       } catch (err) {
-        setError(err.error || 'Failed to load analytics');
+        setError(err.error || t('admin_error_load_analytics'));
       } finally {
         setLoading(false);
       }
@@ -81,6 +81,16 @@ const AnalyticsTab = () => {
   const inactiveQ = stats?.questions?.inactive || 0;
   const totalQ = stats?.questions?.total || 1;
 
+  const TYPE_LABELS = {
+    single: t('question_type_single'),
+    multi: t('question_type_multiple'),
+    text: t('question_type_text'),
+    number: t('question_type_number'),
+    date: t('question_type_date'),
+    boolean: t('question_type_boolean'),
+    image: t('question_type_image'),
+  };
+
   const TYPE_COLORS = {
     single: 'bg-blue-500',
     multi: 'bg-purple-500',
@@ -119,7 +129,7 @@ const AnalyticsTab = () => {
             {Object.entries(typeDistribution).map(([type, count]) => (
               <div key={type}>
                 <div className="flex items-center justify-between mb-1">
-                  <span className="text-sm text-gray-600 capitalize">{type}</span>
+                  <span className="text-sm text-gray-600">{TYPE_LABELS[type] || type}</span>
                   <span className="text-sm font-medium text-gray-900">{count}</span>
                 </div>
                 <div className="h-2 bg-gray-100 rounded-full overflow-hidden">

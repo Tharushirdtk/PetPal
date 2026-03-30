@@ -76,3 +76,10 @@ exports.getStats = asyncHandler(async (req, res) => {
   const stats = await AdminModel.getStats();
   return ok(res, { stats });
 });
+
+// --- Users ---
+exports.listUsers = asyncHandler(async (req, res) => {
+  const { page = 1, limit = 20, search } = req.query;
+  const result = await AdminModel.listUsers({ page: parseInt(page), limit: parseInt(limit), search });
+  return ok(res, result);
+});

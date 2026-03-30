@@ -26,7 +26,7 @@ const StatCard = ({ icon: Icon, label, value, accent, sub }) => (
   </div>
 );
 
-const OverviewTab = () => {
+const OverviewTab = ({ onTabChange }) => {
   const { t } = useLang();
   const [stats, setStats] = useState(null);
   const [recentContacts, setRecentContacts] = useState([]);
@@ -44,7 +44,7 @@ const OverviewTab = () => {
         setStats(statsRes.data.stats);
         setRecentContacts(contactsRes.data.contacts || []);
       } catch (err) {
-        setError(err.error || 'Failed to load dashboard data');
+        setError(err.error || t('admin_error_load_dashboard'));
       } finally {
         setLoading(false);
       }
@@ -170,9 +170,9 @@ const OverviewTab = () => {
             <h3 className="font-semibold text-gray-900 text-sm">{t('admin_quick_actions')}</h3>
           </div>
           <div className="space-y-2">
-            <QuickAction label={t('admin_manage_questions')} />
-            <QuickAction label={t('admin_review_contacts')} />
-            <QuickAction label={t('admin_view_analytics')} />
+            <QuickAction label={t('admin_manage_questions')} onClick={() => onTabChange?.('questions')} />
+            <QuickAction label={t('admin_review_contacts')} onClick={() => onTabChange?.('contacts')} />
+            <QuickAction label={t('admin_view_analytics')} onClick={() => onTabChange?.('analytics')} />
           </div>
         </div>
       </div>
@@ -180,8 +180,8 @@ const OverviewTab = () => {
   );
 };
 
-const QuickAction = ({ label }) => (
-  <div className="flex items-center justify-between p-2 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer group">
+const QuickAction = ({ label, onClick }) => (
+  <div onClick={onClick} className="flex items-center justify-between p-2 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer group">
     <span className="text-sm text-gray-600 group-hover:text-[#7C3AED] transition-colors">{label}</span>
     <ArrowRight className="w-4 h-4 text-gray-400 group-hover:text-[#7C3AED] transition-colors" />
   </div>
