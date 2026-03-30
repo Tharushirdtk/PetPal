@@ -2,8 +2,8 @@ const { query } = require('../config/db');
 
 const PetModel = {
   async findByOwner(ownerId) {
-    return query(
-      `SELECT p.*, s.name AS species_name, b.name AS breed_name,
+    const pets = await query(
+      `SELECT p.*, s.name AS species_name, b.name AS breed_name, b.description AS breed_description,
               ia.file_url AS image_url
        FROM mast_pet p
        LEFT JOIN mast_species s ON p.species_id = s.id
@@ -13,11 +13,16 @@ const PetModel = {
        ORDER BY p.created_at DESC`,
       [ownerId]
     );
+
+    return pets.map(pet => ({
+      ...pet,
+      breed_name: pet.breed_name ? (pet.breed_description || pet.breed_name.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())) : null
+    }));
   },
 
   async findById(id) {
     const rows = await query(
-      `SELECT p.*, s.name AS species_name, b.name AS breed_name,
+      `SELECT p.*, s.name AS species_name, b.name AS breed_name, b.description AS breed_description,
               ia.file_url AS image_url
        FROM mast_pet p
        LEFT JOIN mast_species s ON p.species_id = s.id
@@ -26,7 +31,13 @@ const PetModel = {
        WHERE p.id = ?`,
       [id]
     );
-    return rows[0] || null;
+
+    const pet = rows[0] || null;
+    if (pet && pet.breed_name) {
+      pet.breed_name = pet.breed_description || pet.breed_name.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+    }
+
+    return pet;
   },
 
   async create(data, userId) {
@@ -72,7 +83,13 @@ const PetModel = {
   },
 
   async listBreeds(speciesId) {
-    return query('SELECT id, species_id, name, description FROM mast_breed WHERE species_id = ? ORDER BY name', [speciesId]);
+    const breeds = await query('SELECT id, species_id, name, description FROM mast_breed WHERE species_id = ? ORDER BY name', [speciesId]);
+
+    return breeds.map(breed => ({
+      id: breed.id,
+      species_id: breed.species_id,
+      name: breed.description || breed.name.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())
+    }));
   },
 };
 

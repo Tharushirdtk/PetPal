@@ -141,7 +141,7 @@ export default function EditPetForm({ pet, onSubmit, onClose, loading: externalL
               <select name="breed_id" value={form.breed_id} onChange={handleChange}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
                 <option value="">{t('form_pet_select_breed')}</option>
-                {breeds.map(b => <option key={b.id} value={b.id}>{b.name}</option>)}
+                {breeds.map(b => <option key={b.id} value={b.id}>{b.description || b.name}</option>)}
               </select>
             </div>
           )}

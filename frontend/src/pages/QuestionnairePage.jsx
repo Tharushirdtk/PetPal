@@ -247,7 +247,7 @@ const QuestionnairePage = () => {
         // Pre-fill breed
         if (pet.breed) {
           setPetBreedId(String(pet.breed.id || ''));
-          setPetBreedName(pet.breed.name || '');
+          setPetBreedName(pet.breed.description || pet.breed.name || '');
         }
       })
       .catch(() => {});
@@ -621,7 +621,7 @@ const QuestionnairePage = () => {
                   setPetBreedName('Mixed / Unknown');
                 } else {
                   const breed = breedList.find((b) => String(b.id) === id);
-                  setPetBreedName(breed?.name || breed?.description || '');
+                  setPetBreedName(breed?.description || breed?.name || '');
                 }
               }}
               disabled={loadingBreeds}
@@ -631,7 +631,7 @@ const QuestionnairePage = () => {
                 {loadingBreeds ? '...' : t('quest_pet_breed_placeholder') || 'Select breed'}
               </option>
               {breedList.map((breed) => (
-                <option key={breed.id} value={breed.id}>{breed.name || breed.description}</option>
+                <option key={breed.id} value={breed.id}>{breed.description || breed.name}</option>
               ))}
               <option value="mixed">{t('quest_pet_breed_mixed') || 'Mixed / Unknown'}</option>
             </select>
@@ -809,7 +809,7 @@ const QuestionnairePage = () => {
                 Diagnosing: {selectedPet.name}
               </p>
               <p className="text-xs text-gray-500">
-                {selectedPet.species?.name}{selectedPet.breed?.name ? ` \u2022 ${selectedPet.breed.name}` : ''}
+                {selectedPet.species?.name}{selectedPet.breed ? ` \u2022 ${selectedPet.breed.description || selectedPet.breed.name}` : ''}
               </p>
             </div>
           </div>
