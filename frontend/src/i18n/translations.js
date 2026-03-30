@@ -570,7 +570,7 @@ export const translations = {
     admin_target_type_question: "Question",
     admin_target_type_option: "Option",
     admin_no_match_search: "No users match your search.",
-    admin_no_users_found: "No users found."
+    admin_no_users_found: "No users found.",
 
     // Contact Form
     contact_title: "Get in Touch",
@@ -1216,7 +1216,7 @@ export const translations = {
     admin_target_type_question: "ප්‍රශ්නය",
     admin_target_type_option: "විකල්පය",
     admin_no_match_search: "ඔබේ සෙවුමට ගැළපෙන පරිශීලකයන් නැත.",
-    admin_no_users_found: "පරිශීලකයන් හමු නොවීය."
+    admin_no_users_found: "පරිශීලකයන් හමු නොවීය.",
 
     // Pet Profile
     pet_profile_back: "උපකරණ පුවරුවට ආපසු",
