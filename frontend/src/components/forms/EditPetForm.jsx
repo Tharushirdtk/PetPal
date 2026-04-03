@@ -83,10 +83,10 @@ export default function EditPetForm({ pet, onSubmit, onClose, loading: externalL
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-2xl p-6 w-full max-w-md max-h-[90vh] overflow-y-auto">
+      <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 w-full max-w-md max-h-[90vh] overflow-y-auto">
         <div className="flex justify-between items-center mb-4">
-          <h2 className="text-xl font-bold text-gray-800">{t('form_edit_pet_title')} {pet.name}</h2>
-          <button onClick={onClose} className="text-gray-400 hover:text-gray-600 text-2xl cursor-pointer">&times;</button>
+          <h2 className="text-xl font-bold text-gray-800 dark:text-gray-100">{t('form_edit_pet_title')} {pet.name}</h2>
+          <button onClick={onClose} className="text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 text-2xl cursor-pointer">&times;</button>
         </div>
 
         <ErrorAlert message={error} onClose={() => setError(null)} />
@@ -96,7 +96,7 @@ export default function EditPetForm({ pet, onSubmit, onClose, loading: externalL
           <div className="flex flex-col items-center gap-2">
             <div
               onClick={() => fileRef.current?.click()}
-              className="w-24 h-24 rounded-full bg-gray-100 flex items-center justify-center overflow-hidden cursor-pointer border-2 border-dashed border-gray-300 hover:border-[#7C3AED] transition-colors"
+              className="w-24 h-24 rounded-full bg-gray-100 dark:bg-gray-700 flex items-center justify-center overflow-hidden cursor-pointer border-2 border-dashed border-gray-300 dark:border-gray-600 hover:border-[#7C3AED] transition-colors"
             >
               {imagePreview ? (
                 <img src={imagePreview} alt="Pet" className="w-full h-full object-cover" />
@@ -121,15 +121,15 @@ export default function EditPetForm({ pet, onSubmit, onClose, loading: externalL
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">{t('form_pet_name')} *</label>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{t('form_pet_name')} *</label>
             <input name="name" value={form.name} onChange={handleChange} required
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent" />
+              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent" />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">{t('form_pet_species')} *</label>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{t('form_pet_species')} *</label>
             <select name="species_id" value={form.species_id} onChange={handleChange} required
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
               <option value="">{t('form_pet_select_species')}</option>
               {species.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
             </select>
@@ -137,9 +137,9 @@ export default function EditPetForm({ pet, onSubmit, onClose, loading: externalL
 
           {breeds.length > 0 && (
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">{t('form_pet_breed')}</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{t('form_pet_breed')}</label>
               <select name="breed_id" value={form.breed_id} onChange={handleChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
                 <option value="">{t('form_pet_select_breed')}</option>
                 {breeds.map(b => <option key={b.id} value={b.id}>{b.description || b.name}</option>)}
               </select>
@@ -147,9 +147,9 @@ export default function EditPetForm({ pet, onSubmit, onClose, loading: externalL
           )}
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">{t('form_pet_gender')}</label>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{t('form_pet_gender')}</label>
             <select name="gender" value={form.gender} onChange={handleChange}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
               <option value="Unknown">{t('form_pet_gender_unknown')}</option>
               <option value="Male">{t('form_pet_gender_male')}</option>
               <option value="Female">{t('form_pet_gender_female')}</option>
@@ -157,38 +157,38 @@ export default function EditPetForm({ pet, onSubmit, onClose, loading: externalL
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">{t('form_pet_weight')}</label>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{t('form_pet_weight')}</label>
             <input name="weight" type="number" step="0.1" min="0" value={form.weight} onChange={handleChange}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent" />
+              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent" />
           </div>
 
           <div className="grid grid-cols-3 gap-2">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">{t('form_pet_birth_year')}</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{t('form_pet_birth_year')}</label>
               <input name="birth_year" type="number" min="1990" max="2026" value={form.birth_year} onChange={handleChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent" />
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent" />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">{t('form_pet_birth_month')}</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{t('form_pet_birth_month')}</label>
               <input name="birth_month" type="number" min="1" max="12" value={form.birth_month} onChange={handleChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent" />
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent" />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">{t('form_pet_birth_day')}</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{t('form_pet_birth_day')}</label>
               <input name="birth_day" type="number" min="1" max="31" value={form.birth_day} onChange={handleChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent" />
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent" />
             </div>
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">{t('form_pet_microchip')}</label>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{t('form_pet_microchip')}</label>
             <input name="microchip_id" value={form.microchip_id} onChange={handleChange}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent" />
+              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent" />
           </div>
 
           <div className="flex gap-3 pt-2">
             <button type="button" onClick={onClose}
-              className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 cursor-pointer">
+              className="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer">
               {t('form_button_cancel')}
             </button>
             <button type="submit" disabled={externalLoading}
