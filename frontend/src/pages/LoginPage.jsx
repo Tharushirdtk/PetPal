@@ -58,13 +58,13 @@ const LoginPage = () => {
   return (
     <div className="min-h-screen flex flex-col lg:flex-row">
       {/* ── Left Panel ── */}
-      <div className="w-full lg:w-1/2 bg-white flex flex-col justify-center px-6 sm:px-12 lg:px-20 py-10">
+      <div className="w-full lg:w-1/2 bg-white dark:bg-gray-900 flex flex-col justify-center px-6 sm:px-12 lg:px-20 py-10">
         {/* Top bar: logo + lang toggle */}
         <div className="flex items-center justify-between mb-10">
           {/* Logo */}
           <Link to="/" className="flex items-center gap-2">
             <PawPrint className="w-8 h-8 text-[#7C3AED]" />
-            <span className="text-2xl font-bold text-gray-900">
+            <span className="text-2xl font-bold text-gray-900 dark:text-white">
               Pet<span className="text-[#7C3AED]">Pal</span>
             </span>
           </Link>
@@ -74,7 +74,7 @@ const LoginPage = () => {
 
         {/* Form area */}
         <div className="max-w-md w-full mx-auto">
-          <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-2">
+          <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 dark:text-white mb-2">
             {t('auth_login_title')}{' '}
             <span className="text-[#7C3AED]">PetPal</span>
           </h1>
@@ -86,19 +86,19 @@ const LoginPage = () => {
             <div>
               <label
                 htmlFor="email"
-                className="block text-sm font-medium text-gray-700 mb-1.5"
+                className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5"
               >
                 {t('auth_email')}
               </label>
               <div className="relative">
-                <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 dark:text-gray-500" />
                 <input
                   id="email"
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder={t('auth_email')}
-                  className="rounded-xl border border-[#E5E7EB] px-4 py-3 pl-12 focus:ring-2 focus:ring-[#7C3AED] focus:border-transparent outline-none w-full"
+                  className="rounded-xl border border-[#E5E7EB] dark:border-gray-700 px-4 py-3 pl-12 focus:ring-2 focus:ring-[#7C3AED] focus:border-transparent outline-none w-full"
                   required
                 />
               </div>
@@ -108,7 +108,7 @@ const LoginPage = () => {
             <div>
               <label
                 htmlFor="password"
-                className="block text-sm font-medium text-gray-700 mb-1.5"
+                className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5"
               >
                 {t('auth_password')}
               </label>
@@ -119,13 +119,13 @@ const LoginPage = () => {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder={t('auth_password')}
-                  className="rounded-xl border border-[#E5E7EB] px-4 py-3 focus:ring-2 focus:ring-[#7C3AED] focus:border-transparent outline-none w-full pr-12"
+                  className="rounded-xl border border-[#E5E7EB] dark:border-gray-700 px-4 py-3 focus:ring-2 focus:ring-[#7C3AED] focus:border-transparent outline-none w-full pr-12"
                   required
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 cursor-pointer"
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 cursor-pointer"
                 >
                   {showPassword ? (
                     <EyeOff className="w-5 h-5" />
@@ -165,18 +165,18 @@ const LoginPage = () => {
 
           {/* OR divider */}
           <div className="flex items-center gap-4 my-6">
-            <div className="flex-1 h-px bg-[#E5E7EB]" />
-            <span className="text-sm text-gray-400 whitespace-nowrap">
+            <div className="flex-1 h-px bg-[#E5E7EB] dark:bg-gray-700" />
+            <span className="text-sm text-gray-400 dark:text-gray-500 whitespace-nowrap">
               {t('auth_or_login')}
             </span>
-            <div className="flex-1 h-px bg-[#E5E7EB]" />
+            <div className="flex-1 h-px bg-[#E5E7EB] dark:bg-gray-700" />
           </div>
 
           {/* Social buttons */}
           <div className="flex flex-col sm:flex-row gap-3">
             <button
               type="button"
-              className="flex-1 flex items-center justify-center gap-2 rounded-xl border border-[#E5E7EB] px-4 py-3 text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors cursor-pointer"
+              className="flex-1 flex items-center justify-center gap-2 rounded-xl border border-[#E5E7EB] dark:border-gray-700 px-4 py-3 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors cursor-pointer"
             >
               <svg className="w-5 h-5" viewBox="0 0 24 24">
                 <path
@@ -201,7 +201,7 @@ const LoginPage = () => {
 
             <button
               type="button"
-              className="flex-1 flex items-center justify-center gap-2 rounded-xl border border-[#E5E7EB] px-4 py-3 text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors cursor-pointer"
+              className="flex-1 flex items-center justify-center gap-2 rounded-xl border border-[#E5E7EB] dark:border-gray-700 px-4 py-3 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors cursor-pointer"
             >
               <svg className="w-5 h-5" viewBox="0 0 24 24" fill="#1877F2">
                 <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
@@ -211,7 +211,7 @@ const LoginPage = () => {
           </div>
 
           {/* Sign up link */}
-          <p className="text-center text-sm text-gray-500 mt-8">
+          <p className="text-center text-sm text-gray-500 dark:text-gray-400 mt-8">
             {t('auth_no_account')}{' '}
             <Link
               to="/register"

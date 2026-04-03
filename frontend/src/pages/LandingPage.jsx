@@ -55,17 +55,17 @@ const LandingPage = () => {
       <Navbar variant="landing" />
 
       {/* ───────────────── Hero Section ───────────────── */}
-      <section className="bg-gradient-to-b from-[#F5F3FF] to-white">
+      <section className="bg-gradient-to-b from-[#F5F3FF] to-white dark:from-gray-900 dark:to-gray-900">
         <div className="max-w-7xl mx-auto px-6 py-16 lg:py-24 grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
           {/* Left — Copy */}
           <div className="flex flex-col gap-6">
             <h1 className="font-display text-4xl sm:text-5xl lg:text-6xl font-bold leading-tight">
-              <span className="text-gray-900">{t('landing_hero_title')}</span>
+              <span className="text-gray-900 dark:text-white">{t('landing_hero_title')}</span>
               <br />
               <span className="text-[#7C3AED]">{t('landing_hero_title2')}</span>
             </h1>
 
-            <p className="text-gray-500 text-lg max-w-lg leading-relaxed">
+            <p className="text-gray-500 dark:text-gray-400 text-lg max-w-lg leading-relaxed">
               {t('landing_hero_subtitle')}
             </p>
 
@@ -80,7 +80,7 @@ const LandingPage = () => {
               </Link>
               <Link
                 to="/register"
-                className="border border-[#E5E7EB] rounded-full px-6 py-3 font-semibold text-gray-700 hover:border-[#7C3AED] hover:text-[#7C3AED] transition-colors no-underline"
+                className="border border-[#E5E7EB] dark:border-gray-700 rounded-full px-6 py-3 font-semibold text-gray-700 dark:text-gray-300 hover:border-[#7C3AED] hover:text-[#7C3AED] transition-colors no-underline"
               >
                 {t('landing_cta_signup')}
               </Link>
@@ -94,15 +94,15 @@ const LandingPage = () => {
                   (bg, i) => (
                     <div
                       key={i}
-                      className={`w-8 h-8 rounded-full ${bg} border-2 border-white flex items-center justify-center text-white text-xs font-semibold`}
+                      className={`w-8 h-8 rounded-full ${bg} border-2 border-white dark:border-gray-800 flex items-center justify-center text-white text-xs font-semibold`}
                     >
                       {String.fromCharCode(65 + i)}
                     </div>
                   ),
                 )}
               </div>
-              <span className="text-sm text-gray-500">
-                <span className="font-semibold text-gray-900">10k+</span>{' '}
+              <span className="text-sm text-gray-500 dark:text-gray-400">
+                <span className="font-semibold text-gray-900 dark:text-white">10k+</span>{' '}
                 {t('landing_pet_parents')}
               </span>
             </div>
@@ -113,7 +113,7 @@ const LandingPage = () => {
             {/* Background decorative blob */}
             <div className="absolute w-72 h-72 bg-[#7C3AED]/10 rounded-full blur-3xl -z-10" />
 
-            <div className="bg-white rounded-3xl border border-[#E5E7EB] shadow-xl p-8 w-full max-w-sm flex flex-col items-center gap-6">
+            <div className="bg-white dark:bg-gray-800 rounded-3xl border border-[#E5E7EB] dark:border-gray-700 shadow-xl p-8 w-full max-w-sm flex flex-col items-center gap-6">
               {/* Accuracy ring */}
               <div className="relative w-40 h-40">
                 <svg className="w-full h-full -rotate-90" viewBox="0 0 120 120">
@@ -137,10 +137,10 @@ const LandingPage = () => {
                   />
                 </svg>
                 <div className="absolute inset-0 flex flex-col items-center justify-center">
-                  <span className="font-display text-3xl font-bold text-gray-900">
+                  <span className="font-display text-3xl font-bold text-gray-900 dark:text-white">
                     98.8%
                   </span>
-                  <span className="text-xs text-gray-400 font-medium">
+                  <span className="text-xs text-gray-400 dark:text-gray-500 font-medium">
                     {t('landing_ai_accuracy')}
                   </span>
                 </div>
@@ -156,13 +156,13 @@ const LandingPage = () => {
 
               {/* Mini stat row */}
               <div className="w-full grid grid-cols-2 gap-4 text-center">
-                <div className="bg-[#F5F3FF] rounded-xl p-3">
+                <div className="bg-[#F5F3FF] dark:bg-purple-900/20 rounded-xl p-3">
                   <p className="font-display text-lg font-bold text-[#7C3AED]">10k+</p>
-                  <p className="text-xs text-gray-500">{t('landing_pet_parents')}</p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">{t('landing_pet_parents')}</p>
                 </div>
-                <div className="bg-[#F5F3FF] rounded-xl p-3">
+                <div className="bg-[#F5F3FF] dark:bg-purple-900/20 rounded-xl p-3">
                   <p className="font-display text-lg font-bold text-[#7C3AED]">24/7</p>
-                  <p className="text-xs text-gray-500">{t('landing_feature3_title')}</p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">{t('landing_feature3_title')}</p>
                 </div>
               </div>
             </div>
@@ -171,17 +171,17 @@ const LandingPage = () => {
       </section>
 
       {/* ───────────────── How It Works ───────────────── */}
-      <section className="bg-white py-20">
+      <section className="bg-white dark:bg-gray-900 py-20">
         <div className="max-w-7xl mx-auto px-6 text-center">
           {/* Label pill */}
-          <span className="inline-block bg-[#F5F3FF] text-[#7C3AED] text-xs font-semibold tracking-widest uppercase px-4 py-1.5 rounded-full mb-4">
+          <span className="inline-block bg-[#F5F3FF] dark:bg-purple-900/20 text-[#7C3AED] text-xs font-semibold tracking-widest uppercase px-4 py-1.5 rounded-full mb-4">
             {t('landing_method')}
           </span>
 
-          <h2 className="font-display text-3xl sm:text-4xl font-bold text-gray-900 mb-3">
+          <h2 className="font-display text-3xl sm:text-4xl font-bold text-gray-900 dark:text-white mb-3">
             {t('landing_how_title')}
           </h2>
-          <p className="text-gray-500 max-w-xl mx-auto mb-14">
+          <p className="text-gray-500 dark:text-gray-400 max-w-xl mx-auto mb-14">
             {t('landing_how_subtitle')}
           </p>
 
@@ -213,13 +213,13 @@ const LandingPage = () => {
                   {step.num}
                 </div>
                 {/* Icon */}
-                <div className="w-14 h-14 rounded-2xl bg-[#F5F3FF] flex items-center justify-center">
+                <div className="w-14 h-14 rounded-2xl bg-[#F5F3FF] dark:bg-purple-900/20 flex items-center justify-center">
                   {step.icon}
                 </div>
-                <h3 className="font-display text-lg font-semibold text-gray-900">
+                <h3 className="font-display text-lg font-semibold text-gray-900 dark:text-white">
                   {step.title}
                 </h3>
-                <p className="text-gray-500 text-sm leading-relaxed max-w-xs">
+                <p className="text-gray-500 dark:text-gray-400 text-sm leading-relaxed max-w-xs">
                   {step.desc}
                 </p>
               </div>
@@ -238,7 +238,7 @@ const LandingPage = () => {
       </section>
 
       {/* ───────────────── Features Section ───────────────── */}
-      <section className="bg-[#F9FAFB] py-20">
+      <section className="bg-[#F9FAFB] dark:bg-gray-900 py-20">
         <div className="max-w-7xl mx-auto px-6">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {[
@@ -260,15 +260,15 @@ const LandingPage = () => {
             ].map((feature, i) => (
               <div
                 key={i}
-                className="bg-white rounded-2xl border border-[#E5E7EB] shadow-sm hover:shadow-md transition-shadow p-6 flex flex-col gap-4"
+                className="bg-white dark:bg-gray-800 rounded-2xl border border-[#E5E7EB] dark:border-gray-700 shadow-sm hover:shadow-md transition-shadow p-6 flex flex-col gap-4"
               >
-                <div className="w-12 h-12 rounded-full bg-[#F5F3FF] flex items-center justify-center">
+                <div className="w-12 h-12 rounded-full bg-[#F5F3FF] dark:bg-purple-900/20 flex items-center justify-center">
                   {feature.icon}
                 </div>
-                <h3 className="font-display text-lg font-semibold text-gray-900">
+                <h3 className="font-display text-lg font-semibold text-gray-900 dark:text-white">
                   {feature.title}
                 </h3>
-                <p className="text-gray-500 text-sm leading-relaxed">
+                <p className="text-gray-500 dark:text-gray-400 text-sm leading-relaxed">
                   {feature.desc}
                 </p>
               </div>
@@ -278,23 +278,23 @@ const LandingPage = () => {
       </section>
 
       {/* ───────────────── Contact Us Section ───────────────── */}
-      <section className="bg-white py-20" id="contact">
+      <section className="bg-white dark:bg-gray-900 py-20" id="contact">
         <div className="max-w-3xl mx-auto px-6">
           {/* Label pill */}
           <div className="text-center mb-8">
-            <span className="inline-block bg-[#F5F3FF] text-[#7C3AED] text-xs font-semibold tracking-widest uppercase px-4 py-1.5 rounded-full mb-4">
+            <span className="inline-block bg-[#F5F3FF] dark:bg-purple-900/20 text-[#7C3AED] text-xs font-semibold tracking-widest uppercase px-4 py-1.5 rounded-full mb-4">
               {t('nav_contact') || 'Contact Us'}
             </span>
-            <h2 className="font-display text-3xl sm:text-4xl font-bold text-gray-900 mb-3">
+            <h2 className="font-display text-3xl sm:text-4xl font-bold text-gray-900 dark:text-white mb-3">
               {t('contact_title') || 'Get in Touch'}
             </h2>
-            <p className="text-gray-500 max-w-xl mx-auto">
+            <p className="text-gray-500 dark:text-gray-400 max-w-xl mx-auto">
               {t('contact_subtitle') || 'Have a question or feedback? We would love to hear from you.'}
             </p>
           </div>
 
           {contactSuccess && (
-            <div className="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-xl mb-6 text-center text-sm">
+            <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 text-green-700 dark:text-green-400 px-4 py-3 rounded-xl mb-6 text-center text-sm">
               {t('contact_success') || 'Your message has been sent successfully! We will get back to you soon.'}
             </div>
           )}
@@ -305,7 +305,7 @@ const LandingPage = () => {
 
           <form onSubmit={handleContactSubmit} className="flex flex-col gap-5">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1.5">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
                 {t('contact_heading') || 'Subject'}
               </label>
               <input
@@ -315,11 +315,11 @@ const LandingPage = () => {
                 onChange={handleContactChange}
                 required
                 placeholder={t('contact_heading_placeholder') || 'What is this about?'}
-                className="w-full rounded-xl border border-[#E5E7EB] px-4 py-3 text-sm text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#7C3AED]/30 focus:border-[#7C3AED] transition-all"
+                className="w-full rounded-xl border border-[#E5E7EB] dark:border-gray-700 px-4 py-3 text-sm text-gray-700 dark:text-gray-300 placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#7C3AED]/30 focus:border-[#7C3AED] transition-all"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1.5">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
                 {t('contact_email') || 'Email'}
               </label>
               <input
@@ -329,11 +329,11 @@ const LandingPage = () => {
                 onChange={handleContactChange}
                 required
                 placeholder={t('contact_email_placeholder') || 'your@email.com'}
-                className="w-full rounded-xl border border-[#E5E7EB] px-4 py-3 text-sm text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#7C3AED]/30 focus:border-[#7C3AED] transition-all"
+                className="w-full rounded-xl border border-[#E5E7EB] dark:border-gray-700 px-4 py-3 text-sm text-gray-700 dark:text-gray-300 placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#7C3AED]/30 focus:border-[#7C3AED] transition-all"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1.5">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
                 {t('contact_message') || 'Message'}
               </label>
               <textarea
@@ -343,7 +343,7 @@ const LandingPage = () => {
                 required
                 rows={5}
                 placeholder={t('contact_message_placeholder') || 'Tell us what you need help with...'}
-                className="w-full rounded-xl border border-[#E5E7EB] px-4 py-3 text-sm text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#7C3AED]/30 focus:border-[#7C3AED] transition-all resize-none"
+                className="w-full rounded-xl border border-[#E5E7EB] dark:border-gray-700 px-4 py-3 text-sm text-gray-700 dark:text-gray-300 placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#7C3AED]/30 focus:border-[#7C3AED] transition-all resize-none"
               />
             </div>
             <button

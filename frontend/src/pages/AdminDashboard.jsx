@@ -41,11 +41,11 @@ const AdminDashboard = () => {
   const ActiveComponent = TAB_COMPONENTS[activeTab];
 
   return (
-    <div className="min-h-screen bg-[#F9FAFB]">
+    <div className="min-h-screen bg-[#F9FAFB] dark:bg-gray-900">
       <Navbar variant="admin" />
 
       {/* Tab Navigation */}
-      <div className="bg-white border-b border-[#E5E7EB]">
+      <div className="bg-white dark:bg-gray-800 border-b border-[#E5E7EB] dark:border-gray-700">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <div className="flex gap-1 overflow-x-auto scrollbar-hide">
             {TABS.map(({ key, icon: Icon, labelKey }) => (
@@ -55,7 +55,7 @@ const AdminDashboard = () => {
                 className={`flex items-center gap-2 px-4 py-3 text-sm font-medium whitespace-nowrap border-b-2 transition-colors cursor-pointer ${
                   activeTab === key
                     ? 'border-[#7C3AED] text-[#7C3AED]'
-                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                    : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 hover:border-gray-300 dark:hover:border-gray-500'
                 }`}
               >
                 <Icon className="w-4 h-4" />

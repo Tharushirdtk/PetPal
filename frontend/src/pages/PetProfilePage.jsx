@@ -27,17 +27,17 @@ const speciesEmoji = (speciesName) => {
 
 const speciesGradient = (speciesName) => {
   const map = {
-    dog: 'from-amber-400 to-orange-300',
-    cat: 'from-purple-400 to-fuchsia-300',
-    bird: 'from-sky-400 to-cyan-300',
-    fish: 'from-blue-400 to-indigo-300',
-    rabbit: 'from-pink-400 to-rose-300',
-    hamster: 'from-orange-400 to-amber-300',
-    turtle: 'from-green-400 to-emerald-300',
-    snake: 'from-lime-400 to-green-300',
-    horse: 'from-yellow-400 to-amber-300',
+    dog: 'from-amber-400 to-orange-300 dark:from-amber-900/40 dark:to-orange-900/20',
+    cat: 'from-purple-400 to-fuchsia-300 dark:from-purple-900/40 dark:to-fuchsia-900/20',
+    bird: 'from-sky-400 to-cyan-300 dark:from-sky-900/40 dark:to-cyan-900/20',
+    fish: 'from-blue-400 to-indigo-300 dark:from-blue-900/40 dark:to-indigo-900/20',
+    rabbit: 'from-pink-400 to-rose-300 dark:from-pink-900/40 dark:to-rose-900/20',
+    hamster: 'from-orange-400 to-amber-300 dark:from-orange-900/40 dark:to-amber-900/20',
+    turtle: 'from-green-400 to-emerald-300 dark:from-green-900/40 dark:to-emerald-900/20',
+    snake: 'from-lime-400 to-green-300 dark:from-lime-900/40 dark:to-green-900/20',
+    horse: 'from-yellow-400 to-amber-300 dark:from-yellow-900/40 dark:to-amber-900/20',
   };
-  return map[(speciesName || '').toLowerCase()] || 'from-gray-400 to-slate-300';
+  return map[(speciesName || '').toLowerCase()] || 'from-gray-400 to-slate-300 dark:from-gray-800 dark:to-gray-900';
 };
 
 const getAge = (birthYear, birthMonth, birthDay, t) => {
@@ -159,7 +159,7 @@ const PetProfilePage = () => {
   })();
 
   const wellnessColorClass =
-    wellnessScore === null ? 'text-gray-400' :
+    wellnessScore === null ? 'text-gray-400 dark:text-gray-500' :
     wellnessScore >= 80 ? 'text-green-500' :
     wellnessScore >= 50 ? 'text-amber-500' : 'text-red-500';
 
@@ -170,7 +170,7 @@ const PetProfilePage = () => {
 
   if (petsLoading) {
     return (
-      <div className="min-h-screen bg-gray-50">
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
         <Navbar />
         <LoadingSpinner />
       </div>
@@ -179,7 +179,7 @@ const PetProfilePage = () => {
 
   if (!pet) {
     return (
-      <div className="min-h-screen bg-gray-50">
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
         <Navbar />
         <div className="max-w-4xl mx-auto px-6 py-16 text-center">
           <ErrorAlert message="Pet not found." />
@@ -200,20 +200,20 @@ const PetProfilePage = () => {
   const breedDisplay = [pet.species?.name, pet.breed?.name].filter(Boolean).join(' \u2022 ');
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       <Navbar />
 
       {/* Hero Section */}
       <section className="relative overflow-hidden">
         {/* Background gradient */}
         <div className={`absolute inset-0 bg-gradient-to-br ${gradient} opacity-20`} />
-        <div className="absolute inset-0 bg-gradient-to-b from-white/0 via-white/30 to-white" />
+        <div className="absolute inset-0 bg-gradient-to-b from-white/0 via-white/30 to-white dark:from-gray-900/0 dark:via-gray-900/30 dark:to-gray-900" />
 
         <div className="relative max-w-6xl mx-auto px-6 pt-6 pb-8">
           {/* Back button */}
           <button
             onClick={() => navigate('/dashboard')}
-            className="inline-flex items-center gap-2 text-sm text-gray-500 hover:text-gray-700 transition-colors mb-6 bg-transparent border-none cursor-pointer"
+            className="inline-flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-colors mb-6 bg-transparent border-none cursor-pointer"
           >
             <ArrowLeft className="w-4 h-4" />
             {t('pet_profile_back') || 'Back to Dashboard'}
@@ -245,7 +245,7 @@ const PetProfilePage = () => {
               <button
                 onClick={() => imageInputRef.current?.click()}
                 disabled={uploadingImage}
-                className="absolute bottom-2 right-2 w-10 h-10 rounded-full bg-white shadow-md flex items-center justify-center text-gray-500 hover:text-[#7C3AED] hover:shadow-lg transition-all cursor-pointer border-none opacity-0 group-hover:opacity-100"
+                className="absolute bottom-2 right-2 w-10 h-10 rounded-full bg-white dark:bg-gray-800 shadow-md flex items-center justify-center text-gray-500 dark:text-gray-400 hover:text-[#7C3AED] hover:shadow-lg transition-all cursor-pointer border-none opacity-0 group-hover:opacity-100"
               >
                 <Camera className="w-4.5 h-4.5" />
               </button>
@@ -255,15 +255,15 @@ const PetProfilePage = () => {
             <div className="flex-1 min-w-0">
               <div className="flex items-start justify-between gap-4 flex-wrap">
                 <div>
-                  <h1 className="font-display font-bold text-3xl md:text-4xl text-gray-900 mb-1">
+                  <h1 className="font-display font-bold text-3xl md:text-4xl text-gray-900 dark:text-white mb-1">
                     {pet.name}
                   </h1>
-                  <p className="text-gray-500 text-lg">{breedDisplay}</p>
+                  <p className="text-gray-500 dark:text-gray-400 text-lg">{breedDisplay}</p>
                 </div>
                 <div className="flex items-center gap-2">
                   <button
                     onClick={() => setEditingPet(pet)}
-                    className="inline-flex items-center gap-2 px-4 py-2 rounded-xl border border-gray-200 text-sm font-medium text-gray-600 hover:border-[#7C3AED] hover:text-[#7C3AED] hover:bg-purple-50 transition-colors cursor-pointer bg-white"
+                    className="inline-flex items-center gap-2 px-4 py-2 rounded-xl border border-gray-200 dark:border-gray-700 text-sm font-medium text-gray-600 dark:text-gray-300 hover:border-[#7C3AED] hover:text-[#7C3AED] hover:bg-purple-50 dark:hover:bg-purple-900/20 transition-colors cursor-pointer bg-white dark:bg-gray-800"
                   >
                     <Pencil className="w-3.5 h-3.5" />
                     {t('common_edit') || 'Edit'}
@@ -281,31 +281,31 @@ const PetProfilePage = () => {
               {/* Info chips */}
               <div className="flex flex-wrap gap-3 mt-5">
                 {age !== null && (
-                  <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white border border-gray-200 text-sm text-gray-600 shadow-sm">
+                  <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-sm text-gray-600 dark:text-gray-300 shadow-sm">
                     <Calendar className="w-3.5 h-3.5 text-[#7C3AED]" />
                     {age} old
                   </div>
                 )}
                 {pet.gender && pet.gender !== 'Unknown' && (
-                  <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white border border-gray-200 text-sm text-gray-600 shadow-sm">
+                  <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-sm text-gray-600 dark:text-gray-300 shadow-sm">
                     <Heart className="w-3.5 h-3.5 text-pink-400" />
                     {pet.gender}
                   </div>
                 )}
                 {pet.weight && (
-                  <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white border border-gray-200 text-sm text-gray-600 shadow-sm">
+                  <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-sm text-gray-600 dark:text-gray-300 shadow-sm">
                     <Weight className="w-3.5 h-3.5 text-blue-400" />
                     {pet.weight} kg
                   </div>
                 )}
                 {pet.microchip_id && (
-                  <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white border border-gray-200 text-sm text-gray-600 shadow-sm">
-                    <Hash className="w-3.5 h-3.5 text-gray-400" />
+                  <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-sm text-gray-600 dark:text-gray-300 shadow-sm">
+                    <Hash className="w-3.5 h-3.5 text-gray-400 dark:text-gray-500" />
                     {pet.microchip_id}
                   </div>
                 )}
                 {pet.species?.name && (
-                  <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white border border-gray-200 text-sm text-gray-600 shadow-sm">
+                  <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-sm text-gray-600 dark:text-gray-300 shadow-sm">
                     <Dna className="w-3.5 h-3.5 text-emerald-400" />
                     {pet.species.name}
                   </div>
@@ -320,12 +320,12 @@ const PetProfilePage = () => {
       <section className="max-w-6xl mx-auto px-6 -mt-2">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           {/* Wellness Score */}
-          <div className="bg-white rounded-2xl border border-gray-200 p-5 shadow-sm hover:shadow-md transition-shadow">
+          <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 p-5 shadow-sm hover:shadow-md transition-shadow">
             <div className="flex items-center justify-between mb-3">
-              <span className="text-sm font-medium text-gray-500">
+              <span className="text-sm font-medium text-gray-500 dark:text-gray-400">
                 {t('pet_profile_wellness') || 'Wellness Score'}
               </span>
-              <div className="w-8 h-8 rounded-lg bg-green-50 flex items-center justify-center">
+              <div className="w-8 h-8 rounded-lg bg-green-50 dark:bg-green-900/20 flex items-center justify-center">
                 <Shield className="w-4 h-4 text-green-500" />
               </div>
             </div>
@@ -333,16 +333,16 @@ const PetProfilePage = () => {
               {wellnessScore !== null ? (
                 <>
                   <span className={`text-3xl font-bold ${wellnessColorClass}`}>{wellnessScore}%</span>
-                  <span className="text-xs text-gray-400 mb-1">
+                  <span className="text-xs text-gray-400 dark:text-gray-500 mb-1">
                     {wellnessScore >= 80 ? 'Excellent' : wellnessScore >= 50 ? 'Fair' : 'Needs Attention'}
                   </span>
                 </>
               ) : (
-                <span className="text-lg text-gray-400">{t('common_no_data') || 'No data'}</span>
+                <span className="text-lg text-gray-400 dark:text-gray-500">{t('common_no_data') || 'No data'}</span>
               )}
             </div>
             {wellnessScore !== null && (
-              <div className="w-full h-1.5 rounded-full bg-gray-100 mt-3">
+              <div className="w-full h-1.5 rounded-full bg-gray-100 dark:bg-gray-700 mt-3">
                 <div
                   className="h-full rounded-full transition-all duration-700"
                   style={{ width: `${wellnessScore}%`, backgroundColor: wellnessStroke }}
@@ -352,17 +352,17 @@ const PetProfilePage = () => {
           </div>
 
           {/* Total Diagnoses */}
-          <div className="bg-white rounded-2xl border border-gray-200 p-5 shadow-sm hover:shadow-md transition-shadow">
+          <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 p-5 shadow-sm hover:shadow-md transition-shadow">
             <div className="flex items-center justify-between mb-3">
-              <span className="text-sm font-medium text-gray-500">
+              <span className="text-sm font-medium text-gray-500 dark:text-gray-400">
                 {t('pet_profile_total_diagnoses') || 'Total Diagnoses'}
               </span>
-              <div className="w-8 h-8 rounded-lg bg-purple-50 flex items-center justify-center">
+              <div className="w-8 h-8 rounded-lg bg-purple-50 dark:bg-purple-900/20 flex items-center justify-center">
                 <Cpu className="w-4 h-4 text-[#7C3AED]" />
               </div>
             </div>
             <div className="flex items-end gap-2">
-              <span className="text-3xl font-bold text-gray-900">
+              <span className="text-3xl font-bold text-gray-900 dark:text-white">
                 {historyLoading ? '...' : totalDiagnoses}
               </span>
               {completedDiagnoses > 0 && (
@@ -374,52 +374,52 @@ const PetProfilePage = () => {
           </div>
 
           {/* Last Checkup */}
-          <div className="bg-white rounded-2xl border border-gray-200 p-5 shadow-sm hover:shadow-md transition-shadow">
+          <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 p-5 shadow-sm hover:shadow-md transition-shadow">
             <div className="flex items-center justify-between mb-3">
-              <span className="text-sm font-medium text-gray-500">
+              <span className="text-sm font-medium text-gray-500 dark:text-gray-400">
                 {t('pet_profile_last_checkup') || 'Last Checkup'}
               </span>
-              <div className="w-8 h-8 rounded-lg bg-blue-50 flex items-center justify-center">
+              <div className="w-8 h-8 rounded-lg bg-blue-50 dark:bg-blue-900/20 flex items-center justify-center">
                 <Clock className="w-4 h-4 text-blue-500" />
               </div>
             </div>
             {lastDiagnosisDate ? (
               <div>
-                <span className="text-xl font-bold text-gray-900">
+                <span className="text-xl font-bold text-gray-900 dark:text-white">
                   {lastDiagnosisDate.toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
                 </span>
-                <p className="text-xs text-gray-400 mt-0.5">
+                <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">
                   {lastDiagnosisDate.toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' })}
                 </p>
               </div>
             ) : (
-              <span className="text-lg text-gray-400">{t('pet_profile_no_checkups') || 'No checkups yet'}</span>
+              <span className="text-lg text-gray-400 dark:text-gray-500">{t('pet_profile_no_checkups') || 'No checkups yet'}</span>
             )}
           </div>
 
           {/* Latest Diagnosis */}
-          <div className="bg-white rounded-2xl border border-gray-200 p-5 shadow-sm hover:shadow-md transition-shadow">
+          <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 p-5 shadow-sm hover:shadow-md transition-shadow">
             <div className="flex items-center justify-between mb-3">
-              <span className="text-sm font-medium text-gray-500">
+              <span className="text-sm font-medium text-gray-500 dark:text-gray-400">
                 {t('pet_profile_latest_result') || 'Latest Result'}
               </span>
-              <div className="w-8 h-8 rounded-lg bg-amber-50 flex items-center justify-center">
+              <div className="w-8 h-8 rounded-lg bg-amber-50 dark:bg-amber-900/20 flex items-center justify-center">
                 <TrendingUp className="w-4 h-4 text-amber-500" />
               </div>
             </div>
             {lastDiagnosis?.primary_label ? (
               <div>
-                <span className="text-lg font-bold text-gray-900 leading-tight line-clamp-1">
+                <span className="text-lg font-bold text-gray-900 dark:text-white leading-tight line-clamp-1">
                   {lastDiagnosis.primary_label}
                 </span>
                 {lastDiagnosis.confidence && (
-                  <p className="text-xs text-gray-400 mt-0.5">
+                  <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">
                     {Math.round(lastDiagnosis.confidence * 100)}% confidence
                   </p>
                 )}
               </div>
             ) : (
-              <span className="text-lg text-gray-400">{t('common_no_data') || 'No data'}</span>
+              <span className="text-lg text-gray-400 dark:text-gray-500">{t('common_no_data') || 'No data'}</span>
             )}
           </div>
         </div>
@@ -454,7 +454,7 @@ const PetProfilePage = () => {
       {/* Diagnosis History Section */}
       <section className="max-w-6xl mx-auto px-6 mt-8 pb-12">
         <div className="flex items-center justify-between mb-5">
-          <h2 className="font-display font-bold text-xl text-gray-900">
+          <h2 className="font-display font-bold text-xl text-gray-900 dark:text-white">
             {t('pet_profile_history_title') || 'Diagnosis History'}
           </h2>
           {diagnoses.length > 0 && (
@@ -474,14 +474,14 @@ const PetProfilePage = () => {
           </div>
         ) : diagnoses.length === 0 ? (
           /* Empty state */
-          <div className="bg-white rounded-2xl border border-gray-200 p-12 text-center shadow-sm">
-            <div className="w-16 h-16 rounded-full bg-purple-50 flex items-center justify-center mx-auto mb-4">
+          <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 p-12 text-center shadow-sm">
+            <div className="w-16 h-16 rounded-full bg-purple-50 dark:bg-purple-900/20 flex items-center justify-center mx-auto mb-4">
               <FileText className="w-8 h-8 text-[#7C3AED]" />
             </div>
-            <h3 className="font-display font-bold text-lg text-gray-900 mb-2">
+            <h3 className="font-display font-bold text-lg text-gray-900 dark:text-white mb-2">
               {t('pet_profile_no_history') || 'No Diagnosis History Yet'}
             </h3>
-            <p className="text-gray-500 text-sm max-w-md mx-auto mb-6">
+            <p className="text-gray-500 dark:text-gray-400 text-sm max-w-md mx-auto mb-6">
               {t('pet_profile_no_history_desc') || `Start ${pet.name}'s first AI-powered health checkup to build their medical profile.`}
             </p>
             <button
@@ -539,7 +539,7 @@ const PetProfilePage = () => {
               return (
                 <div
                   key={diag.id || idx}
-                  className="bg-white rounded-2xl border border-gray-200 shadow-sm hover:shadow-md transition-shadow overflow-hidden"
+                  className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 shadow-sm hover:shadow-md transition-shadow overflow-hidden"
                 >
                   {/* Top row */}
                   <div className="p-5 flex items-start gap-4">
@@ -549,7 +549,7 @@ const PetProfilePage = () => {
                         sColor === 'red' ? 'bg-red-500' : sColor === 'amber' ? 'bg-amber-500' : 'bg-green-500'
                       }`} />
                       {idx < diagnoses.length - 1 && (
-                        <div className="w-px h-8 bg-gray-200" />
+                        <div className="w-px h-8 bg-gray-200 dark:bg-gray-700" />
                       )}
                     </div>
 
@@ -557,19 +557,19 @@ const PetProfilePage = () => {
                     <div className="flex-1 min-w-0">
                       <div className="flex items-start justify-between gap-3 flex-wrap">
                         <div>
-                          <h3 className="font-semibold text-gray-900 text-base">
+                          <h3 className="font-semibold text-gray-900 dark:text-white text-base">
                             {diag.primary_label || (t('dashboard_diagnosis_started') || 'Diagnosis started')}
                           </h3>
                           <div className="flex items-center gap-3 mt-1 flex-wrap">
                             {date && (
-                              <span className="text-xs text-gray-400">
+                              <span className="text-xs text-gray-400 dark:text-gray-500">
                                 {date.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}
                                 {' \u2022 '}
                                 {date.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' })}
                               </span>
                             )}
                             {confidence !== null && (
-                              <span className="inline-flex items-center gap-1 text-xs font-medium text-[#7C3AED] bg-purple-50 px-2 py-0.5 rounded-full">
+                              <span className="inline-flex items-center gap-1 text-xs font-medium text-[#7C3AED] bg-purple-50 dark:bg-purple-900/20 px-2 py-0.5 rounded-full">
                                 <Activity className="w-3 h-3" />
                                 {confidence}% confidence
                               </span>
@@ -580,8 +580,8 @@ const PetProfilePage = () => {
                           {statusIcon}
                           <span className={`text-xs font-medium px-2.5 py-1 rounded-full ${
                             isCompleted
-                              ? 'bg-green-50 text-green-700 border border-green-200'
-                              : 'bg-amber-50 text-amber-700 border border-amber-200'
+                              ? 'bg-green-50 dark:bg-green-900/20 text-green-700 border border-green-200'
+                              : 'bg-amber-50 dark:bg-amber-900/20 text-amber-700 border border-amber-200'
                           }`}>
                             {isCompleted ? (t('common_completed') || 'Completed') : (t('common_pending') || 'Pending')}
                           </span>
@@ -590,7 +590,7 @@ const PetProfilePage = () => {
 
                       {/* Explanation */}
                       {diag.explanation && (
-                        <p className="text-sm text-gray-600 mt-3 leading-relaxed line-clamp-2">
+                        <p className="text-sm text-gray-600 dark:text-gray-300 mt-3 leading-relaxed line-clamp-2">
                           {diag.explanation}
                         </p>
                       )}
@@ -600,7 +600,7 @@ const PetProfilePage = () => {
                         {secondaryLabels.slice(0, 3).map((label, i) => (
                           <span
                             key={i}
-                            className="inline-flex items-center px-2.5 py-1 rounded-full bg-gray-100 text-xs text-gray-600"
+                            className="inline-flex items-center px-2.5 py-1 rounded-full bg-gray-100 dark:bg-gray-700 text-xs text-gray-600 dark:text-gray-300"
                           >
                             {typeof label === 'string' ? label : label.label || label.name || ''}
                           </span>
@@ -615,22 +615,22 @@ const PetProfilePage = () => {
 
                       {/* Recommended actions */}
                       {actions.length > 0 && (
-                        <div className="mt-3 pt-3 border-t border-gray-100">
-                          <p className="text-xs font-semibold uppercase tracking-wider text-gray-400 mb-2">
+                        <div className="mt-3 pt-3 border-t border-gray-100 dark:border-gray-700">
+                          <p className="text-xs font-semibold uppercase tracking-wider text-gray-400 dark:text-gray-500 mb-2">
                             Recommended Actions
                           </p>
                           <div className="flex flex-wrap gap-2">
                             {actions.slice(0, 3).map((action, i) => (
                               <span
                                 key={i}
-                                className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-purple-50 text-xs text-[#7C3AED]"
+                                className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-purple-50 dark:bg-purple-900/20 text-xs text-[#7C3AED]"
                               >
                                 <CheckCircle className="w-3 h-3" />
                                 {typeof action === 'string' ? action : action.text || action.description || ''}
                               </span>
                             ))}
                             {actions.length > 3 && (
-                              <span className="text-xs text-gray-400">+{actions.length - 3} more</span>
+                              <span className="text-xs text-gray-400 dark:text-gray-500">+{actions.length - 3} more</span>
                             )}
                           </div>
                         </div>
@@ -640,7 +640,7 @@ const PetProfilePage = () => {
 
                   {/* Footer with link to report */}
                   {diag.consultation_id && (
-                    <div className="px-5 py-3 bg-gray-50 border-t border-gray-100">
+                    <div className="px-5 py-3 bg-gray-50 dark:bg-gray-900 border-t border-gray-100 dark:border-gray-700">
                       <Link
                         to={`/report?consultation_id=${diag.consultation_id}`}
                         className="text-sm font-semibold text-[#7C3AED] hover:text-[#6D28D9] no-underline inline-flex items-center gap-1 transition-colors"

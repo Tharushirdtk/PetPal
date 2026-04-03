@@ -27,17 +27,17 @@ const speciesEmoji = (speciesName) => {
 
 const speciesGradient = (speciesName) => {
   const map = {
-    dog: 'from-amber-100 to-amber-50',
-    cat: 'from-purple-100 to-purple-50',
-    bird: 'from-sky-100 to-sky-50',
-    fish: 'from-blue-100 to-blue-50',
-    rabbit: 'from-pink-100 to-pink-50',
-    hamster: 'from-orange-100 to-orange-50',
-    turtle: 'from-green-100 to-green-50',
-    snake: 'from-lime-100 to-lime-50',
-    horse: 'from-yellow-100 to-yellow-50',
+    dog: 'from-amber-100 to-amber-50 dark:from-amber-900/40 dark:to-amber-900/20',
+    cat: 'from-purple-100 to-purple-50 dark:from-purple-900/40 dark:to-purple-900/20',
+    bird: 'from-sky-100 to-sky-50 dark:from-sky-900/40 dark:to-sky-900/20',
+    fish: 'from-blue-100 to-blue-50 dark:from-blue-900/40 dark:to-blue-900/20',
+    rabbit: 'from-pink-100 to-pink-50 dark:from-pink-900/40 dark:to-pink-900/20',
+    hamster: 'from-orange-100 to-orange-50 dark:from-orange-900/40 dark:to-orange-900/20',
+    turtle: 'from-green-100 to-green-50 dark:from-green-900/40 dark:to-green-900/20',
+    snake: 'from-lime-100 to-lime-50 dark:from-lime-900/40 dark:to-lime-900/20',
+    horse: 'from-yellow-100 to-yellow-50 dark:from-yellow-900/40 dark:to-yellow-900/20',
   };
-  return map[(speciesName || '').toLowerCase()] || 'from-gray-100 to-gray-50';
+  return map[(speciesName || '').toLowerCase()] || 'from-gray-100 to-gray-50 dark:from-gray-800 dark:to-gray-900';
 };
 
 const getAge = (birthYear, birthMonth, birthDay) => {
@@ -202,17 +202,17 @@ const PetDashboard = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       <Navbar />
 
       <div className="max-w-7xl mx-auto px-6 py-8">
         {/* Header Row */}
         <div className="flex justify-between items-center">
           <div>
-            <h1 className="font-display font-bold text-2xl text-gray-900">
+            <h1 className="font-display font-bold text-2xl text-gray-900 dark:text-white">
               {t('dashboard_greeting')}{user?.first_name ? `, ${user.first_name}!` : '!'}
             </h1>
-            <p className="text-gray-500 mt-1">{t('dashboard_subtitle')}</p>
+            <p className="text-gray-500 dark:text-gray-400 mt-1">{t('dashboard_subtitle')}</p>
           </div>
           <button
             onClick={() => setShowAddPet(true)}
@@ -238,7 +238,7 @@ const PetDashboard = () => {
               return (
                 <div
                   key={pet.id}
-                  className="bg-white rounded-2xl border border-[#E5E7EB] shadow-sm hover:shadow-md transition-shadow overflow-hidden"
+                  className="bg-white dark:bg-gray-800 rounded-2xl border border-[#E5E7EB] shadow-sm hover:shadow-md transition-shadow overflow-hidden"
                 >
                   {/* Cover image area */}
                   <div className={`bg-gradient-to-br ${gradient} h-36 flex items-center justify-center relative overflow-hidden`}>
@@ -254,7 +254,7 @@ const PetDashboard = () => {
                       />
                     ) : null}
                     <div
-                      className="w-20 h-20 rounded-full bg-white/80 flex items-center justify-center text-4xl shadow-sm"
+                      className="w-20 h-20 rounded-full bg-white/80 dark:bg-gray-800/80 flex items-center justify-center text-4xl shadow-sm"
                       style={{ display: pet.image_url ? 'none' : 'flex' }}
                     >
                       {emoji}
@@ -263,12 +263,12 @@ const PetDashboard = () => {
                   {/* Body */}
                   <div className="p-5">
                     <div className="flex items-center justify-between mb-1">
-                      <h3 className="font-display font-bold text-lg text-gray-900">
+                      <h3 className="font-display font-bold text-lg text-gray-900 dark:text-white">
                         {pet.name}
                       </h3>
                       <StatusBadge status={petHealthMap[pet.id] || 'healthy'} />
                     </div>
-                    <p className="text-sm text-gray-500 mb-4">
+                    <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
                       {breedDisplay}{age !== null ? ` \u2022 ${age}` : ''}
                     </p>
 
@@ -276,28 +276,28 @@ const PetDashboard = () => {
                     <div className="space-y-2 mb-4">
                       {pet.gender && pet.gender !== 'Unknown' && (
                         <div className="flex items-center justify-between text-sm">
-                          <span className="text-gray-500 flex items-center gap-1.5">
+                          <span className="text-gray-500 dark:text-gray-400 flex items-center gap-1.5">
                             <Calendar className="w-4 h-4" />
                             Gender
                           </span>
-                          <span className="text-gray-700 font-medium">{pet.gender}</span>
+                          <span className="text-gray-700 dark:text-gray-300 font-medium">{pet.gender}</span>
                         </div>
                       )}
                       {pet.weight && (
                         <div className="flex items-center justify-between text-sm">
-                          <span className="text-gray-500 flex items-center gap-1.5">
+                          <span className="text-gray-500 dark:text-gray-400 flex items-center gap-1.5">
                             <Activity className="w-4 h-4" />
                             Weight
                           </span>
-                          <span className="text-gray-700 font-medium">{pet.weight} kg</span>
+                          <span className="text-gray-700 dark:text-gray-300 font-medium">{pet.weight} kg</span>
                         </div>
                       )}
                       <div className="flex items-center justify-between text-sm">
-                        <span className="text-gray-500 flex items-center gap-1.5">
+                        <span className="text-gray-500 dark:text-gray-400 flex items-center gap-1.5">
                           <FileText className="w-4 h-4" />
                           {t('dashboard_last_diagnosis') || 'Last Diagnosis'}
                         </span>
-                        <span className={`text-xs font-medium ${lastDiagnosisMap[pet.id] ? 'text-gray-700' : 'text-gray-400'}`}>
+                        <span className={`text-xs font-medium ${lastDiagnosisMap[pet.id] ? 'text-gray-700 dark:text-gray-300' : 'text-gray-400 dark:text-gray-500'}`}>
                           {lastDiagnosisMap[pet.id] || (t('common_no_data') || 'No data')}
                         </span>
                       </div>
@@ -325,7 +325,7 @@ const PetDashboard = () => {
                         <div className="flex items-center gap-1.5">
                           <button
                             onClick={() => setEditingPet(pet)}
-                            className="w-8 h-8 rounded-lg border border-[#E5E7EB] flex items-center justify-center text-gray-400 hover:text-[#7C3AED] hover:border-[#7C3AED] hover:bg-purple-50 transition-colors cursor-pointer"
+                            className="w-8 h-8 rounded-lg border border-[#E5E7EB] flex items-center justify-center text-gray-400 dark:text-gray-500 hover:text-[#7C3AED] hover:border-[#7C3AED] hover:bg-purple-50 dark:hover:bg-purple-900/20 transition-colors cursor-pointer"
                             title="Edit pet"
                           >
                             <Pencil className="w-3.5 h-3.5" />
@@ -333,7 +333,7 @@ const PetDashboard = () => {
                           <button
                             onClick={() => handleCameraClick(pet)}
                             disabled={uploadingImage === pet.id}
-                            className="w-8 h-8 rounded-lg border border-[#E5E7EB] flex items-center justify-center text-gray-400 hover:text-[#7C3AED] hover:border-[#7C3AED] hover:bg-purple-50 transition-colors cursor-pointer disabled:opacity-50"
+                            className="w-8 h-8 rounded-lg border border-[#E5E7EB] flex items-center justify-center text-gray-400 dark:text-gray-500 hover:text-[#7C3AED] hover:border-[#7C3AED] hover:bg-purple-50 dark:hover:bg-purple-900/20 transition-colors cursor-pointer disabled:opacity-50"
                             title="Upload photo"
                           >
                             <Camera className="w-3.5 h-3.5" />
@@ -341,7 +341,7 @@ const PetDashboard = () => {
                           <button
                             onClick={() => handleDeletePet(pet)}
                             disabled={deletingPet === pet.id}
-                            className="w-8 h-8 rounded-lg border border-[#E5E7EB] flex items-center justify-center text-gray-400 hover:text-red-500 hover:border-red-300 hover:bg-red-50 transition-colors cursor-pointer disabled:opacity-50"
+                            className="w-8 h-8 rounded-lg border border-[#E5E7EB] flex items-center justify-center text-gray-400 dark:text-gray-500 hover:text-red-500 hover:border-red-300 hover:bg-red-50 transition-colors cursor-pointer disabled:opacity-50"
                             title="Delete pet"
                           >
                             <Trash2 className="w-3.5 h-3.5" />
@@ -359,13 +359,13 @@ const PetDashboard = () => {
               onClick={() => setShowAddPet(true)}
               className="border-2 border-dashed border-[#E5E7EB] rounded-2xl flex flex-col items-center justify-center p-8 hover:border-[#7C3AED] transition-colors cursor-pointer"
             >
-              <div className="w-14 h-14 rounded-full bg-purple-50 flex items-center justify-center mb-4">
+              <div className="w-14 h-14 rounded-full bg-purple-50 dark:bg-purple-900/20 flex items-center justify-center mb-4">
                 <Plus className="w-7 h-7 text-[#7C3AED]" />
               </div>
-              <h3 className="font-display font-bold text-gray-900 mb-1">
+              <h3 className="font-display font-bold text-gray-900 dark:text-white mb-1">
                 {t('dashboard_add_another')}
               </h3>
-              <p className="text-sm text-gray-500 text-center mb-4">
+              <p className="text-sm text-gray-500 dark:text-gray-400 text-center mb-4">
                 {t('dashboard_add_another_desc')}
               </p>
               <span className="text-sm font-semibold text-[#7C3AED] hover:text-[#6D28D9] transition-colors no-underline">
@@ -377,19 +377,19 @@ const PetDashboard = () => {
 
         {/* Diagnosing a Different Pet Section */}
         {!loading && pets.length > 0 && (
-          <div className="mt-8 bg-white rounded-2xl border border-[#E5E7EB] shadow-sm p-6">
+          <div className="mt-8 bg-white dark:bg-gray-800 rounded-2xl border border-[#E5E7EB] shadow-sm p-6">
             <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
               <div className="flex-1 text-center sm:text-left">
-                <h3 className="font-display font-semibold text-base text-gray-900 mb-1">
+                <h3 className="font-display font-semibold text-base text-gray-900 dark:text-white mb-1">
                   {t('diagnosis_selector_different_pet_title') || 'Diagnosing a Different Pet?'}
                 </h3>
-                <p className="text-sm text-gray-500">
+                <p className="text-sm text-gray-500 dark:text-gray-400">
                   {t('diagnosis_selector_different_pet_desc') || 'Start a diagnosis for a pet that is not in your account.'}
                 </p>
               </div>
               <button
                 onClick={() => navigate('/questionnaire')}
-                className="inline-flex items-center gap-2 bg-gray-900 text-white rounded-full px-6 py-2.5 font-semibold hover:bg-gray-800 transition-colors whitespace-nowrap"
+                className="inline-flex items-center gap-2 bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 rounded-full px-6 py-2.5 font-semibold hover:bg-gray-800 transition-colors whitespace-nowrap"
               >
                 <Plus className="w-4 h-4" />
                 {t('diagnosis_selector_new_diagnosis') || 'New Diagnosis'}
@@ -401,10 +401,10 @@ const PetDashboard = () => {
         {/* Bottom Row */}
         <div className="grid grid-cols-1 lg:grid-cols-5 gap-6 mt-8">
           {/* Recent Pawsitivity */}
-          <div className="lg:col-span-3 bg-white rounded-2xl border border-[#E5E7EB] shadow-sm p-6">
+          <div className="lg:col-span-3 bg-white dark:bg-gray-800 rounded-2xl border border-[#E5E7EB] shadow-sm p-6">
             {/* Header */}
             <div className="flex items-center justify-between mb-5">
-              <h2 className="font-display font-bold text-lg text-gray-900">
+              <h2 className="font-display font-bold text-lg text-gray-900 dark:text-white">
                 {t('dashboard_recent_activity')}
               </h2>
               <Link
@@ -424,7 +424,7 @@ const PetDashboard = () => {
                 </div>
               ) : recentActivity.length === 0 ? (
                 <div className="text-center py-8">
-                  <p className="text-sm text-gray-400 mb-3">
+                  <p className="text-sm text-gray-400 dark:text-gray-500 mb-3">
                     {t('dashboard_no_activity') || 'No recent activity'}
                   </p>
                   <Link
@@ -450,19 +450,19 @@ const PetDashboard = () => {
                   return (
                     <div key={record.id} className="flex items-center gap-4 py-3.5 first:pt-0 last:pb-0">
                       {/* Pet avatar */}
-                      <div className="w-10 h-10 rounded-full bg-purple-50 flex items-center justify-center text-lg flex-shrink-0">
+                      <div className="w-10 h-10 rounded-full bg-purple-50 dark:bg-purple-900/20 flex items-center justify-center text-lg flex-shrink-0">
                         {emoji}
                       </div>
 
                       {/* Details */}
                       <div className="flex-1 min-w-0">
-                        <p className="text-sm font-semibold text-gray-900 truncate">
+                        <p className="text-sm font-semibold text-gray-900 dark:text-white truncate">
                           {diagnosis
                             ? `${petName} — ${diagnosis}`
                             : `${petName} — ${t('dashboard_diagnosis_in_progress') || 'Diagnosis in progress'}`
                           }
                         </p>
-                        <p className="text-xs text-gray-400 mt-0.5">
+                        <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">
                           {date ? date.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' }) : ''}
                         </p>
                       </div>
@@ -474,7 +474,7 @@ const PetDashboard = () => {
                         ) : isPending ? (
                           <Clock className="w-5 h-5 text-amber-500" />
                         ) : (
-                          <AlertTriangle className="w-5 h-5 text-gray-300" />
+                          <AlertTriangle className="w-5 h-5 text-gray-300 dark:text-gray-600" />
                         )}
                       </div>
                     </div>

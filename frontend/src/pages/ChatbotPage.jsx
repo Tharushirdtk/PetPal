@@ -364,11 +364,11 @@ const ChatbotPage = () => {
       <div className="flex flex-1 overflow-hidden">
 
       {/* ═══════ LEFT SIDEBAR ═══════ */}
-      <aside className="hidden lg:flex flex-col w-64 bg-white border-r border-[#E5E7EB] overflow-y-auto">
+      <aside className="hidden lg:flex flex-col w-64 bg-white dark:bg-gray-800 border-r border-[#E5E7EB] dark:border-gray-700 overflow-y-auto">
         <div className="flex items-center gap-2 px-5 py-5">
           <div className="relative">
             <span className="text-xl font-bold text-[#7C3AED]">PetPal</span>
-            <span className="absolute -right-2 -top-0.5 h-2.5 w-2.5 rounded-full bg-green-500 ring-2 ring-white" />
+            <span className="absolute -right-2 -top-0.5 h-2.5 w-2.5 rounded-full bg-green-500 ring-2 ring-white dark:ring-gray-800" />
           </div>
         </div>
 
@@ -382,13 +382,13 @@ const ChatbotPage = () => {
           </button>
         </div>
 
-        <p className="px-5 mt-6 text-xs font-semibold uppercase tracking-wider text-gray-400">
+        <p className="px-5 mt-6 text-xs font-semibold uppercase tracking-wider text-gray-400 dark:text-gray-500">
           {t('chat_history')}
         </p>
 
         <nav className="mt-2 flex-1 px-2 space-y-1">
           {petGroups.length === 0 && (
-            <p className="px-3 py-3 text-sm text-gray-400">{t('chat_no_history') || 'No consultation history yet'}</p>
+            <p className="px-3 py-3 text-sm text-gray-400 dark:text-gray-500">{t('chat_no_history') || 'No consultation history yet'}</p>
           )}
           {petGroups.map((group) => {
             const isExpanded = expandedPets.has(group.petName);
@@ -398,17 +398,17 @@ const ChatbotPage = () => {
                 <button
                   onClick={() => togglePetGroup(group.petName)}
                   className={`w-full flex items-center gap-2 px-3 py-2.5 rounded-lg text-sm transition-colors cursor-pointer ${
-                    hasActive ? 'bg-[#F5F3FF] text-[#7C3AED] font-semibold' : 'text-gray-700 hover:bg-gray-50'
+                    hasActive ? 'bg-[#F5F3FF] text-[#7C3AED] font-semibold' : 'text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700'
                   }`}
                 >
                   {isExpanded ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
                   <span className="truncate flex-1 text-left">{group.petName}</span>
-                  <span className="text-xs text-gray-400 bg-gray-100 rounded-full px-2 py-0.5">
+                  <span className="text-xs text-gray-400 dark:text-gray-500 bg-gray-100 dark:bg-gray-700 rounded-full px-2 py-0.5">
                     {group.consultations.length}
                   </span>
                 </button>
                 {isExpanded && (
-                  <div className="ml-4 pl-3 border-l border-gray-200 space-y-0.5 mt-0.5 mb-1">
+                  <div className="ml-4 pl-3 border-l border-gray-200 dark:border-gray-700 space-y-0.5 mt-0.5 mb-1">
                     {group.consultations.map((item) => (
                       <button
                         key={item.id}
@@ -416,7 +416,7 @@ const ChatbotPage = () => {
                         className={`w-full text-left px-3 py-2 rounded-lg text-xs transition-colors cursor-pointer ${
                           item.active
                             ? 'bg-[#F5F3FF] text-[#7C3AED] font-medium'
-                            : 'text-gray-500 hover:bg-gray-50'
+                            : 'text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700'
                         }`}
                       >
                         <div className="flex items-center gap-2">
@@ -428,7 +428,7 @@ const ChatbotPage = () => {
                           </span>
                         </div>
                         {item.primaryLabel && (
-                          <p className="text-gray-400 mt-0.5 ml-3.5">{item.date}</p>
+                          <p className="text-gray-400 dark:text-gray-500 mt-0.5 ml-3.5">{item.date}</p>
                         )}
                       </button>
                     ))}
@@ -441,18 +441,18 @@ const ChatbotPage = () => {
       </aside>
 
       {/* ═══════ CENTER CHAT ═══════ */}
-      <section className="flex-1 flex flex-col bg-[#F9FAFB]">
+      <section className="flex-1 flex flex-col bg-[#F9FAFB] dark:bg-gray-900">
         {/* Top bar */}
-        <div className="flex items-center gap-3 bg-white border-b border-[#E5E7EB] px-6 py-4">
+        <div className="flex items-center gap-3 bg-white dark:bg-gray-800 border-b border-[#E5E7EB] dark:border-gray-700 px-6 py-4">
           <div className="h-9 w-9 rounded-full bg-[#7C3AED] flex items-center justify-center text-white text-sm font-bold">
             {user?.name ? user.name.charAt(0).toUpperCase() : 'P'}
           </div>
           <div>
-            <p className="text-sm font-semibold text-gray-900 flex items-center gap-2">
+            <p className="text-sm font-semibold text-gray-900 dark:text-white flex items-center gap-2">
               PetPal AI
               <span className="h-2 w-2 rounded-full bg-green-500 inline-block" />
             </p>
-            <p className="text-xs text-gray-400">
+            <p className="text-xs text-gray-400 dark:text-gray-500">
               {consultationId ? `Consultation #${consultationId}` : t('chat_no_active') || 'No active consultation'}
             </p>
           </div>
@@ -481,9 +481,9 @@ const ChatbotPage = () => {
         {noConsultation && (
           <div className="flex-1 flex items-center justify-center p-6">
             <div className="text-center max-w-md">
-              <MessageCircle className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-              <h3 className="text-lg font-semibold text-gray-700 mb-2">{t('chat_no_consultation_title') || 'No Active Consultation'}</h3>
-              <p className="text-sm text-gray-500 mb-6">{t('chat_no_consultation_desc') || 'Start a new consultation by completing the questionnaire first.'}</p>
+              <MessageCircle className="w-16 h-16 text-gray-300 dark:text-gray-600 mx-auto mb-4" />
+              <h3 className="text-lg font-semibold text-gray-700 dark:text-gray-300 mb-2">{t('chat_no_consultation_title') || 'No Active Consultation'}</h3>
+              <p className="text-sm text-gray-500 dark:text-gray-400 mb-6">{t('chat_no_consultation_desc') || 'Start a new consultation by completing the questionnaire first.'}</p>
               <button
                 onClick={handleNewConsultation}
                 className="px-6 py-3 rounded-full bg-[#7C3AED] text-white text-sm font-medium hover:bg-[#6D28D9] transition-colors"
@@ -503,15 +503,15 @@ const ChatbotPage = () => {
           <div className="flex-1 overflow-y-auto p-6 space-y-5">
             {messages.length > 0 && (
               <div className="flex items-center gap-3">
-                <span className="flex-1 h-px bg-gray-200" />
-                <span className="text-xs font-semibold text-gray-400">{t('chat_today')}</span>
-                <span className="flex-1 h-px bg-gray-200" />
+                <span className="flex-1 h-px bg-gray-200 dark:bg-gray-700" />
+                <span className="text-xs font-semibold text-gray-400 dark:text-gray-500">{t('chat_today')}</span>
+                <span className="flex-1 h-px bg-gray-200 dark:bg-gray-700" />
               </div>
             )}
 
             {messages.length === 0 && !isTyping && (
               <div className="flex items-center justify-center h-full">
-                <p className="text-sm text-gray-400">{t('chat_empty') || 'Start a conversation...'}</p>
+                <p className="text-sm text-gray-400 dark:text-gray-500">{t('chat_empty') || 'Start a conversation...'}</p>
               </div>
             )}
 
@@ -522,9 +522,9 @@ const ChatbotPage = () => {
                     <div className="flex-shrink-0 h-8 w-8 rounded-full bg-[#F5F3FF] flex items-center justify-center">
                       <span className="text-[#7C3AED] text-sm">&#128062;</span>
                     </div>
-                    <div className="bg-white rounded-2xl p-4 shadow-sm max-w-lg">
-                      <p className="text-sm text-gray-700 leading-relaxed whitespace-pre-wrap">{msg.text}</p>
-                      <p className="text-xs text-gray-400 mt-2">{msg.time}</p>
+                    <div className="bg-white dark:bg-gray-800 rounded-2xl p-4 shadow-sm max-w-lg">
+                      <p className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed whitespace-pre-wrap">{msg.text}</p>
+                      <p className="text-xs text-gray-400 dark:text-gray-500 mt-2">{msg.time}</p>
                     </div>
                   </div>
                 ) : (
@@ -544,11 +544,11 @@ const ChatbotPage = () => {
                 <div className="flex-shrink-0 h-8 w-8 rounded-full bg-[#F5F3FF] flex items-center justify-center">
                   <span className="text-[#7C3AED] text-sm">&#128062;</span>
                 </div>
-                <div className="bg-white rounded-2xl p-4 shadow-sm max-w-lg">
+                <div className="bg-white dark:bg-gray-800 rounded-2xl p-4 shadow-sm max-w-lg">
                   <div className="flex items-center gap-1.5">
-                    <div className="w-2 h-2 rounded-full bg-gray-400 animate-bounce" style={{ animationDelay: '0ms' }} />
-                    <div className="w-2 h-2 rounded-full bg-gray-400 animate-bounce" style={{ animationDelay: '150ms' }} />
-                    <div className="w-2 h-2 rounded-full bg-gray-400 animate-bounce" style={{ animationDelay: '300ms' }} />
+                    <div className="w-2 h-2 rounded-full bg-gray-400 dark:bg-gray-600 animate-bounce" style={{ animationDelay: '0ms' }} />
+                    <div className="w-2 h-2 rounded-full bg-gray-400 dark:bg-gray-600 animate-bounce" style={{ animationDelay: '150ms' }} />
+                    <div className="w-2 h-2 rounded-full bg-gray-400 dark:bg-gray-600 animate-bounce" style={{ animationDelay: '300ms' }} />
                   </div>
                 </div>
               </div>
@@ -568,8 +568,8 @@ const ChatbotPage = () => {
                     </span>
                   )}
                 </div>
-                <h4 className="text-base font-bold text-gray-900 mb-1">{diagnosisData.condition}</h4>
-                {diagnosisData.description && <p className="text-sm text-gray-500 mb-4">{diagnosisData.description}</p>}
+                <h4 className="text-base font-bold text-gray-900 dark:text-white mb-1">{diagnosisData.condition}</h4>
+                {diagnosisData.description && <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">{diagnosisData.description}</p>}
                 <button
                   onClick={() => diagnosisData.reportId ? navigate(`/report/${diagnosisData.reportId}`) : navigate('/report')}
                   className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-[#7C3AED] text-white text-sm font-semibold hover:bg-[#6D28D9] transition-colors shadow-sm"
@@ -577,7 +577,7 @@ const ChatbotPage = () => {
                   <FileText size={16} />
                   {t('chat_view_full_report')}
                 </button>
-                <p className="text-xs text-gray-400 text-center mt-2">{t('chat_auto_redirect')}</p>
+                <p className="text-xs text-gray-400 dark:text-gray-500 text-center mt-2">{t('chat_auto_redirect')}</p>
               </div>
             )}
 
@@ -589,16 +589,16 @@ const ChatbotPage = () => {
           </div>
 
           {/* Bottom input area */}
-          <div className="bg-[#F9FAFB] px-6 pb-5">
+          <div className="bg-[#F9FAFB] dark:bg-gray-900 px-6 pb-5">
             {/* Input bar */}
-            <div className="flex items-end gap-3 bg-white rounded-xl border border-gray-200 px-4 py-3 shadow-sm">
+            <div className="flex items-end gap-3 bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 px-4 py-3 shadow-sm">
               <textarea
                 value={inputText}
                 onChange={(e) => setInputText(e.target.value)}
                 onKeyDown={handleKeyDown}
                 placeholder={t('chat_placeholder')}
                 rows={1}
-                className="flex-1 text-sm outline-none bg-transparent text-gray-700 placeholder-gray-400 resize-none max-h-[4.5rem] overflow-y-auto leading-[1.5]"
+                className="flex-1 text-sm outline-none bg-transparent text-gray-700 dark:text-gray-300 placeholder-gray-400 dark:placeholder-gray-500 resize-none max-h-[4.5rem] overflow-y-auto leading-[1.5]"
                 style={{ minHeight: '1.5rem' }}
                 disabled={isTyping}
                 onInput={(e) => {
@@ -641,7 +641,7 @@ const ChatbotPage = () => {
       </section>
 
       {/* ═══════ RIGHT PANEL — pet info ═══════ */}
-      <aside className="hidden xl:flex flex-col w-72 bg-white border-l border-[#E5E7EB] overflow-y-auto p-4">
+      <aside className="hidden xl:flex flex-col w-72 bg-white dark:bg-gray-800 border-l border-[#E5E7EB] dark:border-gray-700 overflow-y-auto p-4">
         {/* Pet avatar */}
         <div className="h-36 rounded-2xl bg-gradient-to-br from-purple-100 to-pink-100 flex items-center justify-center text-5xl mb-4 overflow-hidden">
           {selectedPetData?.imageUrl ? (
@@ -664,14 +664,14 @@ const ChatbotPage = () => {
         </div>
 
         {/* Pet info */}
-        <h3 className="text-lg font-bold text-gray-900">{displayPetName}</h3>
+        <h3 className="text-lg font-bold text-gray-900 dark:text-white">{displayPetName}</h3>
         {displayBreed && (
-          <p className="text-xs font-semibold uppercase tracking-wider text-gray-400 mt-0.5">
+          <p className="text-xs font-semibold uppercase tracking-wider text-gray-400 dark:text-gray-500 mt-0.5">
             {displayBreed.toUpperCase()}
           </p>
         )}
         {displaySpecies && !displayBreed && (
-          <p className="text-xs font-semibold uppercase tracking-wider text-gray-400 mt-0.5">
+          <p className="text-xs font-semibold uppercase tracking-wider text-gray-400 dark:text-gray-500 mt-0.5">
             {displaySpecies.toUpperCase()}
           </p>
         )}
@@ -702,7 +702,7 @@ const ChatbotPage = () => {
         {(diagnosisData?.condition || displayDiagnosis) && (
           <div className="mt-4 bg-purple-50 rounded-xl p-3">
             <p className="text-xs font-semibold uppercase tracking-wider text-purple-400 mb-1">{t('chat_potential_match')}</p>
-            <p className="text-sm font-bold text-gray-900">{diagnosisData?.condition || displayDiagnosis}</p>
+            <p className="text-sm font-bold text-gray-900 dark:text-white">{diagnosisData?.condition || displayDiagnosis}</p>
           </div>
         )}
 
@@ -710,7 +710,7 @@ const ChatbotPage = () => {
         <div className="mt-5 space-y-2.5">
           {displayVaccinated && (
             <div className="flex items-center justify-between">
-              <span className="text-sm text-gray-600">{t('chat_vaccines')}</span>
+              <span className="text-sm text-gray-600 dark:text-gray-300">{t('chat_vaccines')}</span>
               <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold border ${
                 displayVaccinated === 'yes'
                   ? 'bg-green-50 text-green-700 border-green-200'
@@ -723,11 +723,11 @@ const ChatbotPage = () => {
 
           {petInfo?.neutered && (
             <div className="flex items-center justify-between">
-              <span className="text-sm text-gray-600">{t('chat_neutered') || 'Neutered'}</span>
+              <span className="text-sm text-gray-600 dark:text-gray-300">{t('chat_neutered') || 'Neutered'}</span>
               <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold border ${
                 petInfo.neutered === 'yes'
                   ? 'bg-green-50 text-green-700 border-green-200'
-                  : 'bg-gray-50 text-gray-500 border-gray-200'
+                  : 'bg-gray-50 dark:bg-gray-800 text-gray-500 dark:text-gray-400 border-gray-200 dark:border-gray-700'
               }`}>
                 {petInfo.neutered === 'yes' ? 'YES' : 'NO'}
               </span>
@@ -737,9 +737,9 @@ const ChatbotPage = () => {
 
         {/* Consultation info */}
         {consultationId && (
-          <div className="mt-5 bg-[#F9FAFB] rounded-xl p-4">
-            <p className="text-sm font-semibold text-gray-900">Consultation #{consultationId}</p>
-            <p className="text-xs text-gray-400 mt-1">{new Date().toLocaleDateString()}</p>
+          <div className="mt-5 bg-[#F9FAFB] dark:bg-gray-900 rounded-xl p-4">
+            <p className="text-sm font-semibold text-gray-900 dark:text-white">Consultation #{consultationId}</p>
+            <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">{new Date().toLocaleDateString()}</p>
           </div>
         )}
       </aside>

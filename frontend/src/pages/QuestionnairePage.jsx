@@ -25,14 +25,14 @@ import QuestionCard from '../components/questionnaire/QuestionCard';
 
 /* ── Option colours by index (for API questions) ── */
 const OPTION_COLORS = [
-  'bg-green-50 border-green-200',
-  'bg-blue-50 border-blue-200',
-  'bg-yellow-50 border-yellow-200',
-  'bg-orange-50 border-orange-200',
-  'bg-red-50 border-red-200',
-  'bg-purple-50 border-purple-200',
-  'bg-pink-50 border-pink-200',
-  'bg-teal-50 border-teal-200',
+  'bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800',
+  'bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800',
+  'bg-yellow-50 dark:bg-yellow-900/20 border-yellow-200 dark:border-yellow-800',
+  'bg-orange-50 dark:bg-orange-900/20 border-orange-200 dark:border-orange-800',
+  'bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800',
+  'bg-purple-50 dark:bg-purple-900/20 border-purple-200 dark:border-purple-800',
+  'bg-pink-50 dark:bg-pink-900/20 border-pink-200 dark:border-pink-800',
+  'bg-teal-50 dark:bg-teal-900/20 border-teal-200 dark:border-teal-800',
 ];
 
 /* ── Map API question → rendering format ── */
@@ -605,7 +605,7 @@ const QuestionnairePage = () => {
 
   /* ════════════  JSX  ════════════ */
   return (
-    <div className="min-h-screen bg-[#F9FAFB]">
+    <div className="min-h-screen bg-[#F9FAFB] dark:bg-gray-900">
       <Navbar />
 
       {/* Emergency Banner */}
@@ -632,16 +632,16 @@ const QuestionnairePage = () => {
       {/* Resume Previous Diagnosis Prompt */}
       {showResumePrompt && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-          <div className="bg-white rounded-2xl shadow-xl max-w-md w-full mx-4 p-6">
+          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl max-w-md w-full mx-4 p-6">
             <div className="flex items-center gap-3 mb-4">
               <div className="h-10 w-10 rounded-full bg-[#F5F3FF] flex items-center justify-center">
                 <MessageCircle className="w-5 h-5 text-[#7C3AED]" />
               </div>
-              <h3 className="text-lg font-bold text-gray-900">
+              <h3 className="text-lg font-bold text-gray-900 dark:text-white">
                 {t('quest_resume_title') || 'Continue Previous Diagnosis?'}
               </h3>
             </div>
-            <p className="text-sm text-gray-500 mb-6">
+            <p className="text-sm text-gray-500 dark:text-gray-400 mb-6">
               {t('quest_resume_desc') || 'You have an active diagnosis in progress for this pet. Would you like to continue where you left off or start a new diagnosis?'}
             </p>
             <div className="flex flex-col gap-3">
@@ -654,7 +654,7 @@ const QuestionnairePage = () => {
               </button>
               <button
                 onClick={handleStartNew}
-                className="w-full flex items-center justify-center gap-2 bg-white text-gray-700 border border-gray-200 rounded-xl px-4 py-3 font-semibold hover:bg-gray-50 transition-colors cursor-pointer"
+                className="w-full flex items-center justify-center gap-2 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-700 rounded-xl px-4 py-3 font-semibold hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors cursor-pointer"
               >
                 <ClipboardList className="w-4 h-4" />
                 {t('quest_resume_new') || 'Start New Diagnosis'}
@@ -679,9 +679,9 @@ const QuestionnairePage = () => {
 
         {/* No questions */}
         {!loading && !error && allQuestions.length === 0 && (
-          <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-8 text-center">
-            <ClipboardList className="w-12 h-12 text-gray-300 mx-auto mb-3" />
-            <p className="text-sm text-gray-500">
+          <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 shadow-sm p-8 text-center">
+            <ClipboardList className="w-12 h-12 text-gray-300 dark:text-gray-600 mx-auto mb-3" />
+            <p className="text-sm text-gray-500 dark:text-gray-400">
               {t('quest_no_questions') || 'No questionnaire available at this time.'}
             </p>
           </div>
@@ -689,7 +689,7 @@ const QuestionnairePage = () => {
 
         {/* Conversational Questionnaire */}
         {!loading && !error && allQuestions.length > 0 && currentItem && (
-          <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
+          <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 shadow-sm overflow-hidden">
             {/* Progress Bar */}
             <div className="px-6 pt-5">
               <ProgressBar
@@ -706,10 +706,10 @@ const QuestionnairePage = () => {
                   {speciesEmoji((selectedPet.species?.name || '').toLowerCase())}
                 </div>
                 <div>
-                  <p className="text-sm font-semibold text-gray-900">
+                  <p className="text-sm font-semibold text-gray-900 dark:text-white">
                     {t('quest_diagnosing') || 'Diagnosing'}: {selectedPet.name}
                   </p>
-                  <p className="text-xs text-gray-500">
+                  <p className="text-xs text-gray-500 dark:text-gray-400">
                     {selectedPet.species?.name}{selectedPet.breed ? ` \u2022 ${selectedPet.breed.description || selectedPet.breed.name}` : ''}
                   </p>
                 </div>
@@ -743,13 +743,13 @@ const QuestionnairePage = () => {
             </div>
 
             {/* Footer: Back / Next */}
-            <div className="border-t border-gray-100 px-6 py-4">
+            <div className="border-t border-gray-100 dark:border-gray-700 px-6 py-4">
               <div className="flex items-center justify-between">
                 <button
                   type="button"
                   onClick={handleBack}
                   disabled={!canGoBack && !selectedPet}
-                  className="flex items-center gap-1 text-sm text-gray-500 hover:text-gray-700 transition-colors disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
+                  className="flex items-center gap-1 text-sm text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-colors disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
                 >
                   <ChevronLeft className="w-4 h-4" />
                   {t('quest_back') || 'Back'}

@@ -64,50 +64,50 @@ const MedicalHistory = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       <Navbar variant="default" />
 
       <div className="max-w-7xl mx-auto px-6 py-8">
         {/* Breadcrumb */}
-        <nav className="text-sm text-gray-500 mb-6">
-          <Link to="/dashboard" className="hover:text-[#7C3AED] transition-colors no-underline text-gray-500">
+        <nav className="text-sm text-gray-500 dark:text-gray-400 mb-6">
+          <Link to="/dashboard" className="hover:text-[#7C3AED] transition-colors no-underline text-gray-500 dark:text-gray-400">
             {t('history_breadcrumb_dashboard')}
           </Link>
           <span className="mx-2">&gt;</span>
-          <span className="text-gray-900">{t('history_breadcrumb_medical')}</span>
+          <span className="text-gray-900 dark:text-white">{t('history_breadcrumb_medical')}</span>
         </nav>
 
         {/* Page Header */}
         <div className="flex justify-between items-start">
           <div>
-            <h1 className="font-display font-bold text-2xl text-gray-900">
+            <h1 className="font-display font-bold text-2xl text-gray-900 dark:text-white">
               {t('history_title')}
             </h1>
-            <p className="text-gray-500 mt-1">{t('history_subtitle')}</p>
+            <p className="text-gray-500 dark:text-gray-400 mt-1">{t('history_subtitle')}</p>
           </div>
-          <button className="flex items-center gap-2 bg-[#7C3AED] text-white rounded-xl px-5 py-2.5 text-sm font-semibold hover:bg-[#6D28D9] transition-all shadow-md hover:shadow-lg cursor-pointer">
+          {/* <button className="flex items-center gap-2 bg-[#7C3AED] text-white rounded-xl px-5 py-2.5 text-sm font-semibold hover:bg-[#6D28D9] transition-all shadow-md hover:shadow-lg cursor-pointer">
             <Plus className="w-4 h-4" />
             {t('history_new_record')}
-          </button>
+          </button> */}
         </div>
 
         {/* Search + Filter Bar */}
         <div className="flex gap-3 mt-6">
           <div className="relative flex-1">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 dark:text-gray-500" />
             <input
               type="text"
               placeholder={t('history_search')}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full rounded-xl border border-[#E5E7EB] px-4 py-3 pl-10 text-sm text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#7C3AED]/30 focus:border-[#7C3AED] transition-all"
+              className="w-full rounded-xl border border-[#E5E7EB] px-4 py-3 pl-10 text-sm text-gray-700 dark:text-gray-300 placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#7C3AED]/30 focus:border-[#7C3AED] transition-all dark:bg-gray-800"
             />
           </div>
-          <button className="flex items-center gap-2 px-4 py-3 rounded-xl border border-[#E5E7EB] bg-white text-sm font-medium text-gray-600 hover:bg-gray-50 transition-colors cursor-pointer">
+          <button className="flex items-center gap-2 px-4 py-3 rounded-xl border border-[#E5E7EB] bg-white dark:bg-gray-800 text-sm font-medium text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors cursor-pointer">
             <SlidersHorizontal className="w-4 h-4" />
             {t('history_filter')}
           </button>
-          <button className="flex items-center gap-2 px-4 py-3 rounded-xl border border-[#E5E7EB] bg-white text-sm font-medium text-gray-600 hover:bg-gray-50 transition-colors cursor-pointer">
+          <button className="flex items-center gap-2 px-4 py-3 rounded-xl border border-[#E5E7EB] bg-white dark:bg-gray-800 text-sm font-medium text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors cursor-pointer">
             <Download className="w-4 h-4" />
             {t('history_export')}
           </button>
@@ -125,27 +125,27 @@ const MedicalHistory = () => {
 
         {/* Table */}
         {!loading && !error && (
-          <div className="mt-6 bg-white rounded-2xl border border-[#E5E7EB] overflow-hidden">
+          <div className="mt-6 bg-white dark:bg-gray-800 rounded-2xl border border-[#E5E7EB] overflow-hidden">
             <div className="overflow-x-auto">
               <table className="w-full">
                 <thead>
-                  <tr className="bg-gray-50 border-b border-[#E5E7EB]">
-                    <th className="text-left px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                  <tr className="bg-gray-50 dark:bg-gray-900 border-b border-[#E5E7EB]">
+                    <th className="text-left px-6 py-4 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                       {t('history_col_pet')}
                     </th>
-                    <th className="text-left px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                    <th className="text-left px-6 py-4 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                       {t('history_col_date')}
                     </th>
-                    <th className="text-left px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                    <th className="text-left px-6 py-4 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                       {t('history_col_diagnosis')}
                     </th>
-                    <th className="text-left px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                    <th className="text-left px-6 py-4 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                       {t('history_col_clinician')}
                     </th>
-                    <th className="text-left px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                    <th className="text-left px-6 py-4 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                       {t('history_col_status')}
                     </th>
-                    <th className="text-left px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                    <th className="text-left px-6 py-4 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                       {t('history_col_action')}
                     </th>
                   </tr>
@@ -153,7 +153,7 @@ const MedicalHistory = () => {
                 <tbody>
                   {filteredRecords.length === 0 ? (
                     <tr>
-                      <td colSpan={6} className="px-6 py-12 text-center text-gray-400">
+                      <td colSpan={6} className="px-6 py-12 text-center text-gray-400 dark:text-gray-500">
                         {searchQuery ? t('history_no_match') : t('history_no_records')}
                       </td>
                     </tr>
@@ -172,17 +172,17 @@ const MedicalHistory = () => {
                       return (
                         <tr
                           key={consultationId}
-                          className="border-b border-[#E5E7EB] last:border-b-0 hover:bg-gray-50 transition-colors"
+                          className="border-b border-[#E5E7EB] last:border-b-0 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
                         >
                           {/* PET */}
                           <td className="px-6 py-4">
                             <div className="flex items-center gap-3">
                               <div
-                                className={`w-9 h-9 rounded-full ${avatarColors[petAvatar] || 'bg-gray-400'} text-white flex items-center justify-center text-sm font-semibold flex-shrink-0`}
+                                className={`w-9 h-9 rounded-full ${avatarColors[petAvatar] || 'bg-gray-400 dark:bg-gray-600'} text-white flex items-center justify-center text-sm font-semibold flex-shrink-0`}
                               >
                                 {petAvatar}
                               </div>
-                              <span className="text-sm font-medium text-gray-900 whitespace-nowrap">
+                              <span className="text-sm font-medium text-gray-900 dark:text-white whitespace-nowrap">
                                 {petName}
                               </span>
                             </div>
@@ -190,7 +190,7 @@ const MedicalHistory = () => {
 
                           {/* DATE */}
                           <td className="px-6 py-4">
-                            <span className="text-sm text-gray-600 whitespace-nowrap">
+                            <span className="text-sm text-gray-600 dark:text-gray-300 whitespace-nowrap">
                               {date}
                             </span>
                           </td>
@@ -198,11 +198,11 @@ const MedicalHistory = () => {
                           {/* DIAGNOSIS */}
                           <td className="px-6 py-4">
                             <div>
-                              <p className="text-sm font-semibold text-gray-900">
+                              <p className="text-sm font-semibold text-gray-900 dark:text-white">
                                 {diagnosis}
                               </p>
                               {diagnosisSub && (
-                                <p className="text-xs text-gray-500 mt-0.5">
+                                <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
                                   {diagnosisSub}
                                 </p>
                               )}
@@ -217,7 +217,7 @@ const MedicalHistory = () => {
                               >
                                 {clinician.charAt(0).toUpperCase()}
                               </div>
-                              <span className="text-sm text-gray-700 whitespace-nowrap">
+                              <span className="text-sm text-gray-700 dark:text-gray-300 whitespace-nowrap">
                                 {clinician}
                               </span>
                             </div>
@@ -250,14 +250,14 @@ const MedicalHistory = () => {
         {/* Pagination */}
         {!loading && !error && filteredRecords.length > 0 && (
           <div className="flex justify-between items-center mt-4">
-            <p className="text-sm text-gray-500">
+            <p className="text-sm text-gray-500 dark:text-gray-400">
               {t('history_showing')} 1-{filteredRecords.length} {t('history_of')} {records.length} {t('history_records')}
             </p>
             <div className="flex items-center gap-2">
-              <button className="p-2 rounded-lg border border-[#E5E7EB] bg-white text-gray-400 hover:bg-gray-50 hover:text-gray-600 transition-colors cursor-pointer">
+              <button className="p-2 rounded-lg border border-[#E5E7EB] bg-white dark:bg-gray-800 text-gray-400 dark:text-gray-500 hover:bg-gray-50 dark:hover:bg-gray-700 hover:text-gray-600 transition-colors cursor-pointer">
                 <ChevronLeft className="w-4 h-4" />
               </button>
-              <button className="p-2 rounded-lg border border-[#E5E7EB] bg-white text-gray-400 hover:bg-gray-50 hover:text-gray-600 transition-colors cursor-pointer">
+              <button className="p-2 rounded-lg border border-[#E5E7EB] bg-white dark:bg-gray-800 text-gray-400 dark:text-gray-500 hover:bg-gray-50 dark:hover:bg-gray-700 hover:text-gray-600 transition-colors cursor-pointer">
                 <ChevronRight className="w-4 h-4" />
               </button>
             </div>

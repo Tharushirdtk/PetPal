@@ -101,12 +101,12 @@ const ImageAnalysisPage = () => {
      Custom Navbar
      ================================================ */
   const Nav = () => (
-    <nav className="bg-white border-b border-[#E5E7EB] sticky top-0 z-40">
+    <nav className="bg-white dark:bg-gray-800 border-b border-[#E5E7EB] dark:border-gray-700 sticky top-0 z-40">
       <div className="max-w-7xl mx-auto px-6 flex items-center justify-between h-16">
         {/* Logo */}
         <Link to="/dashboard" className="flex items-center gap-2 no-underline">
           <PawIcon />
-          <span className="font-display font-bold text-lg text-gray-900">PetPal</span>
+          <span className="font-display font-bold text-lg text-gray-900 dark:text-white">PetPal</span>
         </Link>
 
         {/* Desktop nav links */}
@@ -118,7 +118,7 @@ const ImageAnalysisPage = () => {
               className={`text-sm font-medium no-underline transition-colors ${
                 isActive(link.to)
                   ? 'text-[#7C3AED]'
-                  : 'text-gray-600 hover:text-[#7C3AED]'
+                  : 'text-gray-600 dark:text-gray-300 hover:text-[#7C3AED]'
               }`}
             >
               {link.label}
@@ -150,12 +150,12 @@ const ImageAnalysisPage = () => {
 
       {/* Mobile dropdown */}
       {mobileOpen && (
-        <div className="md:hidden border-t border-[#E5E7EB] bg-white px-6 py-4 flex flex-col gap-3">
+        <div className="md:hidden border-t border-[#E5E7EB] dark:border-gray-700 bg-white dark:bg-gray-800 px-6 py-4 flex flex-col gap-3">
           {navLinks.map((link) => (
             <Link
               key={link.to}
               to={link.to}
-              className="text-sm font-medium text-gray-600 no-underline"
+              className="text-sm font-medium text-gray-600 dark:text-gray-300 no-underline"
               onClick={() => setMobileOpen(false)}
             >
               {link.label}
@@ -170,16 +170,16 @@ const ImageAnalysisPage = () => {
      Component Render
      ================================================ */
   return (
-    <div className="min-h-screen bg-[#F9FAFB]">
+    <div className="min-h-screen bg-[#F9FAFB] dark:bg-gray-900">
       <Nav />
 
       <main className="max-w-7xl mx-auto px-6 py-8">
         {/* Page Header */}
         <div>
-          <h1 className="font-display font-bold text-2xl text-gray-900">
+          <h1 className="font-display font-bold text-2xl text-gray-900 dark:text-white">
             {t('img_title')}
           </h1>
-          <p className="text-gray-500 mt-1">{t('img_subtitle')}</p>
+          <p className="text-gray-500 dark:text-gray-400 mt-1">{t('img_subtitle')}</p>
         </div>
 
         {/* Error Alert */}
@@ -187,14 +187,14 @@ const ImageAnalysisPage = () => {
 
         {/* Upload Zone */}
         <div
-          className="mt-6 border-2 border-dashed border-[#E5E7EB] rounded-2xl p-12 flex flex-col items-center justify-center hover:border-[#7C3AED] transition-colors cursor-pointer bg-white"
+          className="mt-6 border-2 border-dashed border-[#E5E7EB] dark:border-gray-700 rounded-2xl p-12 flex flex-col items-center justify-center hover:border-[#7C3AED] transition-colors cursor-pointer bg-white dark:bg-gray-800"
           onClick={handleBrowseClick}
           onDrop={handleDrop}
           onDragOver={handleDragOver}
         >
           <Upload className="w-12 h-12 text-[#7C3AED]" />
-          <p className="font-medium text-lg mt-4 text-gray-900">{t('img_drag')}</p>
-          <p className="text-sm text-gray-400 mt-1">{t('img_supports')}</p>
+          <p className="font-medium text-lg mt-4 text-gray-900 dark:text-white">{t('img_drag')}</p>
+          <p className="text-sm text-gray-400 dark:text-gray-500 mt-1">{t('img_supports')}</p>
           <button
             className="bg-gray-900 text-white rounded-full px-6 py-2.5 font-semibold mt-4 hover:bg-gray-800 transition-colors cursor-pointer"
             onClick={(e) => { e.stopPropagation(); handleBrowseClick(); }}
@@ -212,7 +212,7 @@ const ImageAnalysisPage = () => {
 
         {/* Active Analysis Card - shown when uploading or analyzing */}
         {(uploading || status) && status !== 'complete' && (
-          <div className="mt-8 bg-white rounded-2xl border border-[#E5E7EB] shadow-sm p-6">
+          <div className="mt-8 bg-white dark:bg-gray-800 rounded-2xl border border-[#E5E7EB] dark:border-gray-700 shadow-sm p-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {/* Left - Scan Preview */}
               <div className="bg-gradient-to-br from-amber-100 to-amber-50 rounded-xl h-48 relative overflow-hidden">
@@ -236,22 +236,22 @@ const ImageAnalysisPage = () => {
               {/* Right - Analysis Details */}
               <div className="flex flex-col justify-between">
                 <div>
-                  <h3 className="font-display font-semibold text-lg text-gray-900">
+                  <h3 className="font-display font-semibold text-lg text-gray-900 dark:text-white">
                     {getStatusLabel()}
                   </h3>
-                  <p className="text-sm text-gray-400 mt-1">
+                  <p className="text-sm text-gray-400 dark:text-gray-500 mt-1">
                     {selectedFile?.name || 'image.jpg'}
                   </p>
 
                   {/* Progress bar */}
                   <div className="mt-4">
                     <div className="flex items-center justify-between mb-1.5">
-                      <span className="text-xs text-gray-500 font-medium">
+                      <span className="text-xs text-gray-500 dark:text-gray-400 font-medium">
                         {getStatusLabel()}
                       </span>
                       <span className="text-xs font-semibold text-[#7C3AED]">{getProgressPercent()}%</span>
                     </div>
-                    <div className="w-full bg-gray-100 rounded-full h-2 overflow-hidden">
+                    <div className="w-full bg-gray-100 dark:bg-gray-700 rounded-full h-2 overflow-hidden">
                       <div
                         className="bg-[#7C3AED] h-2 rounded-full transition-all duration-1000"
                         style={{ width: `${getProgressPercent()}%` }}
@@ -261,16 +261,16 @@ const ImageAnalysisPage = () => {
 
                   {/* Fun Fact */}
                   <div className="mt-4 flex items-start gap-2">
-                    <span className="text-xs font-semibold text-blue-600 bg-blue-50 px-2 py-0.5 rounded-full whitespace-nowrap">
+                    <span className="text-xs font-semibold text-blue-600 bg-blue-50 dark:bg-blue-900/20 px-2 py-0.5 rounded-full whitespace-nowrap">
                       {t('img_fun_fact')}
                     </span>
-                    <p className="text-sm text-gray-500">{t('img_fun_fact_text')}</p>
+                    <p className="text-sm text-gray-500 dark:text-gray-400">{t('img_fun_fact_text')}</p>
                   </div>
                 </div>
 
                 {/* Cancel link */}
                 <button
-                  className="text-sm text-gray-400 hover:text-red-500 transition-colors mt-4 self-start cursor-pointer"
+                  className="text-sm text-gray-400 dark:text-gray-500 hover:text-red-500 transition-colors mt-4 self-start cursor-pointer"
                   onClick={handleCancel}
                 >
                   {t('img_cancel')}
@@ -282,39 +282,39 @@ const ImageAnalysisPage = () => {
 
         {/* Analysis Complete Card - shown when status is complete */}
         {status === 'complete' && analysis && (
-          <div className="mt-8 bg-white rounded-2xl border border-green-200 shadow-sm p-6">
+          <div className="mt-8 bg-white dark:bg-gray-800 rounded-2xl border border-green-200 dark:border-green-800 shadow-sm p-6">
             <div className="flex items-center gap-3 mb-4">
               <div className="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center">
                 <Check className="w-5 h-5 text-green-600" />
               </div>
               <div>
-                <h3 className="font-display font-semibold text-lg text-gray-900">
+                <h3 className="font-display font-semibold text-lg text-gray-900 dark:text-white">
                   {t('img_completed')}
                 </h3>
-                <p className="text-sm text-gray-400">{selectedFile?.name || 'image.jpg'}</p>
+                <p className="text-sm text-gray-400 dark:text-gray-500">{selectedFile?.name || 'image.jpg'}</p>
               </div>
             </div>
 
             {/* ML Results */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-4">
               {analysis.top_label && (
-                <div className="bg-purple-50 rounded-xl p-4">
-                  <p className="text-xs text-gray-500 font-medium mb-1">Top Label</p>
-                  <p className="text-sm font-semibold text-gray-900">{analysis.top_label}</p>
+                <div className="bg-purple-50 dark:bg-purple-900/20 rounded-xl p-4">
+                  <p className="text-xs text-gray-500 dark:text-gray-400 font-medium mb-1">Top Label</p>
+                  <p className="text-sm font-semibold text-gray-900 dark:text-white">{analysis.top_label}</p>
                 </div>
               )}
               {analysis.top_confidence != null && (
-                <div className="bg-green-50 rounded-xl p-4">
-                  <p className="text-xs text-gray-500 font-medium mb-1">Confidence</p>
-                  <p className="text-sm font-semibold text-gray-900">
+                <div className="bg-green-50 dark:bg-green-900/20 rounded-xl p-4">
+                  <p className="text-xs text-gray-500 dark:text-gray-400 font-medium mb-1">Confidence</p>
+                  <p className="text-sm font-semibold text-gray-900 dark:text-white">
                     {Math.round(analysis.top_confidence * 100)}%
                   </p>
                 </div>
               )}
               {analysis.prediction_text && (
-                <div className="bg-blue-50 rounded-xl p-4">
-                  <p className="text-xs text-gray-500 font-medium mb-1">Prediction</p>
-                  <p className="text-sm font-semibold text-gray-900">{analysis.prediction_text}</p>
+                <div className="bg-blue-50 dark:bg-blue-900/20 rounded-xl p-4">
+                  <p className="text-xs text-gray-500 dark:text-gray-400 font-medium mb-1">Prediction</p>
+                  <p className="text-sm font-semibold text-gray-900 dark:text-white">{analysis.prediction_text}</p>
                 </div>
               )}
             </div>
@@ -332,15 +332,15 @@ const ImageAnalysisPage = () => {
         {/* Upload Queue - only show when no active upload */}
         {!uploading && !status && (
           <div className="mt-8">
-            <h2 className="font-display font-semibold text-lg text-gray-900">
+            <h2 className="font-display font-semibold text-lg text-gray-900 dark:text-white">
               {t('img_queue')}
             </h2>
 
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-4">
               {/* Empty state */}
-              <div className="rounded-xl bg-gray-50 border border-gray-200 p-3 col-span-full flex flex-col items-center justify-center py-8">
-                <Upload className="w-8 h-8 text-gray-300 mb-2" />
-                <p className="text-sm text-gray-400">No images in queue. Upload an image to get started.</p>
+              <div className="rounded-xl bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 p-3 col-span-full flex flex-col items-center justify-center py-8">
+                <Upload className="w-8 h-8 text-gray-300 dark:text-gray-600 mb-2" />
+                <p className="text-sm text-gray-400 dark:text-gray-500">No images in queue. Upload an image to get started.</p>
               </div>
             </div>
           </div>
@@ -348,7 +348,7 @@ const ImageAnalysisPage = () => {
       </main>
 
       {/* Footer */}
-      <footer className="mt-12 text-center text-sm text-gray-400 py-6 border-t border-[#E5E7EB]">
+      <footer className="mt-12 text-center text-sm text-gray-400 dark:text-gray-500 py-6 border-t border-[#E5E7EB] dark:border-gray-700">
         {t('img_footer')}
       </footer>
     </div>

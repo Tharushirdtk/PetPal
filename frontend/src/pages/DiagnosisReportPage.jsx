@@ -175,7 +175,7 @@ const DiagnosisReportPage = () => {
   /* ── loading / error ─────────────────────────────── */
   if (loading) {
     return (
-      <div className="min-h-screen flex flex-col bg-[#F9FAFB]">
+      <div className="min-h-screen flex flex-col bg-[#F9FAFB] dark:bg-gray-900">
         <Navbar variant="default" />
         <LoadingSpinner />
       </div>
@@ -184,7 +184,7 @@ const DiagnosisReportPage = () => {
 
   if (error) {
     return (
-      <div className="min-h-screen flex flex-col bg-[#F9FAFB]">
+      <div className="min-h-screen flex flex-col bg-[#F9FAFB] dark:bg-gray-900">
         <Navbar variant="default" />
         <div className="max-w-2xl mx-auto px-6 py-12 w-full">
           <ErrorAlert message={error} onClose={() => setError(null)} />
@@ -203,7 +203,7 @@ const DiagnosisReportPage = () => {
      RENDER
      ═══════════════════════════════════════════════════ */
   return (
-    <div className="min-h-screen flex flex-col bg-[#F9FAFB]" ref={reportRef}>
+    <div className="min-h-screen flex flex-col bg-[#F9FAFB] dark:bg-gray-900" ref={reportRef}>
       <Navbar variant="default" />
 
       {/* ─── HERO ──────────────────────────────────── */}
@@ -247,7 +247,7 @@ const DiagnosisReportPage = () => {
             <button
               onClick={handleDownloadPDF}
               disabled={downloading}
-              className="bg-white text-gray-900 rounded-full px-6 py-2.5 font-semibold hover:bg-gray-100 transition-colors inline-flex items-center gap-2 cursor-pointer disabled:opacity-60"
+              className="bg-white dark:bg-gray-800 text-gray-900 dark:text-white rounded-full px-6 py-2.5 font-semibold hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors inline-flex items-center gap-2 cursor-pointer disabled:opacity-60"
             >
               {downloading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Download className="w-4 h-4" />}
               {downloading ? t('report_downloading') : t('report_download')}
@@ -265,7 +265,7 @@ const DiagnosisReportPage = () => {
 
       {/* ─── STATS ROW ──────────────────────────────── */}
       <div className="relative z-10 -mt-8 max-w-5xl mx-auto w-full px-6">
-        <div className="bg-white rounded-2xl shadow-lg grid grid-cols-1 sm:grid-cols-3 p-6 gap-6 sm:gap-0 sm:divide-x sm:divide-[#E5E7EB]">
+        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg grid grid-cols-1 sm:grid-cols-3 p-6 gap-6 sm:gap-0 sm:divide-x sm:divide-[#E5E7EB] sm:dark:divide-gray-700">
           {/* Wellness Score */}
           <div className="flex flex-col items-center gap-3 px-4">
             <div className="relative w-20 h-20">
@@ -279,12 +279,12 @@ const DiagnosisReportPage = () => {
                 />
               </svg>
               <div className="absolute inset-0 flex items-center justify-center">
-                <span className="font-display text-xl font-bold text-gray-900">{confidencePercent}%</span>
+                <span className="font-display text-xl font-bold text-gray-900 dark:text-white">{confidencePercent}%</span>
               </div>
             </div>
             <div className="text-center">
-              <p className="text-sm font-semibold text-gray-900">{t('report_wellness_score')}</p>
-              <p className="text-xs text-gray-400 mt-0.5">{scoreLabel(confidencePercent, t)}</p>
+              <p className="text-sm font-semibold text-gray-900 dark:text-white">{t('report_wellness_score')}</p>
+              <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">{scoreLabel(confidencePercent, t)}</p>
             </div>
           </div>
 
@@ -292,23 +292,23 @@ const DiagnosisReportPage = () => {
           <div className="flex flex-col items-center justify-center gap-1 px-4">
             <div className="flex items-center gap-2">
               <Activity className="w-5 h-5 text-[#7C3AED]" />
-              <span className="font-display text-2xl font-bold text-gray-900">
+              <span className="font-display text-2xl font-bold text-gray-900 dark:text-white">
                 {diagnosis?.secondary_labels?.length || 0}
               </span>
             </div>
-            <p className="text-sm font-semibold text-gray-900">{t('report_similar_cases')}</p>
-            <p className="text-xs text-gray-400">{t('report_matched')}</p>
+            <p className="text-sm font-semibold text-gray-900 dark:text-white">{t('report_similar_cases')}</p>
+            <p className="text-xs text-gray-400 dark:text-gray-500">{t('report_matched')}</p>
           </div>
 
           {/* Severity */}
           <div className="flex flex-col items-center justify-center gap-1 px-4">
             <div className="flex items-center gap-2">
               <AlertCircle className="w-5 h-5 text-red-500" />
-              <span className="font-display text-2xl font-bold text-gray-900">
+              <span className="font-display text-2xl font-bold text-gray-900 dark:text-white">
                 {diagnosis?.severity_flags?.length || 0}
               </span>
             </div>
-            <p className="text-sm font-semibold text-gray-900">{t('report_severity_flags')}</p>
+            <p className="text-sm font-semibold text-gray-900 dark:text-white">{t('report_severity_flags')}</p>
             {diagnosis?.severity_flags?.length > 0 && (
               <span className="flex items-center gap-1.5 text-xs text-red-500">
                 <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />
@@ -321,34 +321,34 @@ const DiagnosisReportPage = () => {
 
       {/* ─── CONDITION OVERVIEW (detailed) ────────── */}
       <section className="max-w-5xl mx-auto w-full px-6 pt-10 pb-6">
-        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+        <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm overflow-hidden">
           {/* Section header */}
-          <div className="bg-gradient-to-r from-[#7C3AED]/5 to-transparent px-6 py-4 border-b border-gray-100">
+          <div className="bg-gradient-to-r from-[#7C3AED]/5 to-transparent px-6 py-4 border-b border-gray-100 dark:border-gray-700">
             <div className="flex items-center gap-2">
               <Thermometer className="w-5 h-5 text-[#7C3AED]" />
-              <h2 className="font-display font-bold text-lg text-gray-900">{t('report_condition_overview')}</h2>
+              <h2 className="font-display font-bold text-lg text-gray-900 dark:text-white">{t('report_condition_overview')}</h2>
             </div>
           </div>
 
           <div className="p-6 space-y-5">
             {/* Primary diagnosis */}
             <div>
-              <p className="text-xs font-semibold uppercase tracking-wider text-gray-400 mb-1.5">{t('report_primary_diagnosis')}</p>
-              <p className="text-lg font-bold text-gray-900">{diagnosis?.primary_label || t('report_condition')}</p>
+              <p className="text-xs font-semibold uppercase tracking-wider text-gray-400 dark:text-gray-500 mb-1.5">{t('report_primary_diagnosis')}</p>
+              <p className="text-lg font-bold text-gray-900 dark:text-white">{diagnosis?.primary_label || t('report_condition')}</p>
             </div>
 
             {/* Explanation */}
             {diagnosis?.explanation && (
               <div>
-                <p className="text-xs font-semibold uppercase tracking-wider text-gray-400 mb-1.5">{t('report_about_condition')}</p>
-                <p className="text-sm text-gray-700 leading-relaxed">{diagnosis.explanation}</p>
+                <p className="text-xs font-semibold uppercase tracking-wider text-gray-400 dark:text-gray-500 mb-1.5">{t('report_about_condition')}</p>
+                <p className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed">{diagnosis.explanation}</p>
               </div>
             )}
 
             {/* Symptoms Reported */}
             {symptoms.length > 0 && (
               <div>
-                <p className="text-xs font-semibold uppercase tracking-wider text-gray-400 mb-2">{t('report_symptoms_reported')}</p>
+                <p className="text-xs font-semibold uppercase tracking-wider text-gray-400 dark:text-gray-500 mb-2">{t('report_symptoms_reported')}</p>
                 <div className="flex flex-wrap gap-2">
                   {symptoms.map((s, i) => (
                     <span key={i} className="inline-flex items-center gap-1.5 bg-orange-50 text-orange-700 border border-orange-200 text-xs font-medium px-3 py-1.5 rounded-full">
@@ -362,7 +362,7 @@ const DiagnosisReportPage = () => {
 
             {/* Current state of pet */}
             <div>
-              <p className="text-xs font-semibold uppercase tracking-wider text-gray-400 mb-1.5">{t('report_current_state')}</p>
+              <p className="text-xs font-semibold uppercase tracking-wider text-gray-400 dark:text-gray-500 mb-1.5">{t('report_current_state')}</p>
               <div className="bg-amber-50 border border-amber-200 rounded-xl p-4">
                 <p className="text-sm text-amber-900 leading-relaxed">
                   {t('report_current_state_desc', {
@@ -379,8 +379,8 @@ const DiagnosisReportPage = () => {
 
       {/* ─── KEY OBSERVATIONS ─────────────────────── */}
       <section className="max-w-5xl mx-auto w-full px-6 pb-6">
-        <h2 className="font-display font-bold text-lg text-gray-900 mb-1">{t('report_why_title')}</h2>
-        <p className="text-sm text-gray-400 mb-4">{t('report_observations')}</p>
+        <h2 className="font-display font-bold text-lg text-gray-900 dark:text-white mb-1">{t('report_why_title')}</h2>
+        <p className="text-sm text-gray-400 dark:text-gray-500 mb-4">{t('report_observations')}</p>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
           {observations.map((obs, idx) => {
@@ -394,8 +394,8 @@ const DiagnosisReportPage = () => {
                 <div className="flex items-start gap-3">
                   <span className={`${dots[idx % 4]} w-2.5 h-2.5 rounded-full mt-1.5 shrink-0`} />
                   <div>
-                    <h3 className="font-semibold text-gray-900 text-sm mb-0.5">{obs.title}</h3>
-                    {obs.desc && <p className="text-xs text-gray-600 leading-relaxed">{obs.desc}</p>}
+                    <h3 className="font-semibold text-gray-900 dark:text-white text-sm mb-0.5">{obs.title}</h3>
+                    {obs.desc && <p className="text-xs text-gray-600 dark:text-gray-300 leading-relaxed">{obs.desc}</p>}
                   </div>
                 </div>
               </div>
@@ -407,7 +407,7 @@ const DiagnosisReportPage = () => {
       {/* ─── DO's & DON'Ts ────────────────────────── */}
       {(dosAndDonts.dos.length > 0 || dosAndDonts.donts.length > 0) && (
         <section className="max-w-5xl mx-auto w-full px-6 pb-6">
-          <h2 className="font-display font-bold text-lg text-gray-900 mb-4">{t('report_recommendations')}</h2>
+          <h2 className="font-display font-bold text-lg text-gray-900 dark:text-white mb-4">{t('report_recommendations')}</h2>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {/* DO's */}
@@ -456,16 +456,16 @@ const DiagnosisReportPage = () => {
 
             {/* If no don'ts were detected, show all as numbered recommended steps */}
             {dosAndDonts.donts.length === 0 && dosAndDonts.dos.length === 0 && diagnosis?.recommended_actions?.length > 0 && (
-              <div className="md:col-span-2 bg-white border border-gray-200 rounded-2xl p-5">
+              <div className="md:col-span-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl p-5">
                 <div className="space-y-2">
                   {diagnosis.recommended_actions.map((action, idx) => {
                     const text = typeof action === 'string' ? action : action.text || action.description || '';
                     return (
-                      <div key={idx} className="flex items-start gap-3 p-3 rounded-xl hover:bg-gray-50 transition-colors">
+                      <div key={idx} className="flex items-start gap-3 p-3 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
                         <span className="w-6 h-6 rounded-full bg-[#7C3AED]/10 flex items-center justify-center shrink-0 mt-0.5">
                           <span className="text-xs font-bold text-[#7C3AED]">{idx + 1}</span>
                         </span>
-                        <p className="text-sm text-gray-700 leading-relaxed">{text}</p>
+                        <p className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed">{text}</p>
                       </div>
                     );
                   })}
@@ -478,7 +478,7 @@ const DiagnosisReportPage = () => {
 
       {/* ─── JOURNEY TIMELINE ─────────────────────── */}
       <section className="max-w-5xl mx-auto w-full px-6 pb-8">
-        <h2 className="font-display font-bold text-lg text-gray-900 mb-8">{t('report_journey')}</h2>
+        <h2 className="font-display font-bold text-lg text-gray-900 dark:text-white mb-8">{t('report_journey')}</h2>
 
         <div className="relative pl-8">
           <div className="absolute left-[15px] top-0 bottom-0 w-0.5 bg-green-200" />
@@ -491,8 +491,8 @@ const DiagnosisReportPage = () => {
                     <Icon className="w-4 h-4 text-white" />
                   </div>
                   <div className="ml-4">
-                    <p className="font-semibold text-gray-900">{step.label}</p>
-                    <p className="text-xs text-gray-400 mt-0.5">
+                    <p className="font-semibold text-gray-900 dark:text-white">{step.label}</p>
+                    <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">
                       {idx === 0 && t('report_time_5min')}
                       {idx === 1 && t('report_time_2min')}
                       {idx === 2 && t('report_time_now')}
@@ -508,52 +508,52 @@ const DiagnosisReportPage = () => {
       {/* ─── WHAT'S NEXT – Navigation ─────────────── */}
       <section className="max-w-5xl mx-auto w-full px-6 pb-4" data-no-pdf>
         <div className="bg-gradient-to-br from-[#7C3AED]/5 to-purple-50 border border-[#7C3AED]/10 rounded-2xl p-6 sm:p-8">
-          <h2 className="font-display font-bold text-lg text-gray-900 mb-1">{t('report_whats_next')}</h2>
-          <p className="text-sm text-gray-500 mb-6">{t('report_whats_next_sub')}</p>
+          <h2 className="font-display font-bold text-lg text-gray-900 dark:text-white mb-1">{t('report_whats_next')}</h2>
+          <p className="text-sm text-gray-500 dark:text-gray-400 mb-6">{t('report_whats_next_sub')}</p>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
             {isAuthenticated && (
-              <Link to="/dashboard" className="flex items-center gap-3 bg-white rounded-xl border border-gray-200 p-4 hover:shadow-md hover:border-[#7C3AED]/30 transition-all no-underline group">
+              <Link to="/dashboard" className="flex items-center gap-3 bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-4 hover:shadow-md hover:border-[#7C3AED]/30 transition-all no-underline group">
                 <div className="w-10 h-10 rounded-lg bg-purple-50 flex items-center justify-center shrink-0 group-hover:bg-[#7C3AED]/10 transition-colors">
                   <Home className="w-5 h-5 text-[#7C3AED]" />
                 </div>
                 <div>
-                  <p className="text-sm font-semibold text-gray-900">{t('report_go_dashboard')}</p>
-                  <p className="text-xs text-gray-400">{t('report_go_dashboard_sub')}</p>
+                  <p className="text-sm font-semibold text-gray-900 dark:text-white">{t('report_go_dashboard')}</p>
+                  <p className="text-xs text-gray-400 dark:text-gray-500">{t('report_go_dashboard_sub')}</p>
                 </div>
               </Link>
             )}
 
             {isAuthenticated && petInfo?.id && (
-              <Link to={`/pet/${petInfo.id}`} className="flex items-center gap-3 bg-white rounded-xl border border-gray-200 p-4 hover:shadow-md hover:border-[#7C3AED]/30 transition-all no-underline group">
+              <Link to={`/pet/${petInfo.id}`} className="flex items-center gap-3 bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-4 hover:shadow-md hover:border-[#7C3AED]/30 transition-all no-underline group">
                 <div className="w-10 h-10 rounded-lg bg-teal-50 flex items-center justify-center shrink-0 group-hover:bg-teal-100 transition-colors">
                   <PawPrint className="w-5 h-5 text-teal-600" />
                 </div>
                 <div>
-                  <p className="text-sm font-semibold text-gray-900">{t('report_view_pet')}</p>
-                  <p className="text-xs text-gray-400">{petInfo.name || t('report_view_pet_sub')}</p>
+                  <p className="text-sm font-semibold text-gray-900 dark:text-white">{t('report_view_pet')}</p>
+                  <p className="text-xs text-gray-400 dark:text-gray-500">{petInfo.name || t('report_view_pet_sub')}</p>
                 </div>
               </Link>
             )}
 
-            <button onClick={handleNewDiagnosis} className="flex items-center gap-3 bg-white rounded-xl border border-gray-200 p-4 hover:shadow-md hover:border-[#7C3AED]/30 transition-all cursor-pointer text-left group">
+            <button onClick={handleNewDiagnosis} className="flex items-center gap-3 bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-4 hover:shadow-md hover:border-[#7C3AED]/30 transition-all cursor-pointer text-left group">
               <div className="w-10 h-10 rounded-lg bg-orange-50 flex items-center justify-center shrink-0 group-hover:bg-orange-100 transition-colors">
                 <Stethoscope className="w-5 h-5 text-orange-500" />
               </div>
               <div>
-                <p className="text-sm font-semibold text-gray-900">{t('report_new_diagnosis')}</p>
-                <p className="text-xs text-gray-400">{t('report_new_diagnosis_sub')}</p>
+                <p className="text-sm font-semibold text-gray-900 dark:text-white">{t('report_new_diagnosis')}</p>
+                <p className="text-xs text-gray-400 dark:text-gray-500">{t('report_new_diagnosis_sub')}</p>
               </div>
             </button>
 
             {isAuthenticated && (
-              <Link to="/records" className="flex items-center gap-3 bg-white rounded-xl border border-gray-200 p-4 hover:shadow-md hover:border-[#7C3AED]/30 transition-all no-underline group">
+              <Link to="/records" className="flex items-center gap-3 bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-4 hover:shadow-md hover:border-[#7C3AED]/30 transition-all no-underline group">
                 <div className="w-10 h-10 rounded-lg bg-blue-50 flex items-center justify-center shrink-0 group-hover:bg-blue-100 transition-colors">
                   <TrendingUp className="w-5 h-5 text-blue-500" />
                 </div>
                 <div>
-                  <p className="text-sm font-semibold text-gray-900">{t('report_view_history')}</p>
-                  <p className="text-xs text-gray-400">{t('report_view_history_sub')}</p>
+                  <p className="text-sm font-semibold text-gray-900 dark:text-white">{t('report_view_history')}</p>
+                  <p className="text-xs text-gray-400 dark:text-gray-500">{t('report_view_history_sub')}</p>
                 </div>
               </Link>
             )}
@@ -563,15 +563,15 @@ const DiagnosisReportPage = () => {
           {!isAuthenticated && (
             <div className="mt-6 pt-6 border-t border-[#7C3AED]/10 flex flex-col sm:flex-row items-start sm:items-center gap-4">
               <div className="flex-1">
-                <p className="text-sm font-semibold text-gray-900">{t('report_save_title')}</p>
-                <p className="text-xs text-gray-500 mt-0.5">{t('report_save_desc')}</p>
+                <p className="text-sm font-semibold text-gray-900 dark:text-white">{t('report_save_title')}</p>
+                <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">{t('report_save_desc')}</p>
               </div>
               <div className="flex gap-2">
                 <Link to="/register" className="inline-flex items-center gap-2 bg-[#7C3AED] text-white rounded-xl px-5 py-2.5 text-sm font-semibold hover:bg-[#6D28D9] transition-colors no-underline">
                   {t('report_save_btn')}
                   <ArrowRight className="w-4 h-4" />
                 </Link>
-                <Link to="/login" className="inline-flex items-center gap-2 border border-gray-300 text-gray-700 rounded-xl px-5 py-2.5 text-sm font-medium hover:bg-gray-50 transition-colors no-underline">
+                <Link to="/login" className="inline-flex items-center gap-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-xl px-5 py-2.5 text-sm font-medium hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors no-underline">
                   {t('report_login')}
                 </Link>
               </div>
@@ -582,7 +582,7 @@ const DiagnosisReportPage = () => {
 
       {/* ─── DISCLAIMER ───────────────────────────── */}
       <footer className="max-w-5xl mx-auto w-full px-6 pb-8">
-        <p className="text-xs text-gray-400 text-center leading-relaxed">
+        <p className="text-xs text-gray-400 dark:text-gray-500 text-center leading-relaxed">
           {t('report_disclaimer')}
         </p>
       </footer>
