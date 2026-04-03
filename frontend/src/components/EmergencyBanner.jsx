@@ -13,7 +13,7 @@ const EmergencyBanner = () => {
         </div>
       </div>
       <div className="flex gap-3">
-        <button className="bg-white text-red-600 px-4 py-2 rounded-full text-sm font-semibold hover:bg-red-50 transition-colors cursor-pointer">
+        <button className="bg-white dark:bg-gray-800 text-red-600 px-4 py-2 rounded-full text-sm font-semibold hover:bg-red-50 transition-colors cursor-pointer">
           {t('emergency_call')}
         </button>
         <button className="border border-white text-white px-4 py-2 rounded-full text-sm hover:bg-white/10 transition-colors cursor-pointer hidden sm:block">

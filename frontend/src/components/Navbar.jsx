@@ -1,5 +1,5 @@
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { Menu, X, LogOut, ArrowLeft } from 'lucide-react';
+import { Menu, X, LogOut, ArrowLeft, Settings } from 'lucide-react';
 import { useState } from 'react';
 import { useLang } from '../i18n/LanguageContext';
 import LangToggle from './LangToggle';
@@ -43,27 +43,35 @@ const Navbar = ({ variant = 'default' }) => {
 
   const linkClass = (active) =>
     `text-sm font-medium no-underline transition-colors ${
-      active ? 'text-[#7C3AED]' : 'text-gray-600 hover:text-[#7C3AED]'
+      active ? 'text-[#7C3AED] dark:text-[#A78BFA]' : 'text-gray-600 dark:text-gray-400 hover:text-[#7C3AED] dark:hover:text-[#A78BFA]'
     }`;
 
   // User avatar + dropdown (reusable across variants)
   const UserMenu = () => (
     <div className="relative">
       <div
-        className="w-8 h-8 rounded-full bg-[#7C3AED] text-white flex items-center justify-center text-sm font-semibold cursor-pointer"
+        className="w-8 h-8 rounded-full bg-[#7C3AED] dark:bg-[#A78BFA] text-white flex items-center justify-center text-sm font-semibold cursor-pointer hover:opacity-90 transition-opacity"
         onClick={() => setDropdownOpen(!dropdownOpen)}
       >
         {userInitial}
       </div>
       {dropdownOpen && (
-        <div className="absolute right-0 mt-2 w-48 bg-white rounded-xl border border-[#E5E7EB] shadow-lg py-2 z-50">
-          <div className="px-4 py-2 border-b border-[#E5E7EB]">
-            <p className="text-sm font-semibold text-gray-900 truncate">{user?.name || 'User'}</p>
-            <p className="text-xs text-gray-400 truncate">{user?.email || ''}</p>
+        <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-lg py-2 z-50">
+          <div className="px-4 py-2 border-b border-gray-200 dark:border-gray-700">
+            <p className="text-sm font-semibold text-gray-900 dark:text-white truncate">{user?.name || 'User'}</p>
+            <p className="text-xs text-gray-500 dark:text-gray-400 truncate">{user?.email || ''}</p>
           </div>
+          <Link
+            to="/profile"
+            onClick={() => setDropdownOpen(false)}
+            className="w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors cursor-pointer flex items-center gap-2 no-underline"
+          >
+            <Settings className="w-4 h-4" />
+            {t('nav_profile') || 'Profile'}
+          </Link>
           <button
             onClick={handleLogout}
-            className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors cursor-pointer flex items-center gap-2"
+            className="w-full text-left px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors cursor-pointer flex items-center gap-2"
           >
             <LogOut className="w-4 h-4" />
             {t('nav_logout') || 'Logout'}
@@ -76,11 +84,11 @@ const Navbar = ({ variant = 'default' }) => {
   /* ═══════ LANDING VARIANT ═══════ */
   if (variant === 'landing') {
     return (
-      <nav className="bg-white/80 backdrop-blur-md border-b border-[#E5E7EB] sticky top-0 z-40">
+      <nav className="bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 sticky top-0 z-40">
         <div className="max-w-7xl mx-auto px-6 flex items-center justify-between h-16">
           <Link to="/" className="flex items-center gap-2 no-underline">
             <PawIcon />
-            <span className="font-display font-bold text-lg text-gray-900">PetPal</span>
+            <span className="font-display font-bold text-lg text-gray-900 dark:text-white">PetPal</span>
           </Link>
           <div className="hidden md:flex items-center gap-8">
             {!isAuthenticated && (
@@ -99,33 +107,33 @@ const Navbar = ({ variant = 'default' }) => {
               <UserMenu />
             ) : (
               <>
-                <Link to="/login" className="text-sm font-medium text-gray-600 hover:text-[#7C3AED] transition-colors no-underline hidden sm:block">{t('nav_login')}</Link>
-                <Link to="/register" className="bg-[#7C3AED] text-white rounded-full px-5 py-2 text-sm font-semibold hover:bg-[#6D28D9] transition-all shadow-md hover:shadow-lg hover:-translate-y-0.5 no-underline">{t('nav_register')}</Link>
+                <Link to="/login" className="text-sm font-medium text-gray-600 dark:text-gray-400 hover:text-[#7C3AED] dark:hover:text-[#A78BFA] transition-colors no-underline hidden sm:block">{t('nav_login')}</Link>
+                <Link to="/register" className="bg-[#7C3AED] dark:bg-[#A78BFA] text-white rounded-full px-5 py-2 text-sm font-semibold hover:bg-[#6D28D9] dark:hover:bg-[#8B5CF6] transition-all shadow-md hover:shadow-lg hover:-translate-y-0.5 no-underline">{t('nav_register')}</Link>
               </>
             )}
-            <button onClick={() => setMobileOpen(!mobileOpen)} className="md:hidden p-2 cursor-pointer">
+            <button onClick={() => setMobileOpen(!mobileOpen)} className="md:hidden p-2 cursor-pointer text-gray-900 dark:text-white">
               {mobileOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
             </button>
           </div>
         </div>
         {mobileOpen && (
-          <div className="md:hidden border-t border-[#E5E7EB] bg-white px-6 py-4 flex flex-col gap-3">
+          <div className="md:hidden border-t border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 px-6 py-4 flex flex-col gap-3">
             {!isAuthenticated && (
-              <Link to="/" onClick={closeMobile} className="text-sm font-medium text-gray-600 no-underline">{t('nav_home')}</Link>
+              <Link to="/" onClick={closeMobile} className="text-sm font-medium text-gray-600 dark:text-gray-400 no-underline">{t('nav_home')}</Link>
             )}
             {isAuthenticated ? (
-              <Link to="/dashboard" onClick={closeMobile} className="text-sm font-medium text-gray-600 no-underline">{t('nav_dashboard')}</Link>
+              <Link to="/dashboard" onClick={closeMobile} className="text-sm font-medium text-gray-600 dark:text-gray-400 no-underline">{t('nav_dashboard')}</Link>
             ) : (
-              <Link to="/diagnosis" onClick={closeMobile} className="text-sm font-medium text-gray-600 no-underline">{t('nav_diagnosis')}</Link>
+              <Link to="/diagnosis" onClick={closeMobile} className="text-sm font-medium text-gray-600 dark:text-gray-400 no-underline">{t('nav_diagnosis')}</Link>
             )}
-            <a href="#contact" onClick={closeMobile} className="text-sm font-medium text-gray-600 no-underline">{t('nav_contact')}</a>
+            <a href="#contact" onClick={closeMobile} className="text-sm font-medium text-gray-600 dark:text-gray-400 no-underline">{t('nav_contact')}</a>
             {isAuthenticated ? (
-              <button onClick={handleLogout} className="text-sm font-medium text-red-600 no-underline text-left cursor-pointer flex items-center gap-2">
+              <button onClick={handleLogout} className="text-sm font-medium text-red-600 dark:text-red-400 no-underline text-left cursor-pointer flex items-center gap-2">
                 <LogOut className="w-4 h-4" />
                 {t('nav_logout') || 'Logout'}
               </button>
             ) : (
-              <Link to="/login" onClick={closeMobile} className="text-sm font-medium text-gray-600 no-underline">{t('nav_login')}</Link>
+              <Link to="/login" onClick={closeMobile} className="text-sm font-medium text-gray-600 dark:text-gray-400 no-underline">{t('nav_login')}</Link>
             )}
           </div>
         )}
@@ -136,18 +144,18 @@ const Navbar = ({ variant = 'default' }) => {
   /* ═══════ ADMIN VARIANT ═══════ */
   if (variant === 'admin') {
     return (
-      <nav className="bg-white border-b border-[#E5E7EB] sticky top-0 z-40">
+      <nav className="bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 sticky top-0 z-40">
         <div className="max-w-7xl mx-auto px-6 flex items-center justify-between h-16">
           <Link to="/admin" className="flex items-center gap-2 no-underline">
             <PawIcon />
-            <span className="font-display font-bold text-lg text-gray-900">PetPal</span>
-            <span className="text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded-full font-medium">Admin</span>
+            <span className="font-display font-bold text-lg text-gray-900 dark:text-white">PetPal</span>
+            <span className="text-xs bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 px-2 py-0.5 rounded-full font-medium">Admin</span>
           </Link>
 
           {/* Admin Navigation Links */}
           <div className="hidden md:flex items-center gap-6">
             <Link to="/admin" className={linkClass(isActive('/admin'))}>Admin Panel</Link>
-            <Link to="/dashboard" className="text-xs text-gray-400 hover:text-[#7C3AED] transition-colors no-underline flex items-center gap-1">
+            <Link to="/dashboard" className="text-xs text-gray-400 dark:text-gray-500 hover:text-[#7C3AED] dark:hover:text-[#A78BFA] transition-colors no-underline flex items-center gap-1">
               <ArrowLeft className="w-3 h-3" />
               Back to App
             </Link>
@@ -158,9 +166,9 @@ const Navbar = ({ variant = 'default' }) => {
             {isAuthenticated ? (
               <UserMenu />
             ) : (
-              <div className="w-8 h-8 rounded-full bg-[#7C3AED] text-white flex items-center justify-center text-sm font-semibold">A</div>
+              <div className="w-8 h-8 rounded-full bg-[#7C3AED] dark:bg-[#A78BFA] text-white flex items-center justify-center text-sm font-semibold">A</div>
             )}
-            <button onClick={() => setMobileOpen(!mobileOpen)} className="md:hidden p-2 cursor-pointer">
+            <button onClick={() => setMobileOpen(!mobileOpen)} className="md:hidden p-2 cursor-pointer text-gray-900 dark:text-white">
               {mobileOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
             </button>
           </div>
@@ -168,14 +176,14 @@ const Navbar = ({ variant = 'default' }) => {
 
         {/* Mobile Navigation */}
         {mobileOpen && (
-          <div className="md:hidden border-t border-[#E5E7EB] bg-white px-6 py-4 flex flex-col gap-3">
-            <Link to="/admin" onClick={closeMobile} className="text-sm font-medium text-gray-600 no-underline">Admin Panel</Link>
-            <Link to="/dashboard" onClick={closeMobile} className="text-sm font-medium text-gray-400 no-underline flex items-center gap-1">
+          <div className="md:hidden border-t border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 px-6 py-4 flex flex-col gap-3">
+            <Link to="/admin" onClick={closeMobile} className="text-sm font-medium text-gray-600 dark:text-gray-400 no-underline">Admin Panel</Link>
+            <Link to="/dashboard" onClick={closeMobile} className="text-sm font-medium text-gray-400 dark:text-gray-500 no-underline flex items-center gap-1">
               <ArrowLeft className="w-3 h-3" />
               Back to App
             </Link>
             {isAuthenticated && (
-              <button onClick={handleLogout} className="text-sm font-medium text-red-600 no-underline text-left cursor-pointer flex items-center gap-2">
+              <button onClick={handleLogout} className="text-sm font-medium text-red-600 dark:text-red-400 no-underline text-left cursor-pointer flex items-center gap-2">
                 <LogOut className="w-4 h-4" />
                 {t('nav_logout') || 'Logout'}
               </button>
@@ -188,11 +196,11 @@ const Navbar = ({ variant = 'default' }) => {
 
   /* ═══════ DEFAULT VARIANT — all app pages ═══════ */
   return (
-    <nav className="bg-white border-b border-[#E5E7EB] sticky top-0 z-40">
+    <nav className="bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 sticky top-0 z-40">
       <div className="max-w-7xl mx-auto px-6 flex items-center justify-between h-16">
         <Link to={isAuthenticated ? '/dashboard' : '/'} className="flex items-center gap-2 no-underline">
           <PawIcon />
-          <span className="font-display font-bold text-lg text-gray-900">PetPal</span>
+          <span className="font-display font-bold text-lg text-gray-900 dark:text-white">PetPal</span>
         </Link>
         <div className="hidden md:flex items-center gap-8">
           {!isAuthenticated && (
@@ -204,7 +212,7 @@ const Navbar = ({ variant = 'default' }) => {
             <Link to="/admin" className={linkClass(isActive('/admin'))}>
               <span className="flex items-center gap-1">
                 Admin Panel
-                <span className="text-xs bg-[#7C3AED] text-white px-2 py-0.5 rounded-full font-medium">Admin</span>
+                <span className="text-xs bg-[#7C3AED] dark:bg-[#A78BFA] text-white px-2 py-0.5 rounded-full font-medium">Admin</span>
               </span>
             </Link>
           )}
@@ -214,33 +222,33 @@ const Navbar = ({ variant = 'default' }) => {
           {isAuthenticated ? (
             <UserMenu />
           ) : (
-            <Link to="/login" className="text-sm font-medium text-gray-600 hover:text-[#7C3AED] transition-colors no-underline">{t('nav_login')}</Link>
+            <Link to="/login" className="text-sm font-medium text-gray-600 dark:text-gray-400 hover:text-[#7C3AED] dark:hover:text-[#A78BFA] transition-colors no-underline">{t('nav_login')}</Link>
           )}
-          <button onClick={() => setMobileOpen(!mobileOpen)} className="md:hidden p-2 cursor-pointer">
+          <button onClick={() => setMobileOpen(!mobileOpen)} className="md:hidden p-2 cursor-pointer text-gray-900 dark:text-white">
             {mobileOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
           </button>
         </div>
       </div>
       {mobileOpen && (
-        <div className="md:hidden border-t border-[#E5E7EB] bg-white px-6 py-4 flex flex-col gap-3">
+        <div className="md:hidden border-t border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 px-6 py-4 flex flex-col gap-3">
           {!isAuthenticated && (
-            <Link to="/" onClick={closeMobile} className="text-sm font-medium text-gray-600 no-underline">{t('nav_home')}</Link>
+            <Link to="/" onClick={closeMobile} className="text-sm font-medium text-gray-600 dark:text-gray-400 no-underline">{t('nav_home')}</Link>
           )}
-          <Link to="/dashboard" onClick={closeMobile} className="text-sm font-medium text-gray-600 no-underline">{t('nav_dashboard')}</Link>
-          <Link to="/records" onClick={closeMobile} className="text-sm font-medium text-gray-600 no-underline">{t('nav_records')}</Link>
+          <Link to="/dashboard" onClick={closeMobile} className="text-sm font-medium text-gray-600 dark:text-gray-400 no-underline">{t('nav_dashboard')}</Link>
+          <Link to="/records" onClick={closeMobile} className="text-sm font-medium text-gray-600 dark:text-gray-400 no-underline">{t('nav_records')}</Link>
           {user?.role === 'admin' && (
-            <Link to="/admin" onClick={closeMobile} className="text-sm font-medium text-[#7C3AED] no-underline flex items-center gap-2">
+            <Link to="/admin" onClick={closeMobile} className="text-sm font-medium text-[#7C3AED] dark:text-[#A78BFA] no-underline flex items-center gap-2">
               Admin Panel
-              <span className="text-xs bg-[#7C3AED] text-white px-2 py-0.5 rounded-full font-medium">Admin</span>
+              <span className="text-xs bg-[#7C3AED] dark:bg-[#A78BFA] text-white px-2 py-0.5 rounded-full font-medium">Admin</span>
             </Link>
           )}
           {isAuthenticated ? (
-            <button onClick={handleLogout} className="text-sm font-medium text-red-600 no-underline text-left cursor-pointer flex items-center gap-2">
+            <button onClick={handleLogout} className="text-sm font-medium text-red-600 dark:text-red-400 no-underline text-left cursor-pointer flex items-center gap-2">
               <LogOut className="w-4 h-4" />
               {t('nav_logout') || 'Logout'}
             </button>
           ) : (
-            <Link to="/login" onClick={closeMobile} className="text-sm font-medium text-gray-600 no-underline">{t('nav_login')}</Link>
+            <Link to="/login" onClick={closeMobile} className="text-sm font-medium text-gray-600 dark:text-gray-400 no-underline">{t('nav_login')}</Link>
           )}
         </div>
       )}

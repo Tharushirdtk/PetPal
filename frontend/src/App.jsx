@@ -1,4 +1,5 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { ThemeProvider } from './context/ThemeContext';
 import { LanguageProvider } from './i18n/LanguageContext';
 import { AuthProvider } from './context/AuthContext';
 import { ConsultationProvider } from './context/ConsultationContext';
@@ -15,6 +16,7 @@ import PetSelectorPage from './pages/PetSelectorPage';
 import ImageUploadStep from './pages/ImageUploadStep';
 import DiagnosisReportPage from './pages/DiagnosisReportPage';
 import PetProfilePage from './pages/PetProfilePage';
+import ProfilePage from './pages/ProfilePage';
 import AdminDashboard from './pages/AdminDashboard';
 import { useAuth } from './context/AuthContext';
 
@@ -29,28 +31,31 @@ function HomeRoute() {
 
 function App() {
   return (
-    <LanguageProvider>
-      <AuthProvider>
-        <ConsultationProvider>
-          <BrowserRouter>
-            <Routes>
-              <Route path="/" element={<HomeRoute />} />
-              <Route path="/login" element={<LoginPage />} />
-              <Route path="/register" element={<RegisterPage />} />
-              <Route path="/dashboard" element={<ProtectedRoute><PetDashboard /></ProtectedRoute>} />
-              <Route path="/records" element={<ProtectedRoute><MedicalHistory /></ProtectedRoute>} />
-              <Route path="/diagnosis" element={<PetSelectorPage />} />
-              <Route path="/chat" element={<ChatbotPage />} />
-              <Route path="/questionnaire" element={<QuestionnairePage />} />
-              <Route path="/image-upload" element={<ImageUploadStep />} />
-              <Route path="/report" element={<DiagnosisReportPage />} />
-              <Route path="/pet/:id" element={<ProtectedRoute><PetProfilePage /></ProtectedRoute>} />
-              <Route path="/admin" element={<ProtectedRoute adminOnly><AdminDashboard /></ProtectedRoute>} />
-            </Routes>
-          </BrowserRouter>
-        </ConsultationProvider>
-      </AuthProvider>
-    </LanguageProvider>
+    <ThemeProvider>
+      <LanguageProvider>
+        <AuthProvider>
+          <ConsultationProvider>
+            <BrowserRouter>
+              <Routes>
+                <Route path="/" element={<HomeRoute />} />
+                <Route path="/login" element={<LoginPage />} />
+                <Route path="/register" element={<RegisterPage />} />
+                <Route path="/dashboard" element={<ProtectedRoute><PetDashboard /></ProtectedRoute>} />
+                <Route path="/profile" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
+                <Route path="/records" element={<ProtectedRoute><MedicalHistory /></ProtectedRoute>} />
+                <Route path="/diagnosis" element={<PetSelectorPage />} />
+                <Route path="/chat" element={<ChatbotPage />} />
+                <Route path="/questionnaire" element={<QuestionnairePage />} />
+                <Route path="/image-upload" element={<ImageUploadStep />} />
+                <Route path="/report" element={<DiagnosisReportPage />} />
+                <Route path="/pet/:id" element={<ProtectedRoute><PetProfilePage /></ProtectedRoute>} />
+                <Route path="/admin" element={<ProtectedRoute adminOnly><AdminDashboard /></ProtectedRoute>} />
+              </Routes>
+            </BrowserRouter>
+          </ConsultationProvider>
+        </AuthProvider>
+      </LanguageProvider>
+    </ThemeProvider>
   );
 }
 
