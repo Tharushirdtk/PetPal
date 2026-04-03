@@ -88,6 +88,25 @@ const AdminModel = {
     return rows[0];
   },
 
+  async updateVisibilityRule(id, { condition_json, priority, active }) {
+    const fields = [];
+    const params = [];
+
+    if (condition_json !== undefined) { fields.push('condition_json = ?'); params.push(JSON.stringify(condition_json)); }
+    if (priority !== undefined) { fields.push('priority = ?'); params.push(priority); }
+    if (active !== undefined) { fields.push('active = ?'); params.push(active ? 1 : 0); }
+
+    if (fields.length === 0) {
+      const rows = await query('SELECT * FROM visibility_rules WHERE id = ?', [id]);
+      return rows[0] || null;
+    }
+
+    params.push(id);
+    await query(`UPDATE visibility_rules SET ${fields.join(', ')} WHERE id = ?`, params);
+    const rows = await query('SELECT * FROM visibility_rules WHERE id = ?', [id]);
+    return rows[0] || null;
+  },
+
   async deleteVisibilityRule(id) {
     await query('DELETE FROM visibility_rules WHERE id = ?', [id]);
   },

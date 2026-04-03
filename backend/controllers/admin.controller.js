@@ -48,6 +48,14 @@ exports.createVisibilityRule = asyncHandler(async (req, res) => {
   return ok(res, { rule }, 201);
 });
 
+exports.updateVisibilityRule = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+  const { condition_json, priority, active } = req.body;
+  const rule = await AdminModel.updateVisibilityRule(id, { condition_json, priority, active });
+  if (!rule) return fail(res, 'Rule not found', 404);
+  return ok(res, { rule });
+});
+
 exports.deleteVisibilityRule = asyncHandler(async (req, res) => {
   const { id } = req.params;
   await AdminModel.deleteVisibilityRule(id);

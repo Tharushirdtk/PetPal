@@ -189,6 +189,36 @@ router.post('/visibility-rules', ctrl.createVisibilityRule);
 /**
  * @swagger
  * /admin/visibility-rules/{id}:
+ *   put:
+ *     summary: Update a visibility rule (condition, priority, or active status)
+ *     tags: [Admin]
+ *     security:
+ *       - BearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema: { type: integer }
+ *     requestBody:
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               condition_json: { type: object }
+ *               priority: { type: integer }
+ *               active: { type: boolean }
+ *     responses:
+ *       200:
+ *         description: Rule updated
+ *       404:
+ *         description: Rule not found
+ */
+router.put('/visibility-rules/:id', ctrl.updateVisibilityRule);
+
+/**
+ * @swagger
+ * /admin/visibility-rules/{id}:
  *   delete:
  *     summary: Delete a visibility rule
  *     tags: [Admin]
