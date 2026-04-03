@@ -13,6 +13,7 @@ import {
 import { useLang } from '../../i18n/LanguageContext';
 import { getQuestions, deleteQuestion } from '../../api/admin';
 import QuestionModal from './QuestionModal';
+import ConditionPills from '../../components/admin/ConditionPills';
 
 const TYPE_STYLES = {
   single: 'bg-blue-50 text-blue-700',
@@ -102,11 +103,11 @@ const QuestionsTab = () => {
     return (
       <div className="space-y-3">
         {[...Array(5)].map((_, i) => (
-          <div key={i} className="bg-white rounded-xl border border-[#E5E7EB] p-4 animate-pulse">
+          <div key={i} className="bg-white dark:bg-gray-800 rounded-xl border border-[#E5E7EB] dark:border-gray-700 p-4 animate-pulse">
             <div className="flex items-center gap-4">
-              <div className="w-20 h-4 bg-gray-200 rounded" />
-              <div className="flex-1 h-4 bg-gray-200 rounded" />
-              <div className="w-16 h-6 bg-gray-200 rounded-full" />
+              <div className="w-20 h-4 bg-gray-200 dark:bg-gray-700 rounded" />
+              <div className="flex-1 h-4 bg-gray-200 dark:bg-gray-700 rounded" />
+              <div className="w-16 h-6 bg-gray-200 dark:bg-gray-700 rounded-full" />
             </div>
           </div>
         ))}
@@ -136,8 +137,8 @@ const QuestionsTab = () => {
       {/* Header */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
         <div>
-          <h2 className="text-lg font-bold text-gray-900">{t('admin_questions')}</h2>
-          <p className="text-sm text-gray-500">
+          <h2 className="text-lg font-bold text-gray-900 dark:text-white">{t('admin_questions')}</h2>
+          <p className="text-sm text-gray-500 dark:text-gray-400">
             {filtered.length} {t('admin_of')} {questions.length} {t('admin_questions').toLowerCase()}
           </p>
         </div>
@@ -153,20 +154,20 @@ const QuestionsTab = () => {
       {/* Filters */}
       <div className="flex flex-col sm:flex-row gap-3">
         <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 dark:text-gray-500" />
           <input
             type="text"
             placeholder={t('admin_search_questions')}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full rounded-xl border border-[#E5E7EB] px-3 py-2.5 pl-10 text-sm outline-none focus:border-[#7C3AED] focus:ring-1 focus:ring-[#7C3AED]/20 transition-all"
+            className="w-full rounded-xl border border-[#E5E7EB] dark:border-gray-700 px-3 py-2.5 pl-10 text-sm outline-none focus:border-[#7C3AED] focus:ring-1 focus:ring-[#7C3AED]/20 transition-all"
           />
         </div>
         <div className="flex gap-2">
           <select
             value={typeFilter}
             onChange={(e) => setTypeFilter(e.target.value)}
-            className="rounded-xl border border-[#E5E7EB] px-3 py-2.5 text-sm outline-none focus:border-[#7C3AED] transition-colors cursor-pointer bg-white"
+            className="rounded-xl border border-[#E5E7EB] dark:border-gray-700 px-3 py-2.5 text-sm outline-none focus:border-[#7C3AED] transition-colors cursor-pointer bg-white dark:bg-gray-800"
           >
             <option value="all">{t('admin_all_types')}</option>
             {types.map((tp) => (
@@ -176,7 +177,7 @@ const QuestionsTab = () => {
           <select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
-            className="rounded-xl border border-[#E5E7EB] px-3 py-2.5 text-sm outline-none focus:border-[#7C3AED] transition-colors cursor-pointer bg-white"
+            className="rounded-xl border border-[#E5E7EB] dark:border-gray-700 px-3 py-2.5 text-sm outline-none focus:border-[#7C3AED] transition-colors cursor-pointer bg-white dark:bg-gray-800"
           >
             <option value="all">{t('admin_all_status')}</option>
             <option value="active">{t('admin_active')}</option>
@@ -187,30 +188,30 @@ const QuestionsTab = () => {
 
       {/* Question List */}
       {filtered.length === 0 ? (
-        <div className="bg-white rounded-2xl border border-[#E5E7EB] p-12 text-center">
+        <div className="bg-white dark:bg-gray-800 rounded-2xl border border-[#E5E7EB] dark:border-gray-700 p-12 text-center">
           <Filter className="w-8 h-8 text-gray-300 mx-auto mb-3" />
-          <p className="text-gray-500 text-sm">{t('admin_no_questions')}</p>
+          <p className="text-gray-500 dark:text-gray-400 text-sm">{t('admin_no_questions')}</p>
         </div>
       ) : (
         <div className="space-y-2">
           {filtered.map((q) => {
             const isExpanded = expandedId === q.id;
             return (
-              <div key={q.id} className="bg-white rounded-xl border border-[#E5E7EB] shadow-sm overflow-hidden">
+              <div key={q.id} className="bg-white dark:bg-gray-800 rounded-xl border border-[#E5E7EB] dark:border-gray-700 shadow-sm overflow-hidden">
                 {/* Row */}
                 <div
-                  className="flex items-center gap-3 p-4 cursor-pointer hover:bg-gray-50 transition-colors"
+                  className="flex items-center gap-3 p-4 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
                   onClick={() => setExpandedId(isExpanded ? null : q.id)}
                 >
-                  <button className="text-gray-400 flex-shrink-0">
+                  <button className="text-gray-400 dark:text-gray-500 flex-shrink-0">
                     {isExpanded ? <ChevronDown className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
                   </button>
-                  <span className="font-mono text-xs text-gray-400 w-20 flex-shrink-0 truncate">{q.code}</span>
-                  <p className="flex-1 text-sm text-gray-900 font-medium truncate">{q.text}</p>
-                  <span className={`text-xs px-2.5 py-1 rounded-full font-medium flex-shrink-0 ${TYPE_STYLES[q.question_type] || 'bg-gray-100 text-gray-600'}`}>
+                  <span className="font-mono text-xs text-gray-400 dark:text-gray-500 w-20 flex-shrink-0 truncate">{q.code}</span>
+                  <p className="flex-1 text-sm text-gray-900 dark:text-white font-medium truncate">{q.text}</p>
+                  <span className={`text-xs px-2.5 py-1 rounded-full font-medium flex-shrink-0 ${TYPE_STYLES[q.question_type] || 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300'}`}>
                     {TYPE_LABELS[q.question_type] || q.question_type}
                   </span>
-                  <span className="text-xs text-gray-400 flex-shrink-0 hidden sm:block">
+                  <span className="text-xs text-gray-400 dark:text-gray-500 flex-shrink-0 hidden sm:block">
                     #{q.display_order}
                   </span>
                   <span className={`flex-shrink-0 ${q.is_active ? 'text-green-500' : 'text-gray-300'}`}>
@@ -219,13 +220,13 @@ const QuestionsTab = () => {
                   <div className="flex items-center gap-1 flex-shrink-0" onClick={(e) => e.stopPropagation()}>
                     <button
                       onClick={() => { setEditingQuestion(q); setModalOpen(true); }}
-                      className="p-1.5 text-gray-400 hover:text-[#7C3AED] hover:bg-purple-50 rounded-lg transition-colors cursor-pointer"
+                      className="p-1.5 text-gray-400 dark:text-gray-500 hover:text-[#7C3AED] hover:bg-purple-50 rounded-lg transition-colors cursor-pointer"
                     >
                       <Pencil className="w-4 h-4" />
                     </button>
                     <button
                       onClick={() => setDeleteConfirm(q)}
-                      className="p-1.5 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors cursor-pointer"
+                      className="p-1.5 text-gray-400 dark:text-gray-500 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors cursor-pointer"
                     >
                       <Trash2 className="w-4 h-4" />
                     </button>
@@ -234,18 +235,18 @@ const QuestionsTab = () => {
 
                 {/* Expanded detail */}
                 {isExpanded && (
-                  <div className="border-t border-[#E5E7EB] bg-gray-50 p-4">
+                  <div className="border-t border-[#E5E7EB] dark:border-gray-700 bg-gray-50 dark:bg-gray-800 p-4">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       {/* Options */}
                       <div>
-                        <h4 className="text-xs font-semibold text-gray-400 uppercase mb-2">{t('admin_options')} ({q.options?.length || 0})</h4>
+                        <h4 className="text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase mb-2">{t('admin_options')} ({q.options?.length || 0})</h4>
                         {q.options?.length > 0 ? (
                           <div className="space-y-1">
                             {q.options.map((opt) => (
-                              <div key={opt.id} className="flex items-center gap-2 bg-white rounded-lg px-3 py-2 border border-[#E5E7EB] text-sm">
+                              <div key={opt.id} className="flex items-center gap-2 bg-white dark:bg-gray-800 rounded-lg px-3 py-2 border border-[#E5E7EB] dark:border-gray-700 text-sm">
                                 <span className="font-mono text-xs text-purple-600">{opt.value_key}</span>
-                                <span className="text-gray-400">-</span>
-                                <span className="text-gray-700">{opt.label}</span>
+                                <span className="text-gray-400 dark:text-gray-500">-</span>
+                                <span className="text-gray-700 dark:text-gray-300">{opt.label}</span>
                                 {!opt.is_active && (
                                   <span className="text-xs bg-red-50 text-red-500 px-1.5 py-0.5 rounded ml-auto">{t('admin_inactive')}</span>
                                 )}
@@ -253,31 +254,29 @@ const QuestionsTab = () => {
                             ))}
                           </div>
                         ) : (
-                          <p className="text-xs text-gray-400">{t('admin_no_options')}</p>
+                          <p className="text-xs text-gray-400 dark:text-gray-500">{t('admin_no_options')}</p>
                         )}
                       </div>
 
                       {/* Visibility Rules */}
                       <div>
-                        <h4 className="text-xs font-semibold text-gray-400 uppercase mb-2">{t('admin_visibility_rules')} ({q.visibility_rules?.length || 0})</h4>
+                        <h4 className="text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase mb-2">{t('admin_visibility_rules')} ({q.visibility_rules?.length || 0})</h4>
                         {q.visibility_rules?.length > 0 ? (
                           <div className="space-y-1">
                             {q.visibility_rules.map((rule) => (
-                              <div key={rule.id} className="bg-white rounded-lg px-3 py-2 border border-[#E5E7EB] text-xs">
-                                <div className="flex items-center justify-between mb-1">
-                                  <span className="font-medium text-gray-600">{t('admin_rule_priority')}: {rule.priority}</span>
-                                  <span className={`px-1.5 py-0.5 rounded ${rule.active ? 'bg-green-50 text-green-600' : 'bg-red-50 text-red-500'}`}>
+                              <div key={rule.id} className="bg-white dark:bg-gray-800 rounded-lg px-3 py-2 border border-[#E5E7EB] dark:border-gray-700 text-xs">
+                                <div className="flex items-center justify-between mb-1.5">
+                                  <span className="font-medium text-gray-600 dark:text-gray-300">{t('admin_rule_priority')}: {rule.priority}</span>
+                                  <span className={`px-1.5 py-0.5 rounded ${rule.active ? 'bg-green-50 dark:bg-green-900/20 text-green-600 dark:text-green-400' : 'bg-red-50 dark:bg-red-900/20 text-red-500 dark:text-red-400'}`}>
                                     {rule.active ? t('admin_active') : t('admin_inactive')}
                                   </span>
                                 </div>
-                                <pre className="text-xs text-gray-500 bg-gray-50 rounded p-2 overflow-x-auto">
-                                  {typeof rule.condition_json === 'string' ? rule.condition_json : JSON.stringify(rule.condition_json, null, 2)}
-                                </pre>
+                                <ConditionPills conditionJson={rule.condition_json} />
                               </div>
                             ))}
                           </div>
                         ) : (
-                          <p className="text-xs text-gray-400">{t('admin_no_rules')}</p>
+                          <p className="text-xs text-gray-400 dark:text-gray-500">{t('admin_no_rules')}</p>
                         )}
                       </div>
                     </div>
@@ -302,16 +301,16 @@ const QuestionsTab = () => {
       {deleteConfirm && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
           <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setDeleteConfirm(null)} />
-          <div className="relative bg-white rounded-2xl p-6 max-w-sm w-full shadow-xl">
-            <h3 className="text-lg font-bold text-gray-900 mb-2">{t('admin_confirm_delete')}</h3>
-            <p className="text-sm text-gray-500 mb-1">{t('admin_confirm_delete_msg')}</p>
-            <p className="text-sm font-medium text-gray-700 mb-5">
+          <div className="relative bg-white dark:bg-gray-800 rounded-2xl p-6 max-w-sm w-full shadow-xl">
+            <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2">{t('admin_confirm_delete')}</h3>
+            <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">{t('admin_confirm_delete_msg')}</p>
+            <p className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-5">
               <span className="font-mono text-purple-600">{deleteConfirm.code}</span> - {deleteConfirm.text}
             </p>
             <div className="flex gap-3 justify-end">
               <button
                 onClick={() => setDeleteConfirm(null)}
-                className="px-4 py-2 text-sm text-gray-600 hover:text-gray-800 transition-colors cursor-pointer rounded-xl border border-[#E5E7EB] hover:bg-gray-50"
+                className="px-4 py-2 text-sm text-gray-600 dark:text-gray-300 hover:text-gray-800 transition-colors cursor-pointer rounded-xl border border-[#E5E7EB] dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700"
               >
                 {t('admin_cancel')}
               </button>
