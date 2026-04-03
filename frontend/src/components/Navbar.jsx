@@ -155,10 +155,10 @@ const Navbar = ({ variant = 'default' }) => {
           {/* Admin Navigation Links */}
           <div className="hidden md:flex items-center gap-6">
             <Link to="/admin" className={linkClass(isActive('/admin'))}>Admin Panel</Link>
-            <Link to="/dashboard" className="text-xs text-gray-400 dark:text-gray-500 hover:text-[#7C3AED] dark:hover:text-[#A78BFA] transition-colors no-underline flex items-center gap-1">
+            {/* <Link to="/dashboard" className="text-xs text-gray-400 dark:text-gray-500 hover:text-[#7C3AED] dark:hover:text-[#A78BFA] transition-colors no-underline flex items-center gap-1">
               <ArrowLeft className="w-3 h-3" />
               Back to App
-            </Link>
+            </Link> */}
           </div>
 
           <div className="flex items-center gap-3">
@@ -178,10 +178,10 @@ const Navbar = ({ variant = 'default' }) => {
         {mobileOpen && (
           <div className="md:hidden border-t border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 px-6 py-4 flex flex-col gap-3">
             <Link to="/admin" onClick={closeMobile} className="text-sm font-medium text-gray-600 dark:text-gray-400 no-underline">Admin Panel</Link>
-            <Link to="/dashboard" onClick={closeMobile} className="text-sm font-medium text-gray-400 dark:text-gray-500 no-underline flex items-center gap-1">
+            {/* <Link to="/dashboard" onClick={closeMobile} className="text-sm font-medium text-gray-400 dark:text-gray-500 no-underline flex items-center gap-1">
               <ArrowLeft className="w-3 h-3" />
               Back to App
-            </Link>
+            </Link> */}
             {isAuthenticated && (
               <button onClick={handleLogout} className="text-sm font-medium text-red-600 dark:text-red-400 no-underline text-left cursor-pointer flex items-center gap-2">
                 <LogOut className="w-4 h-4" />

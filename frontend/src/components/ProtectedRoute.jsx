@@ -9,6 +9,7 @@ export default function ProtectedRoute({ children, adminOnly = false }) {
   if (loading) return <LoadingSpinner />;
   if (!isAuthenticated) return <Navigate to="/login" state={{ from: location }} replace />;
   if (adminOnly && user?.role !== 'admin') return <Navigate to="/dashboard" replace />;
+  if (!adminOnly && user?.role === 'admin') return <Navigate to="/admin" replace />;
 
   return children;
 }

@@ -20,6 +20,14 @@ import ProfilePage from './pages/ProfilePage';
 import AdminDashboard from './pages/AdminDashboard';
 import { useAuth } from './context/AuthContext';
 
+function RedirectIfAdmin({ children }) {
+  const { isAuthenticated, loading, user } = useAuth();
+
+  if (loading) return <LoadingSpinner />;
+  if (isAuthenticated && user?.role === 'admin') return <Navigate to="/admin" replace />;
+  return children;
+}
+
 function HomeRoute() {
   const { isAuthenticated, loading, user } = useAuth();
 
@@ -38,18 +46,19 @@ function App() {
             <BrowserRouter>
               <Routes>
                 <Route path="/" element={<HomeRoute />} />
-                <Route path="/login" element={<LoginPage />} />
-                <Route path="/register" element={<RegisterPage />} />
+                <Route path="/login" element={<RedirectIfAdmin><LoginPage /></RedirectIfAdmin>} />
+                <Route path="/register" element={<RedirectIfAdmin><RegisterPage /></RedirectIfAdmin>} />
                 <Route path="/dashboard" element={<ProtectedRoute><PetDashboard /></ProtectedRoute>} />
                 <Route path="/profile" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
                 <Route path="/records" element={<ProtectedRoute><MedicalHistory /></ProtectedRoute>} />
-                <Route path="/diagnosis" element={<PetSelectorPage />} />
-                <Route path="/chat" element={<ChatbotPage />} />
-                <Route path="/questionnaire" element={<QuestionnairePage />} />
-                <Route path="/image-upload" element={<ImageUploadStep />} />
-                <Route path="/report" element={<DiagnosisReportPage />} />
+                <Route path="/diagnosis" element={<RedirectIfAdmin><PetSelectorPage /></RedirectIfAdmin>} />
+                <Route path="/chat" element={<RedirectIfAdmin><ChatbotPage /></RedirectIfAdmin>} />
+                <Route path="/questionnaire" element={<RedirectIfAdmin><QuestionnairePage /></RedirectIfAdmin>} />
+                <Route path="/image-upload" element={<RedirectIfAdmin><ImageUploadStep /></RedirectIfAdmin>} />
+                <Route path="/report" element={<RedirectIfAdmin><DiagnosisReportPage /></RedirectIfAdmin>} />
                 <Route path="/pet/:id" element={<ProtectedRoute><PetProfilePage /></ProtectedRoute>} />
                 <Route path="/admin" element={<ProtectedRoute adminOnly><AdminDashboard /></ProtectedRoute>} />
+                <Route path="*" element={<HomeRoute />} />
               </Routes>
             </BrowserRouter>
           </ConsultationProvider>
