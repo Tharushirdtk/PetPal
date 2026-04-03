@@ -85,13 +85,13 @@ const QuestionModal = ({ question, onClose, onSaved }) => {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={onClose} />
-      <div className="relative bg-white rounded-2xl max-w-lg w-full shadow-xl max-h-[90vh] overflow-y-auto">
+      <div className="relative bg-white dark:bg-gray-800 rounded-2xl max-w-lg w-full shadow-xl max-h-[90vh] overflow-y-auto">
         {/* Header */}
-        <div className="flex items-center justify-between p-5 border-b border-[#E5E7EB] sticky top-0 bg-white rounded-t-2xl z-10">
-          <h3 className="text-lg font-bold text-gray-900">
+        <div className="flex items-center justify-between p-5 border-b border-[#E5E7EB] dark:border-gray-700 sticky top-0 bg-white dark:bg-gray-800 rounded-t-2xl z-10">
+          <h3 className="text-lg font-bold text-gray-900 dark:text-white">
             {isEdit ? t('admin_edit_question') : t('admin_create_question')}
           </h3>
-          <button onClick={onClose} className="p-1.5 text-gray-400 hover:text-gray-600 rounded-lg hover:bg-gray-100 transition-colors cursor-pointer">
+          <button onClick={onClose} className="p-1.5 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors cursor-pointer">
             <X className="w-5 h-5" />
           </button>
         </div>
@@ -105,37 +105,37 @@ const QuestionModal = ({ question, onClose, onSaved }) => {
 
           {/* Code */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1.5">{t('admin_code')}</label>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">{t('admin_code')}</label>
             <input
               type="text"
               value={form.code}
               onChange={(e) => handleChange('code', e.target.value)}
               placeholder="e.g., q_new_question"
               disabled={isEdit}
-              className={`w-full rounded-xl border border-[#E5E7EB] px-3 py-2.5 text-sm outline-none focus:border-[#7C3AED] focus:ring-1 focus:ring-[#7C3AED]/20 transition-all font-mono ${isEdit ? 'bg-gray-50 text-gray-500' : ''}`}
+              className={`w-full rounded-xl border border-[#E5E7EB] dark:border-gray-700 px-3 py-2.5 text-sm outline-none focus:border-[#7C3AED] focus:ring-1 focus:ring-[#7C3AED]/20 transition-all font-mono ${isEdit ? 'bg-gray-50 dark:bg-gray-800 text-gray-500 dark:text-gray-400' : ''}`}
             />
           </div>
 
           {/* Text */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1.5">{t('admin_question_text')}</label>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">{t('admin_question_text')}</label>
             <textarea
               value={form.text}
               onChange={(e) => handleChange('text', e.target.value)}
               placeholder={t('admin_question_text_placeholder')}
               rows={3}
-              className="w-full rounded-xl border border-[#E5E7EB] px-3 py-2.5 text-sm outline-none focus:border-[#7C3AED] focus:ring-1 focus:ring-[#7C3AED]/20 transition-all resize-none"
+              className="w-full rounded-xl border border-[#E5E7EB] dark:border-gray-700 px-3 py-2.5 text-sm outline-none focus:border-[#7C3AED] focus:ring-1 focus:ring-[#7C3AED]/20 transition-all resize-none"
             />
           </div>
 
           {/* Type & Order row */}
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1.5">{t('admin_type')}</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">{t('admin_type')}</label>
               <select
                 value={form.question_type}
                 onChange={(e) => handleChange('question_type', e.target.value)}
-                className="w-full rounded-xl border border-[#E5E7EB] px-3 py-2.5 text-sm outline-none focus:border-[#7C3AED] transition-colors cursor-pointer bg-white"
+                className="w-full rounded-xl border border-[#E5E7EB] dark:border-gray-700 px-3 py-2.5 text-sm outline-none focus:border-[#7C3AED] transition-colors cursor-pointer bg-white dark:bg-gray-800"
               >
                 {QUESTION_TYPES.map((tp) => (
                   <option key={tp} value={tp}>{TYPE_LABELS[tp] || tp}</option>
@@ -143,24 +143,24 @@ const QuestionModal = ({ question, onClose, onSaved }) => {
               </select>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1.5">{t('admin_order')}</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">{t('admin_order')}</label>
               <input
                 type="number"
                 value={form.display_order}
                 onChange={(e) => handleChange('display_order', e.target.value)}
-                className="w-full rounded-xl border border-[#E5E7EB] px-3 py-2.5 text-sm outline-none focus:border-[#7C3AED] focus:ring-1 focus:ring-[#7C3AED]/20 transition-all"
+                className="w-full rounded-xl border border-[#E5E7EB] dark:border-gray-700 px-3 py-2.5 text-sm outline-none focus:border-[#7C3AED] focus:ring-1 focus:ring-[#7C3AED]/20 transition-all"
               />
             </div>
           </div>
 
           {/* Active toggle */}
           <div className="flex items-center justify-between">
-            <label className="text-sm font-medium text-gray-700">{t('admin_active')}</label>
+            <label className="text-sm font-medium text-gray-700 dark:text-gray-300">{t('admin_active')}</label>
             <button
               type="button"
               onClick={() => handleChange('is_active', !form.is_active)}
               className={`relative w-11 h-6 rounded-full transition-colors cursor-pointer ${
-                form.is_active ? 'bg-[#7C3AED]' : 'bg-gray-300'
+                form.is_active ? 'bg-[#7C3AED]' : 'bg-gray-300 dark:bg-gray-600'
               }`}
             >
               <span className={`absolute top-0.5 w-5 h-5 rounded-full bg-white shadow transition-transform ${
@@ -173,7 +173,7 @@ const QuestionModal = ({ question, onClose, onSaved }) => {
           {!isEdit && ['single', 'multi', 'boolean'].includes(form.question_type) && (
             <div>
               <div className="flex items-center justify-between mb-2">
-                <label className="text-sm font-medium text-gray-700">{t('admin_options')}</label>
+                <label className="text-sm font-medium text-gray-700 dark:text-gray-300">{t('admin_options')}</label>
                 <button
                   type="button"
                   onClick={addOption}
@@ -184,7 +184,7 @@ const QuestionModal = ({ question, onClose, onSaved }) => {
                 </button>
               </div>
               {options.length === 0 ? (
-                <p className="text-xs text-gray-400 text-center py-3">{t('admin_no_options_yet')}</p>
+                <p className="text-xs text-gray-400 dark:text-gray-500 text-center py-3">{t('admin_no_options_yet')}</p>
               ) : (
                 <div className="space-y-2">
                   {options.map((opt, idx) => (
@@ -195,19 +195,19 @@ const QuestionModal = ({ question, onClose, onSaved }) => {
                         value={opt.value_key}
                         onChange={(e) => updateOption(idx, 'value_key', e.target.value)}
                         placeholder="Key (e.g. skin)"
-                        className="flex-1 rounded-lg border border-[#E5E7EB] px-2.5 py-2 text-sm font-mono outline-none focus:border-[#7C3AED] transition-colors"
+                        className="flex-1 rounded-lg border border-[#E5E7EB] dark:border-gray-700 px-2.5 py-2 text-sm font-mono outline-none focus:border-[#7C3AED] transition-colors"
                       />
                       <input
                         type="text"
                         value={opt.label}
                         onChange={(e) => updateOption(idx, 'label', e.target.value)}
                         placeholder="Label"
-                        className="flex-1 rounded-lg border border-[#E5E7EB] px-2.5 py-2 text-sm outline-none focus:border-[#7C3AED] transition-colors"
+                        className="flex-1 rounded-lg border border-[#E5E7EB] dark:border-gray-700 px-2.5 py-2 text-sm outline-none focus:border-[#7C3AED] transition-colors"
                       />
                       <button
                         type="button"
                         onClick={() => removeOption(idx)}
-                        className="p-1.5 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors cursor-pointer flex-shrink-0"
+                        className="p-1.5 text-gray-400 dark:text-gray-500 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors cursor-pointer flex-shrink-0"
                       >
                         <Trash2 className="w-4 h-4" />
                       </button>
@@ -223,7 +223,7 @@ const QuestionModal = ({ question, onClose, onSaved }) => {
             <button
               type="button"
               onClick={onClose}
-              className="px-5 py-2.5 text-sm text-gray-600 hover:text-gray-800 transition-colors cursor-pointer rounded-xl border border-[#E5E7EB] hover:bg-gray-50"
+              className="px-5 py-2.5 text-sm text-gray-600 dark:text-gray-300 hover:text-gray-800 transition-colors cursor-pointer rounded-xl border border-[#E5E7EB] dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700"
             >
               {t('admin_cancel')}
             </button>

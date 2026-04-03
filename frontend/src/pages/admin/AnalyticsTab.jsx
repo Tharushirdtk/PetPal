@@ -42,10 +42,10 @@ const AnalyticsTab = () => {
       <div className="space-y-6">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           {[...Array(4)].map((_, i) => (
-            <div key={i} className="bg-white rounded-2xl border border-[#E5E7EB] p-5 animate-pulse">
-              <div className="w-10 h-10 bg-gray-200 rounded-xl mb-3" />
-              <div className="w-12 h-8 bg-gray-200 rounded mb-2" />
-              <div className="w-24 h-4 bg-gray-200 rounded" />
+            <div key={i} className="bg-white dark:bg-gray-800 rounded-2xl border border-[#E5E7EB] p-5 animate-pulse">
+              <div className="w-10 h-10 bg-gray-200 dark:bg-gray-700 rounded-xl mb-3" />
+              <div className="w-12 h-8 bg-gray-200 dark:bg-gray-700 rounded mb-2" />
+              <div className="w-24 h-4 bg-gray-200 dark:bg-gray-700 rounded" />
             </div>
           ))}
         </div>
@@ -105,8 +105,8 @@ const AnalyticsTab = () => {
     <div className="space-y-6">
       {/* Header */}
       <div>
-        <h2 className="text-lg font-bold text-gray-900">{t('admin_analytics_title')}</h2>
-        <p className="text-sm text-gray-500">{t('admin_analytics_sub')}</p>
+        <h2 className="text-lg font-bold text-gray-900 dark:text-white">{t('admin_analytics_title')}</h2>
+        <p className="text-sm text-gray-500 dark:text-gray-400">{t('admin_analytics_sub')}</p>
       </div>
 
       {/* Summary Cards */}
@@ -120,19 +120,19 @@ const AnalyticsTab = () => {
       {/* Charts Row */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         {/* Question Type Distribution */}
-        <div className="bg-white rounded-2xl border border-[#E5E7EB] p-5 shadow-sm">
+        <div className="bg-white dark:bg-gray-800 rounded-2xl border border-[#E5E7EB] p-5 shadow-sm">
           <div className="flex items-center gap-2 mb-4">
-            <BarChart3 className="w-4 h-4 text-gray-400" />
-            <h3 className="font-semibold text-gray-900 text-sm">{t('admin_question_types')}</h3>
+            <BarChart3 className="w-4 h-4 text-gray-400 dark:text-gray-500" />
+            <h3 className="font-semibold text-gray-900 dark:text-white text-sm">{t('admin_question_types')}</h3>
           </div>
           <div className="space-y-3">
             {Object.entries(typeDistribution).map(([type, count]) => (
               <div key={type}>
                 <div className="flex items-center justify-between mb-1">
-                  <span className="text-sm text-gray-600">{TYPE_LABELS[type] || type}</span>
-                  <span className="text-sm font-medium text-gray-900">{count}</span>
+                  <span className="text-sm text-gray-600 dark:text-gray-300">{TYPE_LABELS[type] || type}</span>
+                  <span className="text-sm font-medium text-gray-900 dark:text-white">{count}</span>
                 </div>
-                <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
+                <div className="h-2 bg-gray-100 dark:bg-gray-700 rounded-full overflow-hidden">
                   <div
                     className={`h-full rounded-full transition-all duration-500 ${TYPE_COLORS[type] || 'bg-gray-400'}`}
                     style={{ width: `${(count / maxTypeCount) * 100}%` }}
@@ -144,10 +144,10 @@ const AnalyticsTab = () => {
         </div>
 
         {/* Contact Status Breakdown */}
-        <div className="bg-white rounded-2xl border border-[#E5E7EB] p-5 shadow-sm">
+        <div className="bg-white dark:bg-gray-800 rounded-2xl border border-[#E5E7EB] p-5 shadow-sm">
           <div className="flex items-center gap-2 mb-4">
-            <Mail className="w-4 h-4 text-gray-400" />
-            <h3 className="font-semibold text-gray-900 text-sm">{t('admin_contact_breakdown')}</h3>
+            <Mail className="w-4 h-4 text-gray-400 dark:text-gray-500" />
+            <h3 className="font-semibold text-gray-900 dark:text-white text-sm">{t('admin_contact_breakdown')}</h3>
           </div>
           <div className="space-y-4">
             <StatusBar label={t('admin_status_new')} count={contactDist.new} total={contactTotal} color="bg-orange-500" icon={AlertCircle} />
@@ -156,7 +156,7 @@ const AnalyticsTab = () => {
           </div>
           <div className="mt-4 pt-4 border-t border-[#E5E7EB]">
             <div className="flex items-center justify-between">
-              <span className="text-sm text-gray-500">{t('admin_resolution_rate')}</span>
+              <span className="text-sm text-gray-500 dark:text-gray-400">{t('admin_resolution_rate')}</span>
               <span className="text-lg font-bold text-green-600">
                 {contactTotal > 0 ? Math.round((contactDist.resolved / contactTotal) * 100) : 0}%
               </span>
@@ -166,10 +166,10 @@ const AnalyticsTab = () => {
       </div>
 
       {/* Question Health */}
-      <div className="bg-white rounded-2xl border border-[#E5E7EB] p-5 shadow-sm">
+      <div className="bg-white dark:bg-gray-800 rounded-2xl border border-[#E5E7EB] p-5 shadow-sm">
         <div className="flex items-center gap-2 mb-4">
-          <TrendingUp className="w-4 h-4 text-gray-400" />
-          <h3 className="font-semibold text-gray-900 text-sm">{t('admin_question_health')}</h3>
+          <TrendingUp className="w-4 h-4 text-gray-400 dark:text-gray-500" />
+          <h3 className="font-semibold text-gray-900 dark:text-white text-sm">{t('admin_question_health')}</h3>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           <div className="text-center p-4 bg-green-50 rounded-xl">
@@ -200,12 +200,12 @@ const AnalyticsTab = () => {
 };
 
 const SummaryCard = ({ icon: Icon, value, label, color }) => (
-  <div className="bg-white rounded-2xl border border-[#E5E7EB] p-5 shadow-sm">
+  <div className="bg-white dark:bg-gray-800 rounded-2xl border border-[#E5E7EB] p-5 shadow-sm">
     <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${color} mb-3`}>
       <Icon className="w-5 h-5" />
     </div>
-    <p className="text-2xl font-bold text-gray-900">{value}</p>
-    <p className="text-sm text-gray-500 mt-1">{label}</p>
+    <p className="text-2xl font-bold text-gray-900 dark:text-white">{value}</p>
+    <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">{label}</p>
   </div>
 );
 
@@ -213,12 +213,12 @@ const StatusBar = ({ label, count, total, color, icon: Icon }) => (
   <div>
     <div className="flex items-center justify-between mb-1">
       <div className="flex items-center gap-2">
-        <Icon className="w-4 h-4 text-gray-400" />
-        <span className="text-sm text-gray-600">{label}</span>
+        <Icon className="w-4 h-4 text-gray-400 dark:text-gray-500" />
+        <span className="text-sm text-gray-600 dark:text-gray-300">{label}</span>
       </div>
-      <span className="text-sm font-medium text-gray-900">{count}</span>
+      <span className="text-sm font-medium text-gray-900 dark:text-white">{count}</span>
     </div>
-    <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
+    <div className="h-2 bg-gray-100 dark:bg-gray-700 rounded-full overflow-hidden">
       <div
         className={`h-full rounded-full transition-all duration-500 ${color}`}
         style={{ width: `${total > 0 ? (count / total) * 100 : 0}%` }}

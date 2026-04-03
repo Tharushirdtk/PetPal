@@ -86,8 +86,8 @@ const ContactsTab = () => {
 
       {/* Header */}
       <div>
-        <h2 className="text-lg font-bold text-gray-900">{t('admin_contact_messages')}</h2>
-        <p className="text-sm text-gray-500">{pagination.total} {t('admin_total').toLowerCase()} {t('admin_messages')}</p>
+        <h2 className="text-lg font-bold text-gray-900 dark:text-white">{t('admin_contact_messages')}</h2>
+        <p className="text-sm text-gray-500 dark:text-gray-400">{pagination.total} {t('admin_total').toLowerCase()} {t('admin_messages')}</p>
       </div>
 
       {/* Filter Pills */}
@@ -99,7 +99,7 @@ const ContactsTab = () => {
             className={`rounded-full px-4 py-1.5 text-sm font-medium cursor-pointer transition-colors ${
               statusFilter === f.key
                 ? 'bg-[#7C3AED] text-white'
-                : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
             }`}
           >
             {f.label}
@@ -111,35 +111,35 @@ const ContactsTab = () => {
       {loading ? (
         <div className="space-y-2">
           {[...Array(5)].map((_, i) => (
-            <div key={i} className="bg-white rounded-xl border border-[#E5E7EB] p-4 animate-pulse">
-              <div className="h-4 w-48 bg-gray-200 rounded mb-2" />
-              <div className="h-3 w-32 bg-gray-200 rounded mb-2" />
-              <div className="h-3 w-full bg-gray-200 rounded" />
+            <div key={i} className="bg-white dark:bg-gray-800 rounded-xl border border-[#E5E7EB] p-4 animate-pulse">
+              <div className="h-4 w-48 bg-gray-200 dark:bg-gray-700 rounded mb-2" />
+              <div className="h-3 w-32 bg-gray-200 dark:bg-gray-700 rounded mb-2" />
+              <div className="h-3 w-full bg-gray-200 dark:bg-gray-700 rounded" />
             </div>
           ))}
         </div>
       ) : contacts.length === 0 ? (
-        <div className="bg-white rounded-2xl border border-[#E5E7EB] p-12 text-center">
+        <div className="bg-white dark:bg-gray-800 rounded-2xl border border-[#E5E7EB] p-12 text-center">
           <Mail className="w-8 h-8 text-gray-300 mx-auto mb-3" />
-          <p className="text-gray-500 text-sm">{t('admin_no_contacts')}</p>
+          <p className="text-gray-500 dark:text-gray-400 text-sm">{t('admin_no_contacts')}</p>
         </div>
       ) : (
         <div className="space-y-2">
           {contacts.map((c) => {
             const isExpanded = expandedId === c.id;
             return (
-              <div key={c.id} className="bg-white rounded-xl border border-[#E5E7EB] shadow-sm overflow-hidden hover:shadow-md transition-shadow">
+              <div key={c.id} className="bg-white dark:bg-gray-800 rounded-xl border border-[#E5E7EB] shadow-sm overflow-hidden hover:shadow-md transition-shadow">
                 <div className="p-4">
                   <div className="flex items-start justify-between gap-3">
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 flex-wrap mb-1">
-                        <h4 className="text-sm font-semibold text-gray-900">{c.heading || t('admin_no_subject')}</h4>
-                        <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${STATUS_STYLES[c.status] || 'bg-gray-100 text-gray-600'}`}>
+                        <h4 className="text-sm font-semibold text-gray-900 dark:text-white">{c.heading || t('admin_no_subject')}</h4>
+                        <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${STATUS_STYLES[c.status] || 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300'}`}>
                           {t(`admin_status_${c.status}`)}
                         </span>
                       </div>
-                      <p className="text-xs text-gray-500 mb-1">{c.email}</p>
-                      <p className={`text-sm text-gray-600 ${isExpanded ? '' : 'line-clamp-2'}`}>
+                      <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">{c.email}</p>
+                      <p className={`text-sm text-gray-600 dark:text-gray-300 ${isExpanded ? '' : 'line-clamp-2'}`}>
                         {c.message}
                       </p>
                       {c.message?.length > 150 && (
@@ -153,14 +153,14 @@ const ContactsTab = () => {
                       )}
                     </div>
                     <div className="flex flex-col items-end gap-2 flex-shrink-0">
-                      <div className="flex items-center gap-1 text-xs text-gray-400">
+                      <div className="flex items-center gap-1 text-xs text-gray-400 dark:text-gray-500">
                         <Clock className="w-3 h-3" />
                         {new Date(c.created_at).toLocaleDateString()}
                       </div>
                       <select
                         value={c.status}
                         onChange={(e) => handleStatusChange(c.id, e.target.value)}
-                        className="text-xs rounded-lg border border-[#E5E7EB] px-2 py-1 outline-none focus:border-[#7C3AED] cursor-pointer bg-white"
+                        className="text-xs rounded-lg border border-[#E5E7EB] px-2 py-1 outline-none focus:border-[#7C3AED] cursor-pointer bg-white dark:bg-gray-800"
                       >
                         <option value="new">{t('admin_status_new')}</option>
                         <option value="read">{t('admin_status_read')}</option>
@@ -181,17 +181,17 @@ const ContactsTab = () => {
           <button
             onClick={() => fetchContacts(pagination.page - 1)}
             disabled={pagination.page <= 1}
-            className="p-2 rounded-lg border border-[#E5E7EB] text-gray-500 hover:text-gray-700 hover:bg-gray-50 transition-colors cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed"
+            className="p-2 rounded-lg border border-[#E5E7EB] text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed"
           >
             <ChevronLeft className="w-4 h-4" />
           </button>
-          <span className="text-sm text-gray-600 px-3">
+          <span className="text-sm text-gray-600 dark:text-gray-300 px-3">
             {pagination.page} / {totalPages}
           </span>
           <button
             onClick={() => fetchContacts(pagination.page + 1)}
             disabled={pagination.page >= totalPages}
-            className="p-2 rounded-lg border border-[#E5E7EB] text-gray-500 hover:text-gray-700 hover:bg-gray-50 transition-colors cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed"
+            className="p-2 rounded-lg border border-[#E5E7EB] text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed"
           >
             <ChevronRight className="w-4 h-4" />
           </button>
