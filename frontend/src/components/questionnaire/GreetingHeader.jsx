@@ -64,10 +64,10 @@ const GreetingHeader = ({ currentItem, petName }) => {
 
   return (
     <div className="flex items-center gap-3 mb-6 animate-fade-in-up">
-      <div className="h-10 w-10 rounded-full bg-[#F5F3FF] flex items-center justify-center flex-shrink-0">
+      <div className="h-10 w-10 rounded-full bg-[#F5F3FF] dark:bg-purple-900/20 flex items-center justify-center flex-shrink-0">
         <PawIcon />
       </div>
-      <div className="bg-[#F5F3FF] rounded-2xl rounded-bl-sm px-4 py-2.5">
+      <div className="bg-[#F5F3FF] dark:bg-purple-900/20 rounded-2xl rounded-bl-sm px-4 py-2.5">
         <p className="text-sm font-medium text-[#7C3AED]">{message}</p>
       </div>
     </div>

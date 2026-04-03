@@ -8,8 +8,8 @@ const SD1_ICONS = {
 };
 
 const getOptionBg = (color) => {
-  if (!color) return 'bg-gray-50';
-  return color.split(' ').filter((c) => c.startsWith('bg-')).join(' ') || 'bg-gray-50';
+  if (!color) return 'bg-gray-50 dark:bg-gray-800';
+  return color.split(' ').filter((c) => c.startsWith('bg-')).join(' ') || 'bg-gray-50 dark:bg-gray-800';
 };
 
 /* ── P1 pet type: special lucide icon buttons ── */
@@ -22,14 +22,14 @@ const PetTypeCard = ({ answers, onAnswer }) => {
         type="button"
         onClick={() => onAnswer('P1', 'dog')}
         className={`rounded-2xl border-2 p-6 flex flex-col items-center gap-3 cursor-pointer transition-all duration-200
-          bg-orange-50
+          bg-orange-50 dark:bg-orange-900/20
           ${answers.P1 === 'dog'
             ? 'border-[#7C3AED] ring-2 ring-[#7C3AED]/20 scale-[1.03] shadow-md'
-            : 'border-gray-200 hover:border-gray-300 hover:shadow-sm'
+            : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-500 hover:shadow-sm'
           }`}
       >
         <Dog className="w-12 h-12 text-orange-500" />
-        <span className="text-base font-semibold text-gray-700">{t('quest_pet_type_dog') || 'Dog'}</span>
+        <span className="text-base font-semibold text-gray-700 dark:text-gray-300">{t('quest_pet_type_dog') || 'Dog'}</span>
       </button>
       <button
         type="button"
@@ -38,11 +38,11 @@ const PetTypeCard = ({ answers, onAnswer }) => {
           bg-purple-50
           ${answers.P1 === 'cat'
             ? 'border-[#7C3AED] ring-2 ring-[#7C3AED]/20 scale-[1.03] shadow-md'
-            : 'border-gray-200 hover:border-gray-300 hover:shadow-sm'
+            : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-500 hover:shadow-sm'
           }`}
       >
         <Cat className="w-12 h-12 text-purple-500" />
-        <span className="text-base font-semibold text-gray-700">{t('quest_pet_type_cat') || 'Cat'}</span>
+        <span className="text-base font-semibold text-gray-700 dark:text-gray-300">{t('quest_pet_type_cat') || 'Cat'}</span>
       </button>
     </div>
   );
@@ -67,11 +67,11 @@ const SingleSelectGrid = ({ question, answers, onAnswer }) => {
               ${getOptionBg(opt.color)}
               ${isSelected
                 ? 'border-[#7C3AED] ring-2 ring-[#7C3AED]/20 scale-[1.03] shadow-md'
-                : 'border-gray-200 hover:border-gray-300 hover:shadow-sm'
+                : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-500 hover:shadow-sm'
               }`}
           >
             {icon && <span className={isSD1 ? 'text-3xl flex-shrink-0' : 'text-xl flex-shrink-0'}>{icon}</span>}
-            <span className="text-sm font-semibold text-gray-700">{opt.label}</span>
+            <span className="text-sm font-semibold text-gray-700 dark:text-gray-300">{opt.label}</span>
           </button>
         );
       })}
@@ -104,16 +104,16 @@ const MultiSelectGrid = ({ question, answers, onAnswer }) => {
               ${getOptionBg(opt.color)}
               ${isSelected
                 ? 'border-[#7C3AED] ring-2 ring-[#7C3AED]/20 scale-[1.03] shadow-md'
-                : 'border-gray-200 hover:border-gray-300 hover:shadow-sm'
+                : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-500 hover:shadow-sm'
               }`}
           >
             <span className={`w-5 h-5 rounded border-2 flex items-center justify-center flex-shrink-0 ${
-              isSelected ? 'bg-[#7C3AED] border-[#7C3AED]' : 'border-gray-300'
+              isSelected ? 'bg-[#7C3AED] border-[#7C3AED]' : 'border-gray-300 dark:border-gray-600'
             }`}>
               {isSelected && <span className="text-white text-xs font-bold">&#10003;</span>}
             </span>
             {icon && <span className="text-xl flex-shrink-0">{icon}</span>}
-            <span className="text-sm font-semibold text-gray-700">{opt.label}</span>
+            <span className="text-sm font-semibold text-gray-700 dark:text-gray-300">{opt.label}</span>
           </button>
         );
       })}
@@ -130,13 +130,13 @@ const AgeInput = ({ answers, onAnswer, t }) => {
   };
 
   const selectClass =
-    'w-full border-2 border-gray-200 rounded-xl p-3 text-sm text-gray-700 outline-none focus:border-[#7C3AED] transition-colors bg-white cursor-pointer';
+    'w-full border-2 border-gray-200 dark:border-gray-700 rounded-xl p-3 text-sm text-gray-700 dark:text-gray-300 outline-none focus:border-[#7C3AED] transition-colors bg-white dark:bg-gray-800 cursor-pointer';
 
   return (
     <div className="max-w-sm mx-auto space-y-4">
       {/* Years */}
       <div>
-        <label className="block text-xs font-semibold text-gray-500 mb-1.5 text-left">
+        <label className="block text-xs font-semibold text-gray-500 dark:text-gray-400 mb-1.5 text-left">
           {t('quest_age_years') || 'Years'}
         </label>
         <input
@@ -147,13 +147,13 @@ const AgeInput = ({ answers, onAnswer, t }) => {
           onChange={(e) => update('years', e.target.value)}
           placeholder="0"
           autoFocus
-          className="w-full border-2 border-gray-200 rounded-xl p-3 text-sm text-gray-700 outline-none focus:border-[#7C3AED] transition-colors bg-white"
+          className="w-full border-2 border-gray-200 dark:border-gray-700 rounded-xl p-3 text-sm text-gray-700 dark:text-gray-300 outline-none focus:border-[#7C3AED] transition-colors bg-white dark:bg-gray-800"
         />
       </div>
 
       {/* Months */}
       <div>
-        <label className="block text-xs font-semibold text-gray-500 mb-1.5 text-left">
+        <label className="block text-xs font-semibold text-gray-500 dark:text-gray-400 mb-1.5 text-left">
           {t('quest_age_months') || 'Months'}
         </label>
         <select
@@ -171,7 +171,7 @@ const AgeInput = ({ answers, onAnswer, t }) => {
 
       {/* Days */}
       <div>
-        <label className="block text-xs font-semibold text-gray-500 mb-1.5 text-left">
+        <label className="block text-xs font-semibold text-gray-500 dark:text-gray-400 mb-1.5 text-left">
           {t('quest_age_days') || 'Days'}
         </label>
         <select
@@ -187,7 +187,7 @@ const AgeInput = ({ answers, onAnswer, t }) => {
         </select>
       </div>
 
-      <p className="text-xs text-gray-400 text-center pt-1">
+      <p className="text-xs text-gray-400 dark:text-gray-500 text-center pt-1">
         {t('quest_age_hint') || 'Only years is required — months and days are optional'}
       </p>
     </div>
@@ -205,7 +205,7 @@ const NumberInput = ({ question, answers, onAnswer, t }) => (
       onChange={(e) => onAnswer(question.code, e.target.value)}
       placeholder={t('quest_enter_number') || 'Enter a number...'}
       autoFocus
-      className="w-full border-2 border-gray-200 rounded-2xl p-4 text-center text-2xl font-bold text-gray-900 outline-none focus:border-[#7C3AED] transition-colors"
+      className="w-full border-2 border-gray-200 dark:border-gray-700 rounded-2xl p-4 text-center text-2xl font-bold text-gray-900 dark:text-white outline-none focus:border-[#7C3AED] transition-colors"
     />
   </div>
 );
@@ -219,7 +219,7 @@ const TextInput = ({ question, answers, onAnswer, t }) => (
       placeholder={t('quest_type_answer') || 'Type your answer...'}
       rows={4}
       autoFocus
-      className="w-full border-2 border-gray-200 rounded-2xl p-4 text-base text-gray-700 outline-none focus:border-[#7C3AED] transition-colors resize-none"
+      className="w-full border-2 border-gray-200 dark:border-gray-700 rounded-2xl p-4 text-base text-gray-700 dark:text-gray-300 outline-none focus:border-[#7C3AED] transition-colors resize-none"
     />
   </div>
 );
@@ -231,7 +231,7 @@ const BreedSelect = ({ breedList, petBreedId, loadingBreeds, onBreedChange, t })
       value={petBreedId}
       onChange={(e) => onBreedChange(e.target.value)}
       disabled={loadingBreeds}
-      className="w-full border-2 border-gray-200 rounded-2xl p-4 text-base text-gray-700 outline-none focus:border-[#7C3AED] transition-colors bg-white cursor-pointer"
+      className="w-full border-2 border-gray-200 dark:border-gray-700 rounded-2xl p-4 text-base text-gray-700 dark:text-gray-300 outline-none focus:border-[#7C3AED] transition-colors bg-white dark:bg-gray-800 cursor-pointer"
     >
       <option value="">
         {loadingBreeds ? '...' : t('quest_pet_breed_placeholder') || 'Select breed'}
@@ -241,7 +241,7 @@ const BreedSelect = ({ breedList, petBreedId, loadingBreeds, onBreedChange, t })
       ))}
       <option value="mixed">{t('quest_pet_breed_mixed') || 'Mixed / Unknown'}</option>
     </select>
-    <p className="text-xs text-gray-400 text-center mt-3">
+    <p className="text-xs text-gray-400 dark:text-gray-500 text-center mt-3">
       {t('quest_breed_optional') || 'This is optional but helps us be more accurate'}
     </p>
   </div>
@@ -265,7 +265,7 @@ const QuestionCard = ({
   if (item.type === 'breed') {
     return (
       <div className="text-center">
-        <h2 className="text-2xl font-bold text-gray-900 mb-6 font-display">
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6 font-display">
           {t('quest_breed_question') || 'What breed is your pet?'}
         </h2>
         <BreedSelect
@@ -286,7 +286,7 @@ const QuestionCard = ({
   return (
     <div className="text-center">
       {/* Question text */}
-      <h2 className="text-2xl font-bold text-gray-900 mb-8 font-display leading-relaxed">
+      <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-8 font-display leading-relaxed">
         {q.code === 'P2' ? (t('quest_age_question') || 'How old is your pet?') : q.text}
       </h2>
 
