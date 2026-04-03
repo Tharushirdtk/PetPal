@@ -8,7 +8,7 @@ const UserModel = {
 
   async findById(id) {
     const rows = await query(
-      'SELECT id, first_name, last_name, email, phone, preferred_language, is_verified, role, created_at FROM mast_user WHERE id = ?',
+      'SELECT id, first_name, last_name, email, phone, preferred_language, theme, is_verified, role, created_at FROM mast_user WHERE id = ?',
       [id]
     );
     return rows[0] || null;
@@ -34,6 +34,11 @@ const UserModel = {
       [first_name, last_name, phone || null, preferred_language || null, id],
       id
     );
+    return this.findById(id);
+  },
+
+  async updateTheme(id, theme) {
+    await query('UPDATE mast_user SET theme = ? WHERE id = ?', [theme, id], id);
     return this.findById(id);
   },
 

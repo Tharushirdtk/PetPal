@@ -91,6 +91,15 @@ exports.updateProfile = asyncHandler(async (req, res) => {
   return ok(res, { user });
 });
 
+exports.updateTheme = asyncHandler(async (req, res) => {
+  const { theme } = req.body;
+  if (![0, 1].includes(theme)) {
+    return fail(res, 'theme must be 0 (light) or 1 (dark)');
+  }
+  const user = await UserModel.updateTheme(req.user.id, theme);
+  return ok(res, { user });
+});
+
 exports.changePassword = asyncHandler(async (req, res) => {
   const { current_password, new_password } = req.body;
   if (!current_password || !new_password) {

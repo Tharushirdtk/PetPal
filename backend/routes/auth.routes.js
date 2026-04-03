@@ -225,6 +225,37 @@ router.get('/me', requireAuth, ctrl.me);
 router.put('/profile', requireAuth, ctrl.updateProfile);
 /**
  * @swagger
+ * /auth/theme:
+ *   put:
+ *     summary: Update the authenticated user's theme preference
+ *     tags: [Authentication]
+ *     security:
+ *       - BearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - theme
+ *             properties:
+ *               theme:
+ *                 type: integer
+ *                 enum: [0, 1]
+ *                 description: "0 = light, 1 = dark"
+ *                 example: 1
+ *     responses:
+ *       200:
+ *         description: Theme updated successfully
+ *       400:
+ *         description: Invalid theme value
+ *       401:
+ *         description: Unauthorized
+ */
+router.put('/theme', requireAuth, ctrl.updateTheme);
+/**
+ * @swagger
  * /auth/password:
  *   put:
  *     summary: Change the authenticated user's password

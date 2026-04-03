@@ -1,9 +1,11 @@
 import { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { getMe } from '../api/auth';
+import { useTheme } from './ThemeContext';
 
 const AuthContext = createContext(null);
 
 export function AuthProvider({ children }) {
+  const { setTheme } = useTheme();
   const [user, setUser] = useState(() => {
     const stored = localStorage.getItem('petpal_user');
     try { return stored ? JSON.parse(stored) : null; } catch { return null; }
@@ -18,6 +20,12 @@ export function AuthProvider({ children }) {
           const u = res.data.user;
           setUser(u);
           localStorage.setItem('petpal_user', JSON.stringify(u));
+
+          // Sync theme preference from user data (database wins over localStorage)
+          if (u.theme !== undefined) {
+            const themeName = u.theme === 1 ? 'dark' : 'light';
+            setTheme(themeName);
+          }
         })
         .catch(() => {
           localStorage.removeItem('petpal_token');
@@ -28,13 +36,19 @@ export function AuthProvider({ children }) {
     } else {
       setLoading(false);
     }
-  }, []);
+  }, [setTheme]);
 
   const loginUser = useCallback((userData, token) => {
     localStorage.setItem('petpal_token', token);
     localStorage.setItem('petpal_user', JSON.stringify(userData));
     setUser(userData);
-  }, []);
+
+    // Sync theme from login user data
+    if (userData.theme !== undefined) {
+      const themeName = userData.theme === 1 ? 'dark' : 'light';
+      setTheme(themeName);
+    }
+  }, [setTheme]);
 
   const logoutUser = useCallback(() => {
     localStorage.removeItem('petpal_token');
