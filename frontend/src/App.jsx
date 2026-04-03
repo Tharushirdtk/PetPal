@@ -1,8 +1,9 @@
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { LanguageProvider } from './i18n/LanguageContext';
 import { AuthProvider } from './context/AuthContext';
 import { ConsultationProvider } from './context/ConsultationContext';
 import ProtectedRoute from './components/ProtectedRoute';
+import LoadingSpinner from './components/LoadingSpinner';
 import LandingPage from './pages/LandingPage';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
@@ -15,6 +16,16 @@ import ImageUploadStep from './pages/ImageUploadStep';
 import DiagnosisReportPage from './pages/DiagnosisReportPage';
 import PetProfilePage from './pages/PetProfilePage';
 import AdminDashboard from './pages/AdminDashboard';
+import { useAuth } from './context/AuthContext';
+
+function HomeRoute() {
+  const { isAuthenticated, loading, user } = useAuth();
+
+  if (loading) return <LoadingSpinner />;
+  if (!isAuthenticated) return <LandingPage />;
+  if (user?.role === 'admin') return <Navigate to="/admin" replace />;
+  return <Navigate to="/dashboard" replace />;
+}
 
 function App() {
   return (
@@ -23,7 +34,7 @@ function App() {
         <ConsultationProvider>
           <BrowserRouter>
             <Routes>
-              <Route path="/" element={<LandingPage />} />
+              <Route path="/" element={<HomeRoute />} />
               <Route path="/login" element={<LoginPage />} />
               <Route path="/register" element={<RegisterPage />} />
               <Route path="/dashboard" element={<ProtectedRoute><PetDashboard /></ProtectedRoute>} />

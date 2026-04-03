@@ -83,7 +83,9 @@ const Navbar = ({ variant = 'default' }) => {
             <span className="font-display font-bold text-lg text-gray-900">PetPal</span>
           </Link>
           <div className="hidden md:flex items-center gap-8">
-            <Link to="/" className={linkClass(isActive('/'))}>{t('nav_home')}</Link>
+            {!isAuthenticated && (
+              <Link to="/" className={linkClass(isActive('/'))}>{t('nav_home')}</Link>
+            )}
             {isAuthenticated ? (
               <Link to="/dashboard" className={linkClass(isActive('/dashboard'))}>{t('nav_dashboard')}</Link>
             ) : (
@@ -108,7 +110,9 @@ const Navbar = ({ variant = 'default' }) => {
         </div>
         {mobileOpen && (
           <div className="md:hidden border-t border-[#E5E7EB] bg-white px-6 py-4 flex flex-col gap-3">
-            <Link to="/" onClick={closeMobile} className="text-sm font-medium text-gray-600 no-underline">{t('nav_home')}</Link>
+            {!isAuthenticated && (
+              <Link to="/" onClick={closeMobile} className="text-sm font-medium text-gray-600 no-underline">{t('nav_home')}</Link>
+            )}
             {isAuthenticated ? (
               <Link to="/dashboard" onClick={closeMobile} className="text-sm font-medium text-gray-600 no-underline">{t('nav_dashboard')}</Link>
             ) : (
@@ -191,7 +195,9 @@ const Navbar = ({ variant = 'default' }) => {
           <span className="font-display font-bold text-lg text-gray-900">PetPal</span>
         </Link>
         <div className="hidden md:flex items-center gap-8">
-          <Link to="/" className={linkClass(isActive('/'))}>{t('nav_home')}</Link>
+          {!isAuthenticated && (
+            <Link to="/" className={linkClass(isActive('/'))}>{t('nav_home')}</Link>
+          )}
           <Link to="/dashboard" className={linkClass(isActive('/dashboard'))}>{t('nav_dashboard')}</Link>
           <Link to="/records" className={linkClass(isActive('/records'))}>{t('nav_records')}</Link>
           {user?.role === 'admin' && (
@@ -217,7 +223,9 @@ const Navbar = ({ variant = 'default' }) => {
       </div>
       {mobileOpen && (
         <div className="md:hidden border-t border-[#E5E7EB] bg-white px-6 py-4 flex flex-col gap-3">
-          <Link to="/" onClick={closeMobile} className="text-sm font-medium text-gray-600 no-underline">{t('nav_home')}</Link>
+          {!isAuthenticated && (
+            <Link to="/" onClick={closeMobile} className="text-sm font-medium text-gray-600 no-underline">{t('nav_home')}</Link>
+          )}
           <Link to="/dashboard" onClick={closeMobile} className="text-sm font-medium text-gray-600 no-underline">{t('nav_dashboard')}</Link>
           <Link to="/records" onClick={closeMobile} className="text-sm font-medium text-gray-600 no-underline">{t('nav_records')}</Link>
           {user?.role === 'admin' && (
