@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "@headlessui/react": "^2.2.9",
+    "@xyflow/react": "^12.10.2",
     "axios": "^1.13.6",
     "html2pdf.js": "^0.14.0",
     "json-logic-js": "^2.0.5",
