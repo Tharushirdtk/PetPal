@@ -1,12 +1,10 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import {
   ChevronLeft,
   ChevronRight,
   ClipboardList,
   AlertTriangle,
-  Dog,
-  Cat,
   MessageCircle,
 } from 'lucide-react';
 import jsonLogic from 'json-logic-js';
@@ -17,22 +15,15 @@ import { useStartConsultation } from '../hooks/useConsultation';
 import { getActiveQuestionnaire, submitResponse, saveContext } from '../api/questionnaire';
 import { getActiveConsultation } from '../api/consultation';
 import { getSpecies, getBreeds, getMyPets } from '../api/pets';
-import { questionFlow, EMERGENCY_RULES } from '../data/mockData';
+import { EMERGENCY_RULES } from '../data/mockData';
 import Navbar from '../components/Navbar';
 import LoadingSpinner from '../components/LoadingSpinner';
 import ErrorAlert from '../components/ErrorAlert';
+import ProgressBar from '../components/questionnaire/ProgressBar';
+import GreetingHeader from '../components/questionnaire/GreetingHeader';
+import QuestionCard from '../components/questionnaire/QuestionCard';
 
-/* ── Step labels ── */
-const STEP_TITLES = {
-  1: { en: 'Pet Details', si: 'සුරතල් විස්තර' },
-  2: { en: 'Main Symptom', si: 'ප්‍රධාන රෝග ලක්ෂණය' },
-  3: { en: 'Symptom Details', si: 'රෝග ලක්ෂණ විස්තර' },
-  4: { en: 'General Assessment', si: 'සාමාන්‍ය තක්සේරුව' },
-};
-
-const TOTAL_STEPS = 4;
-
-/* ── Option colours by index ── */
+/* ── Option colours by index (for API questions) ── */
 const OPTION_COLORS = [
   'bg-green-50 border-green-200',
   'bg-blue-50 border-blue-200',
@@ -60,48 +51,8 @@ const mapApiQuestion = (apiQ) => ({
   visibility_rules: apiQ.visibility_rules || [],
 });
 
-/* ── Map mock question → rendering format ── */
-const mapMockQuestion = (mq, lang) => ({
-  id: mq.code,
-  code: mq.code,
-  text: lang === 'si' ? mq.text_si : mq.text_en,
-  question_type: mq.type === 'yesno' ? 'single' : mq.type,
-  step: mq.step,
-  visibleWhen: mq.visibleWhen || null,
-  options: (mq.options || []).map((opt) => ({
-    value: opt.value,
-    label: lang === 'si' ? opt.label_si : opt.label_en,
-    icon: opt.icon || '',
-    color: opt.color || 'bg-gray-50 border-gray-200',
-    emergencyTrigger: opt.emergencyTrigger || false,
-  })),
-  visibility_rules: [],
-});
-
-/* ── Determine step from question code ── */
-const getStepForCode = (code) => {
-  // Mock data patterns (original)
-  if (/^P\d+$/.test(code)) return 1;
-  if (code === 'SD1') return 2;
-  if (/^SD[234]/.test(code)) return 3;
-  if (/^SD[567]$/.test(code)) return 4;
-
-  // API data patterns (new)
-  if (code === 'q_pet_type') return 1; // Pet Details
-  if (code === 'q_c') return 2; // Main symptom (Which symptoms are present?)
-  if (/^q_[bdfg]$/.test(code)) return 3; // Follow-up questions
-
-  return 0;
-};
-
 /* ── Evaluate visibility ── */
-const isVisible = (question, answers, usingMock) => {
-  if (usingMock) {
-    if (!question.visibleWhen) return true;
-    return Object.entries(question.visibleWhen).every(
-      ([key, val]) => answers[key] === val
-    );
-  }
+const isVisible = (question, answers) => {
   if (!question.visibility_rules || question.visibility_rules.length === 0) return true;
   return question.visibility_rules.every((rule) => {
     try {
@@ -112,16 +63,72 @@ const isVisible = (question, answers, usingMock) => {
   });
 };
 
-/* ── SD1 symptom icons ── */
-const SD1_ICONS = {
-  skin: '\uD83D\uDC3E', vomiting: '\uD83E\uDD2E', diarrhea: '\uD83D\uDCA9', coughing: '\uD83E\uDEC1',
-  injury: '\uD83E\uDE79', appetite_loss: '\uD83C\uDF7D\uFE0F', other: '\u2753',
+/* ── Determine step from question code ── */
+const getStepForCode = (code) => {
+  if (/^P\d+$/.test(code)) return 1;
+  if (code === 'SD1') return 2;
+  if (/^SD[234]/.test(code)) return 3;
+  if (/^SD[567]$/.test(code)) return 4;
+  if (code === 'q_pet_type') return 1;
+  if (code === 'q_c') return 2;
+  if (/^q_[bdfg]$/.test(code)) return 3;
+  return 0;
 };
 
 /* ── Species emoji for selected pet banner ── */
 const speciesEmoji = (name) => {
   const map = { dog: '\uD83D\uDC15', cat: '\uD83D\uDC08' };
   return map[name] || '\uD83D\uDC3E';
+};
+
+/* ── Build flat question sequence ── */
+const buildSequence = (allQuestions, selectedPet) => {
+  const seq = [];
+
+  // Step 1: Pet details (skip for registered pets)
+  if (!selectedPet) {
+    const p1 = allQuestions.find((q) => q.code === 'P1');
+    if (p1) seq.push({ type: 'question', question: p1 });
+
+    // Breed pseudo-question after P1
+    seq.push({ type: 'breed', id: 'BREED' });
+
+    ['P2', 'P3', 'P4', 'P5'].forEach((code) => {
+      const q = allQuestions.find((q2) => q2.code === code);
+      if (q) seq.push({ type: 'question', question: q });
+    });
+  }
+
+  // Step 2: Main symptom
+  const sd1 = allQuestions.find((q) => q.step === 2);
+  if (sd1) seq.push({ type: 'question', question: sd1 });
+
+  // Step 3: Branch questions (preserve order from allQuestions)
+  allQuestions
+    .filter((q) => q.step === 3)
+    .forEach((q) => seq.push({ type: 'question', question: q }));
+
+  // Step 4: General assessment
+  allQuestions
+    .filter((q) => q.step === 4)
+    .forEach((q) => seq.push({ type: 'question', question: q }));
+
+  return seq;
+};
+
+/* ── Check if a sequence item is visible ── */
+const isItemVisible = (item, answers) => {
+  if (item.type === 'breed') return !!answers.P1;
+  if (item.type !== 'question') return false;
+  return isVisible(item.question, answers);
+};
+
+/* ── Check if a question requires manual Next (not auto-advance) ── */
+const needsManualNext = (item) => {
+  if (item.type === 'breed') return true;
+  if (item.type !== 'question') return true;
+  const qt = item.question.question_type;
+  return qt === 'number' || qt === 'text' || qt === 'multi';
 };
 
 /* ════════════════════════════════════════════════════════════════ */
@@ -138,15 +145,23 @@ const QuestionnairePage = () => {
   /* ── Core state ── */
   const [allQuestions, setAllQuestions] = useState([]);
   const [questionnaireId, setQuestionnaireId] = useState(null);
-  const [usingMock, setUsingMock] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [submitting, setSubmitting] = useState(false);
 
-  const [currentStep, setCurrentStep] = useState(petIdFromUrl ? 2 : 1);
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [direction, setDirection] = useState('forward');
   const [answers, setAnswers] = useState({});
   const [showEmergency, setShowEmergency] = useState(false);
   const [emergencyMsg, setEmergencyMsg] = useState('');
+
+  /* Ref to track latest answers for auto-advance */
+  const answersRef = useRef(answers);
+  answersRef.current = answers;
+
+  /* Ref to guard auto-advance race conditions */
+  const currentIndexRef = useRef(0);
+  currentIndexRef.current = currentIndex;
 
   /* ── Pet breed state ── */
   const [speciesList, setSpeciesList] = useState([]);
@@ -169,7 +184,6 @@ const QuestionnairePage = () => {
       return;
     }
 
-    // For registered pets, check if there's an active (in-progress) consultation
     let cancelled = false;
     const checkActive = async () => {
       try {
@@ -223,14 +237,13 @@ const QuestionnairePage = () => {
         if (!pet) return;
         setSelectedPet(pet);
 
-        // Pre-fill answers from pet data
         const prefilled = {};
         const speciesName = (pet.species?.name || '').toLowerCase();
         if (speciesName === 'dog' || speciesName === 'cat') {
           prefilled.P1 = speciesName;
         }
         if (pet.birth_year) {
-          prefilled.P2 = String(new Date().getFullYear() - pet.birth_year);
+          prefilled.P2 = { years: String(new Date().getFullYear() - pet.birth_year), months: '', days: '' };
         }
         if (pet.gender && pet.gender !== 'Unknown') {
           prefilled.P3 = pet.gender.toLowerCase();
@@ -244,7 +257,6 @@ const QuestionnairePage = () => {
 
         setAnswers((prev) => ({ ...prefilled, ...prev }));
 
-        // Pre-fill breed
         if (pet.breed) {
           setPetBreedId(String(pet.breed.id || ''));
           setPetBreedName(pet.breed.description || pet.breed.name || '');
@@ -266,39 +278,21 @@ const QuestionnairePage = () => {
 
         const data = res.data;
         const apiQs = (data?.questions || []).map(mapApiQuestion);
-        const usable = apiQs.filter((q) => (q.question_type !== 'single' && q.question_type !== 'multi') || (q.options && q.options.length > 0));
 
-        if (usable.length > 0) {
-          /* Assign step based on code */
-          usable.forEach((q) => { q.step = getStepForCode(q.code); });
-
-          /* The 4-step wizard needs P1-P5 for Step 1.
-             If API questions don't include them, fall back to mock
-             which has the full question flow. */
-          const hasStep1 = usable.some((q) => /^P\d+$/.test(q.code));
-          const hasStep2 = usable.some((q) => q.step === 2);
-          const hasStep4 = usable.some((q) => q.step === 4);
-
-          if (hasStep1 && hasStep2 && hasStep4) {
-            setQuestionnaireId(data.questionnaire?.id);
-            setAllQuestions(usable);
-            setUsingMock(false);
-          } else {
-            loadMock();
-          }
+        if (apiQs.length > 0) {
+          apiQs.forEach((q) => { q.step = getStepForCode(q.code); });
+          setQuestionnaireId(data.questionnaire?.id);
+          setAllQuestions(apiQs);
         } else {
-          loadMock();
+          setError('No questions found in the questionnaire. Please check the database.');
         }
-      } catch {
-        if (!cancelled) loadMock();
+      } catch (err) {
+        if (!cancelled) {
+          setError(err?.message || 'Failed to load questionnaire from the server.');
+        }
       } finally {
         if (!cancelled) setLoading(false);
       }
-    };
-    const loadMock = () => {
-      setAllQuestions(questionFlow.map((q) => mapMockQuestion(q, lang)));
-      setUsingMock(true);
-      setQuestionnaireId(null);
     };
     load();
     return () => { cancelled = true; };
@@ -309,9 +303,9 @@ const QuestionnairePage = () => {
     getSpecies()
       .then((res) => {
         const list = res.data?.species || (Array.isArray(res.data) ? res.data : []);
-        setSpeciesList(list.length > 0 ? list : [{ id: 1, name: 'Dog' }, { id: 2, name: 'Cat' }]);
+        setSpeciesList(list.length > 0 ? list : []);
       })
-      .catch(() => setSpeciesList([{ id: 1, name: 'Dog' }, { id: 2, name: 'Cat' }]));
+      .catch(() => setSpeciesList([]));
   }, []);
 
   /* ── Load breeds when pet type changes ── */
@@ -321,7 +315,6 @@ const QuestionnairePage = () => {
     const species = speciesList.find((s) => s.name.toLowerCase() === petType.toLowerCase());
     if (!species) return;
     setLoadingBreeds(true);
-    // Don't wipe pre-filled breed when pet comes from URL
     if (!petIdFromUrl || !petBreedId) {
       setPetBreedId('');
       setPetBreedName('');
@@ -335,14 +328,30 @@ const QuestionnairePage = () => {
       .finally(() => setLoadingBreeds(false));
   }, [petType, speciesList]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  /* ── Get questions for a step ── */
-  const getStepQuestions = useCallback((step) => {
-    return allQuestions.filter((q) => {
-      if (q.step !== step) return false;
-      if (step === 3) return isVisible(q, answers, usingMock);
-      return true;
-    });
-  }, [allQuestions, answers, usingMock]);
+  /* ── Build question sequence ── */
+  const questionSequence = useMemo(
+    () => buildSequence(allQuestions, selectedPet),
+    [allQuestions, selectedPet]
+  );
+
+  /* ── Navigation helpers ── */
+  const findNextVisible = useCallback((fromIndex) => {
+    for (let i = fromIndex + 1; i < questionSequence.length; i++) {
+      if (isItemVisible(questionSequence[i], answers)) return i;
+    }
+    return -1;
+  }, [questionSequence, answers]);
+
+  const findPrevVisible = useCallback((fromIndex) => {
+    for (let i = fromIndex - 1; i >= 0; i--) {
+      if (isItemVisible(questionSequence[i], answers)) return i;
+    }
+    return -1;
+  }, [questionSequence, answers]);
+
+  const isLastVisibleQuestion = useCallback(() => {
+    return findNextVisible(currentIndex) === -1;
+  }, [findNextVisible, currentIndex]);
 
   /* ── Emergency check ── */
   const checkEmergency = useCallback((code, value) => {
@@ -357,70 +366,25 @@ const QuestionnairePage = () => {
     }
   }, [t]);
 
-  /* ── Answer handler ── */
-  const handleAnswer = (code, value) => {
-    setAnswers((prev) => ({ ...prev, [code]: value }));
-    checkEmergency(code, value);
-  };
-
-  /* ── Validate current step ── */
-  const isStepValid = () => {
-    const qs = getStepQuestions(currentStep);
-    if (currentStep === 1) {
-      // Registered pet — already filled, always valid
-      if (selectedPet) return true;
-      if (!answers.P1) return false;
-      if (!answers.P2) return false;
-      if (!answers.P3) return false;
-      if (!answers.P4) return false;
-      if (!answers.P5) return false;
-      return true;
-    }
-    return qs.every((q) => {
-      const val = answers[q.code];
-      if (q.question_type === 'text') return true; // text is optional
-      return val !== undefined && val !== '';
-    });
-  };
-
-  /* ── Navigation ── */
-  const handleNext = async () => {
-    if (currentStep < TOTAL_STEPS) {
-      let next = currentStep + 1;
-      // Auto-skip step 3 if no visible branch questions
-      if (next === 3 && getStepQuestions(3).length === 0) next = 4;
-      setCurrentStep(next);
-    } else {
-      await handleSubmit();
-    }
-  };
-
-  const handleBack = () => {
-    if (currentStep > 1) {
-      let prev = currentStep - 1;
-      // Auto-skip step 3 back if no visible branch questions
-      if (prev === 3 && getStepQuestions(3).length === 0) prev = 2;
-      // Skip step 1 for registered pets — go back to dashboard
-      if (prev === 1 && selectedPet) {
-        navigate('/dashboard');
-        return;
-      }
-      setCurrentStep(prev);
-    }
-  };
-
   /* ── Submit ── */
   const handleSubmit = async () => {
     try {
       setSubmitting(true);
       setError(null);
 
-      /* Build structured payload */
+      /* Format P2 age from { years, months, days } */
+      const ageObj = (typeof answers.P2 === 'object' && answers.P2) || {};
+      const ageParts = [];
+      if (ageObj.years && ageObj.years !== '') ageParts.push(`${ageObj.years} year${ageObj.years === '1' ? '' : 's'}`);
+      if (ageObj.months && ageObj.months !== '' && ageObj.months !== 'not_sure') ageParts.push(`${ageObj.months} month${ageObj.months === '1' ? '' : 's'}`);
+      if (ageObj.days && ageObj.days !== '' && ageObj.days !== 'not_sure') ageParts.push(`${ageObj.days} day${ageObj.days === '1' ? '' : 's'}`);
+
       const payload = {
         pet: {
           type: answers.P1,
           breed: petBreedName || 'Unknown',
-          age: answers.P2,
+          age: ageParts.length > 0 ? ageParts.join(', ') : 'Unknown',
+          age_details: ageObj,
           gender: answers.P3,
           neutered: answers.P4,
           vaccinated: answers.P5,
@@ -435,24 +399,29 @@ const QuestionnairePage = () => {
         emergency_flags: [],
       };
 
-      /* Collect branch answers */
       Object.keys(answers).forEach((code) => {
         if (/^SD[234]_/.test(code)) {
           payload.symptom_details[code] = answers[code];
         }
       });
 
-      /* Emergency flags */
       Object.entries(EMERGENCY_RULES).forEach(([code, triggerVal]) => {
         if (answers[code] === triggerVal) payload.emergency_flags.push(code);
       });
 
-      /* 1. Submit formal response if API questions */
-      if (!usingMock && questionnaireId) {
+      if (questionnaireId) {
         const formattedAnswers = Object.entries(answers)
           .map(([code, value]) => {
             const qObj = allQuestions.find((q) => q.code === code);
             if (!qObj) return null;
+            // P2 age: send years as the number
+            if (code === 'P2' && typeof value === 'object') {
+              return {
+                question_id: qObj.id,
+                answer_number: value.years ? parseFloat(value.years) : undefined,
+                free_text: ageParts.join(', ') || undefined,
+              };
+            }
             return {
               question_id: qObj.id,
               selected_option_value_key: qObj.question_type === 'single' ? String(value) : undefined,
@@ -473,7 +442,6 @@ const QuestionnairePage = () => {
         }
       }
 
-      /* 2. Save to llm_context */
       if (consultationId) {
         try {
           await saveContext({ consultation_id: consultationId, answers: payload });
@@ -482,10 +450,7 @@ const QuestionnairePage = () => {
         }
       }
 
-      /* 3. Save pet info to context for right sidebar */
       savePetInfo(payload.pet);
-
-      /* Navigate to optional image upload step */
       navigate('/image-upload');
     } catch (err) {
       setError(err?.message || 'Failed to submit questionnaire.');
@@ -494,231 +459,149 @@ const QuestionnairePage = () => {
     }
   };
 
-  /* ── Progress ── */
-  const progress = selectedPet
-    ? Math.round(((currentStep - 1) / (TOTAL_STEPS - 1)) * 100)
-    : Math.round((currentStep / TOTAL_STEPS) * 100);
-  const stepTitle = STEP_TITLES[currentStep]?.[lang] || STEP_TITLES[currentStep]?.en || '';
-
-  /* ── Render helpers ── */
-  const getOptionBg = (color) => {
-    // Extract only the bg-* class from the option color, ignore border-* (we control borders for selection)
-    if (!color) return 'bg-gray-50';
-    return color.split(' ').filter((c) => c.startsWith('bg-')).join(' ') || 'bg-gray-50';
-  };
-
-  const renderOptionButton = (q, opt, isSelected) => (
-    <button
-      key={opt.value}
-      type="button"
-      onClick={() => handleAnswer(q.code, opt.value)}
-      className={`rounded-xl border-2 p-4 flex items-center gap-3 text-left cursor-pointer transition-all duration-200
-        ${getOptionBg(opt.color)}
-        ${isSelected
-          ? 'border-[#7C3AED] ring-2 ring-[#7C3AED]/20 scale-[1.02] shadow-sm'
-          : 'border-gray-200 hover:border-gray-300 hover:shadow-sm'
-        }`}
-    >
-      {opt.icon && <span className="text-xl flex-shrink-0">{opt.icon}</span>}
-      <span className="text-sm font-medium text-gray-700">{opt.label}</span>
-    </button>
-  );
-
-  const renderQuestion = (q) => {
-    const val = answers[q.code];
-    return (
-      <div key={q.code} className="mb-5">
-        <label className="block text-sm font-medium text-gray-700 mb-2">{q.text}</label>
-
-        {(q.question_type === 'single' || q.question_type === 'boolean') && (
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            {q.options.map((opt) => renderOptionButton(q, opt, val === opt.value))}
-          </div>
-        )}
-
-        {q.question_type === 'number' && (
-          <input
-            type="number"
-            min="0"
-            max="30"
-            value={val || ''}
-            onChange={(e) => handleAnswer(q.code, e.target.value)}
-            placeholder={t('quest_enter_number') || 'Enter a number...'}
-            className="w-full border-2 border-gray-200 rounded-xl p-3 text-sm text-gray-700 outline-none focus:border-[#7C3AED] transition-colors"
-          />
-        )}
-
-        {q.question_type === 'text' && (
-          <textarea
-            value={val || ''}
-            onChange={(e) => handleAnswer(q.code, e.target.value)}
-            placeholder={t('quest_type_answer') || 'Type your answer...'}
-            rows={3}
-            className="w-full border-2 border-gray-200 rounded-xl p-3 text-sm text-gray-700 outline-none focus:border-[#7C3AED] transition-colors resize-none"
-          />
-        )}
-      </div>
-    );
-  };
-
-  /* ── Render Step 1: Pet Details ── */
-  const renderStep1 = () => {
-    const p1 = allQuestions.find((q) => q.code === 'P1');
-    const p2 = allQuestions.find((q) => q.code === 'P2');
-    const p3 = allQuestions.find((q) => q.code === 'P3');
-    const p4 = allQuestions.find((q) => q.code === 'P4');
-    const p5 = allQuestions.find((q) => q.code === 'P5');
-
-    return (
-      <div className="space-y-5">
-        {/* P1: Pet Type — special icon buttons */}
-        {p1 && (
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">{p1.text}</label>
-            <div className="grid grid-cols-2 gap-3">
-              <button
-                type="button"
-                onClick={() => handleAnswer('P1', 'dog')}
-                className={`rounded-xl border-2 p-4 flex flex-col items-center gap-2 cursor-pointer transition-all duration-200
-                  bg-orange-50
-                  ${answers.P1 === 'dog'
-                    ? 'border-[#7C3AED] ring-2 ring-[#7C3AED]/20 scale-[1.02] shadow-sm'
-                    : 'border-gray-200 hover:border-gray-300 hover:shadow-sm'
-                  }`}
-              >
-                <Dog className="w-8 h-8 text-orange-500" />
-                <span className="text-sm font-medium text-gray-700">{t('quest_pet_type_dog') || 'Dog'}</span>
-              </button>
-              <button
-                type="button"
-                onClick={() => handleAnswer('P1', 'cat')}
-                className={`rounded-xl border-2 p-4 flex flex-col items-center gap-2 cursor-pointer transition-all duration-200
-                  bg-purple-50
-                  ${answers.P1 === 'cat'
-                    ? 'border-[#7C3AED] ring-2 ring-[#7C3AED]/20 scale-[1.02] shadow-sm'
-                    : 'border-gray-200 hover:border-gray-300 hover:shadow-sm'
-                  }`}
-              >
-                <Cat className="w-8 h-8 text-purple-500" />
-                <span className="text-sm font-medium text-gray-700">{t('quest_pet_type_cat') || 'Cat'}</span>
-              </button>
-            </div>
-          </div>
-        )}
-
-        {/* Breed dropdown (shown when pet type selected) */}
-        {petType && (
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              {t('quest_pet_breed') || 'Breed'}
-            </label>
-            <select
-              value={petBreedId}
-              onChange={(e) => {
-                const id = e.target.value;
-                setPetBreedId(id);
-                if (id === 'mixed') {
-                  setPetBreedName('Mixed / Unknown');
-                } else {
-                  const breed = breedList.find((b) => String(b.id) === id);
-                  setPetBreedName(breed?.description || breed?.name || '');
-                }
-              }}
-              disabled={loadingBreeds}
-              className="w-full border-2 border-gray-200 rounded-xl p-3 text-sm text-gray-700 outline-none focus:border-[#7C3AED] transition-colors bg-white"
-            >
-              <option value="">
-                {loadingBreeds ? '...' : t('quest_pet_breed_placeholder') || 'Select breed'}
-              </option>
-              {breedList.map((breed) => (
-                <option key={breed.id} value={breed.id}>{breed.description || breed.name}</option>
-              ))}
-              <option value="mixed">{t('quest_pet_breed_mixed') || 'Mixed / Unknown'}</option>
-            </select>
-          </div>
-        )}
-
-        {/* P2: Age */}
-        {p2 && (
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">{p2.text}</label>
-            <input
-              type="number"
-              min="0"
-              max="30"
-              value={answers.P2 || ''}
-              onChange={(e) => handleAnswer('P2', e.target.value)}
-              placeholder={t('quest_pet_age_placeholder') || 'Enter age'}
-              className="w-full border-2 border-gray-200 rounded-xl p-3 text-sm text-gray-700 outline-none focus:border-[#7C3AED] transition-colors"
-            />
-          </div>
-        )}
-
-        {/* P3: Gender */}
-        {p3 && renderQuestion(p3)}
-
-        {/* P4: Neutered/Spayed */}
-        {p4 && renderQuestion(p4)}
-
-        {/* P5: Vaccinated */}
-        {p5 && renderQuestion(p5)}
-      </div>
-    );
-  };
-
-  /* ── Render Step 2: Main Symptom ── */
-  const renderStep2 = () => {
-    const sd1 = allQuestions.find((q) => q.step === 2);
-    if (!sd1) return null;
-    return (
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-3">{sd1.text}</label>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-          {sd1.options.map((opt) => {
-            const icon = SD1_ICONS[opt.value] || opt.icon || '❓';
-            const isSelected = answers[sd1.code] === opt.value;
-            return (
-              <button
-                key={opt.value}
-                type="button"
-                onClick={() => handleAnswer(sd1.code, opt.value)}
-                className={`rounded-xl border-2 p-4 flex items-center gap-3 text-left cursor-pointer transition-all duration-200
-                  ${getOptionBg(opt.color)}
-                  ${isSelected
-                    ? 'border-[#7C3AED] ring-2 ring-[#7C3AED]/20 scale-[1.02] shadow-sm'
-                    : 'border-gray-200 hover:border-gray-300 hover:shadow-sm'
-                  }`}
-              >
-                <span className="text-2xl flex-shrink-0">{icon}</span>
-                <span className="text-sm font-medium text-gray-700">{opt.label}</span>
-              </button>
-            );
-          })}
-        </div>
-      </div>
-    );
-  };
-
-  /* ── Render Step 3: Branch Questions ── */
-  const renderStep3 = () => {
-    const qs = getStepQuestions(3);
-    if (qs.length === 0) {
-      return (
-        <div className="text-center py-8 text-gray-400 text-sm">
-          {t('quest_no_branch') || 'No specific follow-up questions for this symptom.'}
-        </div>
-      );
+  /* ── Navigate forward ── */
+  const handleNext = async () => {
+    const next = findNextVisible(currentIndex);
+    if (next === -1) {
+      // Last question — submit
+      await handleSubmit();
+    } else {
+      setDirection('forward');
+      setCurrentIndex(next);
     }
-    return <div className="space-y-1">{qs.map(renderQuestion)}</div>;
   };
 
-  /* ── Render Step 4: Global Questions ── */
-  const renderStep4 = () => {
-    const qs = getStepQuestions(4);
-    return <div className="space-y-1">{qs.map(renderQuestion)}</div>;
+  /* ── Navigate backward ── */
+  const handleBack = () => {
+    const prev = findPrevVisible(currentIndex);
+    if (prev === -1) {
+      // At first question
+      if (selectedPet) {
+        navigate('/dashboard');
+      }
+      return;
+    }
+    setDirection('backward');
+    setCurrentIndex(prev);
   };
 
-  const stepRenderers = { 1: renderStep1, 2: renderStep2, 3: renderStep3, 4: renderStep4 };
+  /* ── Answer handler with auto-advance ── */
+  const handleAnswer = useCallback((code, value) => {
+    setAnswers((prev) => {
+      const updated = { ...prev, [code]: value };
+
+      // When SD1 changes, clear old branch answers
+      if (code === 'SD1' && prev.SD1 && prev.SD1 !== value) {
+        Object.keys(updated).forEach((key) => {
+          if (/^SD[234]_/.test(key)) delete updated[key];
+        });
+      }
+
+      return updated;
+    });
+    checkEmergency(code, value);
+
+    // Auto-advance for single-select / boolean (not for number/text/breed)
+    const currentItem = questionSequence[currentIndexRef.current];
+    if (
+      currentItem?.type === 'question' &&
+      (currentItem.question.question_type === 'single' || currentItem.question.question_type === 'boolean')
+    ) {
+      const savedIndex = currentIndexRef.current;
+      setTimeout(() => {
+        // Guard: only advance if user hasn't already navigated
+        if (currentIndexRef.current !== savedIndex) return;
+
+        // Use latest answers (via ref) so visibility is computed with the new answer
+        const latestAnswers = { ...answersRef.current, [code]: value };
+        let next = -1;
+        for (let i = savedIndex + 1; i < questionSequence.length; i++) {
+          if (isItemVisible(questionSequence[i], latestAnswers)) {
+            next = i;
+            break;
+          }
+        }
+        if (next === -1) {
+          // Last question — don't auto-submit, let user click the button
+          return;
+        }
+        setDirection('forward');
+        setCurrentIndex(next);
+      }, 350);
+    }
+  }, [questionSequence, checkEmergency]);
+
+  /* ── Breed change handler ── */
+  const handleBreedChange = useCallback((id) => {
+    setPetBreedId(id);
+    if (id === 'mixed') {
+      setPetBreedName('Mixed / Unknown');
+    } else {
+      const breed = breedList.find((b) => String(b.id) === id);
+      setPetBreedName(breed?.description || breed?.name || '');
+    }
+  }, [breedList]);
+
+  /* ── Check if current item has a valid answer (for Next button) ── */
+  const isCurrentValid = () => {
+    const item = questionSequence[currentIndex];
+    if (!item) return false;
+    if (item.type === 'breed') return true; // breed is optional
+    if (item.type !== 'question') return false;
+    const q = item.question;
+    if (q.question_type === 'text') return true; // text is optional
+    const val = answers[q.code];
+    // P2 age: valid if years is filled
+    if (q.code === 'P2') {
+      return typeof val === 'object' && val && val.years !== '' && val.years !== undefined;
+    }
+    if (q.question_type === 'multi') return Array.isArray(val) && val.length > 0;
+    return val !== undefined && val !== '';
+  };
+
+  /* ── Progress calculation ── */
+  const visibleQuestions = useMemo(() => {
+    return questionSequence.filter((item) =>
+      item.type === 'question' && isItemVisible(item, answers)
+    );
+  }, [questionSequence, answers]);
+
+  const answeredCount = useMemo(() => {
+    return visibleQuestions.filter((item) => {
+      const val = answers[item.question.code];
+      // P2 age object: answered if years is filled
+      if (item.question.code === 'P2') {
+        return typeof val === 'object' && val && val.years !== '' && val.years !== undefined;
+      }
+      if (Array.isArray(val)) return val.length > 0;
+      return val !== undefined && val !== '';
+    }).length;
+  }, [visibleQuestions, answers]);
+
+  const totalVisible = visibleQuestions.length;
+  const progress = totalVisible > 0 ? Math.round((answeredCount / totalVisible) * 100) : 0;
+
+  /* ── Current visible question number (for "Question X of Y") ── */
+  const currentVisibleIndex = useMemo(() => {
+    let count = 0;
+    for (let i = 0; i < questionSequence.length; i++) {
+      if (isItemVisible(questionSequence[i], answers)) {
+        count++;
+        if (i === currentIndex) return count;
+      }
+    }
+    return count;
+  }, [questionSequence, answers, currentIndex]);
+
+  const totalVisibleItems = useMemo(() => {
+    return questionSequence.filter((item) => isItemVisible(item, answers)).length;
+  }, [questionSequence, answers]);
+
+  /* ── Current item ── */
+  const currentItem = questionSequence[currentIndex];
+  const showManualNext = currentItem ? needsManualNext(currentItem) : true;
+  const isLast = isLastVisibleQuestion();
+  const canGoBack = findPrevVisible(currentIndex) !== -1;
 
   /* ════════════  JSX  ════════════ */
   return (
@@ -727,7 +610,7 @@ const QuestionnairePage = () => {
 
       {/* Emergency Banner */}
       {showEmergency && (
-        <div className="max-w-2xl mx-auto mt-4 px-4">
+        <div className="max-w-xl mx-auto mt-4 px-4">
           <div className="bg-red-50 border border-red-200 rounded-2xl p-4 flex items-start gap-3">
             <AlertTriangle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
             <div className="flex-1">
@@ -738,7 +621,7 @@ const QuestionnairePage = () => {
             </div>
             <button
               onClick={() => setShowEmergency(false)}
-              className="text-red-400 hover:text-red-600 text-lg font-bold leading-none"
+              className="text-red-400 hover:text-red-600 text-lg font-bold leading-none cursor-pointer"
             >
               &times;
             </button>
@@ -764,14 +647,14 @@ const QuestionnairePage = () => {
             <div className="flex flex-col gap-3">
               <button
                 onClick={handleResumePrevious}
-                className="w-full flex items-center justify-center gap-2 bg-[#7C3AED] text-white rounded-xl px-4 py-3 font-semibold hover:bg-[#6D28D9] transition-colors"
+                className="w-full flex items-center justify-center gap-2 bg-[#7C3AED] text-white rounded-xl px-4 py-3 font-semibold hover:bg-[#6D28D9] transition-colors cursor-pointer"
               >
                 <MessageCircle className="w-4 h-4" />
                 {t('quest_resume_continue') || 'Continue Previous Diagnosis'}
               </button>
               <button
                 onClick={handleStartNew}
-                className="w-full flex items-center justify-center gap-2 bg-white text-gray-700 border border-gray-200 rounded-xl px-4 py-3 font-semibold hover:bg-gray-50 transition-colors"
+                className="w-full flex items-center justify-center gap-2 bg-white text-gray-700 border border-gray-200 rounded-xl px-4 py-3 font-semibold hover:bg-gray-50 transition-colors cursor-pointer"
               >
                 <ClipboardList className="w-4 h-4" />
                 {t('quest_resume_new') || 'Start New Diagnosis'}
@@ -782,38 +665,7 @@ const QuestionnairePage = () => {
       )}
 
       {/* Main Content */}
-      <div className="max-w-2xl mx-auto px-4 py-8">
-        {/* Page Header */}
-        <div className="flex items-center gap-3 mb-6">
-          <div className="h-10 w-10 rounded-full bg-[#F5F3FF] flex items-center justify-center">
-            <ClipboardList className="w-5 h-5 text-[#7C3AED]" />
-          </div>
-          <div>
-            <h1 className="text-lg font-bold text-gray-900">
-              {t('quest_title') || 'Pet Health Questionnaire'}
-            </h1>
-            <p className="text-xs text-gray-400">
-              {t('quest_subtitle') || "Answer a few questions to help us understand your pet's condition."}
-            </p>
-          </div>
-        </div>
-
-        {/* Selected pet banner */}
-        {selectedPet && (
-          <div className="bg-purple-50 border border-purple-200 rounded-xl p-3 mb-4 flex items-center gap-3">
-            <div className="w-8 h-8 rounded-full bg-white flex items-center justify-center text-lg">
-              {speciesEmoji((selectedPet.species?.name || '').toLowerCase())}
-            </div>
-            <div>
-              <p className="text-sm font-semibold text-gray-900">
-                Diagnosing: {selectedPet.name}
-              </p>
-              <p className="text-xs text-gray-500">
-                {selectedPet.species?.name}{selectedPet.breed ? ` \u2022 ${selectedPet.breed.description || selectedPet.breed.name}` : ''}
-              </p>
-            </div>
-          </div>
-        )}
+      <div className="max-w-xl mx-auto px-4 py-8">
 
         {/* Loading */}
         {loading && (
@@ -835,71 +687,90 @@ const QuestionnairePage = () => {
           </div>
         )}
 
-        {/* Wizard Card */}
-        {!loading && !error && allQuestions.length > 0 && (
+        {/* Conversational Questionnaire */}
+        {!loading && !error && allQuestions.length > 0 && currentItem && (
           <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
             {/* Progress Bar */}
-            <div className="px-6 pt-5 pb-0">
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-xs font-semibold text-gray-500 tracking-wide">
-                  {selectedPet
-                    ? `${t('quest_step') || 'STEP'} ${currentStep - 1} ${t('quest_of') || 'OF'} ${TOTAL_STEPS - 1}`
-                    : `${t('quest_step') || 'STEP'} ${currentStep} ${t('quest_of') || 'OF'} ${TOTAL_STEPS}`
-                  }
-                </span>
-                <span className="text-xs font-semibold text-[#7C3AED]">
-                  {progress}% {t('quest_complete') || 'Complete'}
-                </span>
+            <div className="px-6 pt-5">
+              <ProgressBar
+                progress={progress}
+                currentQuestion={currentVisibleIndex}
+                totalQuestions={totalVisibleItems}
+              />
+            </div>
+
+            {/* Selected Pet Banner */}
+            {selectedPet && (
+              <div className="mx-6 mb-2 bg-purple-50 border border-purple-200 rounded-xl p-3 flex items-center gap-3">
+                <div className="w-8 h-8 rounded-full bg-white flex items-center justify-center text-lg">
+                  {speciesEmoji((selectedPet.species?.name || '').toLowerCase())}
+                </div>
+                <div>
+                  <p className="text-sm font-semibold text-gray-900">
+                    {t('quest_diagnosing') || 'Diagnosing'}: {selectedPet.name}
+                  </p>
+                  <p className="text-xs text-gray-500">
+                    {selectedPet.species?.name}{selectedPet.breed ? ` \u2022 ${selectedPet.breed.description || selectedPet.breed.name}` : ''}
+                  </p>
+                </div>
               </div>
-              <div className="h-2 rounded-full bg-gray-100 overflow-hidden">
-                <div
-                  className="h-full rounded-full bg-[#7C3AED] transition-all duration-500"
-                  style={{ width: `${progress}%` }}
+            )}
+
+            {/* Greeting */}
+            <div className="px-6 pt-4">
+              <GreetingHeader
+                currentItem={currentItem}
+                petName={selectedPet?.name}
+              />
+            </div>
+
+            {/* Question Card with animation */}
+            <div className="px-6 pb-6 min-h-[280px] flex items-center">
+              <div
+                key={currentIndex}
+                className={`w-full ${direction === 'forward' ? 'animate-slide-in-right' : 'animate-slide-in-left'}`}
+              >
+                <QuestionCard
+                  item={currentItem}
+                  answers={answers}
+                  onAnswer={handleAnswer}
+                  breedList={breedList}
+                  petBreedId={petBreedId}
+                  loadingBreeds={loadingBreeds}
+                  onBreedChange={handleBreedChange}
                 />
               </div>
             </div>
 
-            {/* Step Title */}
-            <div className="px-6 pt-5 pb-2">
-              <h2 className="text-base font-semibold text-gray-900 leading-relaxed">{stepTitle}</h2>
-              {currentStep === 1 && (
-                <p className="text-xs text-gray-400 mt-1">
-                  {t('quest_pet_info_subtitle') || 'This helps us provide a more accurate diagnosis.'}
-                </p>
-              )}
-            </div>
-
-            {/* Step Content */}
-            <div className="px-6 pb-4">
-              {stepRenderers[currentStep]?.()}
-            </div>
-
-            {/* Footer */}
+            {/* Footer: Back / Next */}
             <div className="border-t border-gray-100 px-6 py-4">
               <div className="flex items-center justify-between">
                 <button
                   type="button"
                   onClick={handleBack}
-                  disabled={currentStep <= 1}
+                  disabled={!canGoBack && !selectedPet}
                   className="flex items-center gap-1 text-sm text-gray-500 hover:text-gray-700 transition-colors disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
                 >
                   <ChevronLeft className="w-4 h-4" />
                   {t('quest_back') || 'Back'}
                 </button>
 
-                <button
-                  type="button"
-                  onClick={handleNext}
-                  disabled={!isStepValid() || submitting}
-                  className="flex items-center gap-1 px-6 py-2.5 rounded-full bg-[#7C3AED] text-white text-sm font-medium hover:bg-[#6D28D9] transition-colors disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
-                >
-                  {submitting
-                    ? t('quest_submitting') || 'Submitting...'
-                    : currentStep >= TOTAL_STEPS
-                      ? t('quest_finish') || 'Finish'
-                      : t('quest_next') || 'Next Step'}
-                  {!submitting && <ChevronRight className="w-4 h-4" />}
-                </button>
+                {/* Show Next/Submit button for manual-next items, or when it's the last question */}
+                {(showManualNext || isLast) && (
+                  <button
+                    type="button"
+                    onClick={handleNext}
+                    disabled={!isCurrentValid() || submitting}
+                    className="flex items-center gap-1 px-6 py-2.5 rounded-full bg-[#7C3AED] text-white text-sm font-medium hover:bg-[#6D28D9] transition-colors disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
+                  >
+                    {submitting
+                      ? t('quest_submitting') || 'Submitting...'
+                      : isLast
+                        ? t('quest_finish') || 'Finish'
+                        : t('quest_next') || 'Next'}
+                    {!submitting && <ChevronRight className="w-4 h-4" />}
+                  </button>
+                )}
               </div>
             </div>
           </div>
