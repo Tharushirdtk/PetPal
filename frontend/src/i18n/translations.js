@@ -394,6 +394,12 @@ export const translations = {
     admin_tab_analytics: "Analytics",
     admin_tab_users: "Users",
 
+    // Admin Dashboard Categories
+    admin_category_dashboard: "Dashboard",
+    admin_category_content: "Content Management",
+    admin_category_user_management: "User Management",
+    admin_category_analytics: "Analytics",
+
     // Admin Users Tab
     admin_users_title: "Registered Users",
     admin_users_total: "users total",
@@ -1082,6 +1088,12 @@ export const translations = {
     admin_tab_contacts: "සම්බන්ධතා",
     admin_tab_users: "පරිශීලකයන්",
     admin_tab_analytics: "විශ්ලේෂණ",
+
+    // Admin Dashboard Categories (SI)
+    admin_category_dashboard: "උපකරණ පුවරුව",
+    admin_category_content: "අන්තර්ගත කළමනාකරණය",
+    admin_category_user_management: "පරිශීලක කළමනාකරණය",
+    admin_category_analytics: "විශ්ලේෂණ",
 
     // Admin Overview
     admin_welcome: "පරිපාලක උපකරණ පුවරුව",
