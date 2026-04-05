@@ -289,4 +289,245 @@ router.put('/contacts/:id', ctrl.updateContactStatus);
 
 router.get('/users', ctrl.listUsers);
 
+// --- Emergency Patterns Routes ---
+
+/**
+ * @swagger
+ * /admin/emergency-patterns:
+ *   get:
+ *     summary: List emergency detection patterns
+ *     tags: [Admin - Emergency Patterns]
+ *     security:
+ *       - BearerAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: page
+ *         schema: { type: integer, default: 1 }
+ *       - in: query
+ *         name: limit
+ *         schema: { type: integer, default: 20 }
+ *       - in: query
+ *         name: search
+ *         schema: { type: string }
+ *         description: Search in name, description, or warning message
+ *       - in: query
+ *         name: severity
+ *         schema: { type: string, enum: [LOW, MEDIUM, HIGH, CRITICAL] }
+ *     responses:
+ *       200:
+ *         description: Paginated list of emergency patterns
+ */
+router.get('/emergency-patterns', ctrl.listEmergencyPatterns);
+
+/**
+ * @swagger
+ * /admin/emergency-patterns/stats:
+ *   get:
+ *     summary: Get emergency patterns statistics
+ *     tags: [Admin - Emergency Patterns]
+ *     security:
+ *       - BearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Emergency patterns statistics
+ */
+router.get('/emergency-patterns/stats', ctrl.getEmergencyPatternStats);
+
+/**
+ * @swagger
+ * /admin/emergency-patterns/test:
+ *   post:
+ *     summary: Test a regex pattern against text
+ *     tags: [Admin - Emergency Patterns]
+ *     security:
+ *       - BearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [pattern_regex, test_text]
+ *             properties:
+ *               pattern_regex: { type: string }
+ *               test_text: { type: string }
+ *     responses:
+ *       200:
+ *         description: Test results
+ */
+router.post('/emergency-patterns/test', ctrl.testEmergencyPattern);
+
+/**
+ * @swagger
+ * /admin/emergency-patterns/priorities:
+ *   put:
+ *     summary: Bulk update pattern priorities
+ *     tags: [Admin - Emergency Patterns]
+ *     security:
+ *       - BearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [priority_updates]
+ *             properties:
+ *               priority_updates:
+ *                 type: array
+ *                 items:
+ *                   type: object
+ *                   properties:
+ *                     id: { type: integer }
+ *                     priority: { type: integer }
+ *     responses:
+ *       200:
+ *         description: Priorities updated successfully
+ */
+router.put('/emergency-patterns/priorities', ctrl.updateEmergencyPatternPriorities);
+
+/**
+ * @swagger
+ * /admin/emergency-patterns:
+ *   post:
+ *     summary: Create a new emergency pattern
+ *     tags: [Admin - Emergency Patterns]
+ *     security:
+ *       - BearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [name, pattern_regex, warning_message]
+ *             properties:
+ *               name: { type: string }
+ *               description: { type: string }
+ *               pattern_regex: { type: string }
+ *               warning_message: { type: string }
+ *               severity_level: { type: string, enum: [LOW, MEDIUM, HIGH, CRITICAL], default: HIGH }
+ *               priority: { type: integer, default: 10 }
+ *     responses:
+ *       201:
+ *         description: Emergency pattern created
+ */
+router.post('/emergency-patterns', ctrl.createEmergencyPattern);
+
+/**
+ * @swagger
+ * /admin/emergency-patterns/{id}:
+ *   get:
+ *     summary: Get emergency pattern by ID
+ *     tags: [Admin - Emergency Patterns]
+ *     security:
+ *       - BearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema: { type: integer }
+ *     responses:
+ *       200:
+ *         description: Emergency pattern details
+ *       404:
+ *         description: Pattern not found
+ */
+router.get('/emergency-patterns/:id', ctrl.getEmergencyPattern);
+
+/**
+ * @swagger
+ * /admin/emergency-patterns/{id}:
+ *   put:
+ *     summary: Update emergency pattern
+ *     tags: [Admin - Emergency Patterns]
+ *     security:
+ *       - BearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema: { type: integer }
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               name: { type: string }
+ *               description: { type: string }
+ *               pattern_regex: { type: string }
+ *               warning_message: { type: string }
+ *               severity_level: { type: string, enum: [LOW, MEDIUM, HIGH, CRITICAL] }
+ *               priority: { type: integer }
+ *               is_active: { type: boolean }
+ *     responses:
+ *       200:
+ *         description: Emergency pattern updated
+ *       404:
+ *         description: Pattern not found
+ */
+router.put('/emergency-patterns/:id', ctrl.updateEmergencyPattern);
+
+/**
+ * @swagger
+ * /admin/emergency-patterns/{id}/toggle:
+ *   post:
+ *     summary: Toggle emergency pattern active status
+ *     tags: [Admin - Emergency Patterns]
+ *     security:
+ *       - BearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema: { type: integer }
+ *     responses:
+ *       200:
+ *         description: Pattern status toggled
+ */
+router.post('/emergency-patterns/:id/toggle', ctrl.toggleEmergencyPattern);
+
+/**
+ * @swagger
+ * /admin/emergency-patterns/{id}:
+ *   delete:
+ *     summary: Delete emergency pattern
+ *     tags: [Admin - Emergency Patterns]
+ *     security:
+ *       - BearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema: { type: integer }
+ *     responses:
+ *       200:
+ *         description: Pattern deleted successfully
+ */
+router.delete('/emergency-patterns/:id', ctrl.deleteEmergencyPattern);
+
+/**
+ * @swagger
+ * /admin/emergency-patterns/{id}/audit:
+ *   get:
+ *     summary: Get emergency pattern audit history
+ *     tags: [Admin - Emergency Patterns]
+ *     security:
+ *       - BearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema: { type: integer }
+ *       - in: query
+ *         name: limit
+ *         schema: { type: integer, default: 50 }
+ *     responses:
+ *       200:
+ *         description: Audit history
+ */
+router.get('/emergency-patterns/:id/audit', ctrl.getEmergencyPatternAudit);
+
 module.exports = router;

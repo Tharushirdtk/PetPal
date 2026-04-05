@@ -10,6 +10,7 @@ import {
   Settings,
   MessageSquare,
   TrendingUp,
+  Shield,
 } from 'lucide-react';
 import { useLang } from '../i18n/LanguageContext';
 import Navbar from '../components/Navbar';
@@ -19,6 +20,7 @@ import RulesTab from './admin/RulesTab';
 import ContactsTab from './admin/ContactsTab';
 import AnalyticsTab from './admin/AnalyticsTab';
 import UsersTab from './admin/UsersTab';
+import EmergencyPatternsTab from './admin/EmergencyPatternsTab';
 
 const TAB_CATEGORIES = [
   {
@@ -35,7 +37,8 @@ const TAB_CATEGORIES = [
     labelKey: 'admin_category_content',
     tabs: [
       { key: 'questions', icon: FileQuestion, labelKey: 'admin_tab_questions' },
-      { key: 'rules', icon: GitBranch, labelKey: 'admin_tab_rules' }
+      { key: 'rules', icon: GitBranch, labelKey: 'admin_tab_rules' },
+      { key: 'emergency-patterns', icon: Shield, labelKey: 'admin_tab_emergency_patterns' }
     ]
   },
   {
@@ -67,6 +70,7 @@ const TAB_COMPONENTS = {
   contacts: ContactsTab,
   users: UsersTab,
   analytics: AnalyticsTab,
+  'emergency-patterns': EmergencyPatternsTab,
 };
 
 const AdminDashboard = () => {
