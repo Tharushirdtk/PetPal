@@ -5,42 +5,43 @@
 ## 🌟 Features
 
 - **AI-Powered Diagnosis**: Advanced pet health diagnosis using machine learning and AI
+- **Emergency Detection System**: Database-driven emergency detection for critical pet health conditions
 - **Skin Condition Analysis**: Image-based skin condition detection using TensorFlow models
 - **Interactive Chat**: Real-time chat with AI-powered pet health consultation
 - **Pet Profile Management**: Create and manage multiple pet profiles
 - **Health History Tracking**: Keep track of diagnoses and consultations over time
 - **Questionnaire System**: Guided symptom assessment for accurate diagnosis
-- **Vector Database Integration**: ChromaDB for intelligent context retrieval
-- **Secure Authentication**: JWT-based authentication system
-- **Admin Dashboard**: Administrative interface for system management
+- **Vector Database Integration**: ChromaDB for intelligent context retrieval and embeddings
+- **Secure Authentication**: JWT-based authentication with bcrypt hashing
+- **Admin Dashboard**: Comprehensive administrative interface for system management
 - **API Documentation**: Interactive Swagger/OpenAPI documentation
 
 ## 🛠️ Tech Stack
 
 ### Frontend
-- **React 19** - Modern UI library
-- **Vite** - Fast build tool and dev server
+- **React 19** - Modern UI library (JSX, not TypeScript)
+- **Vite 8** - Fast build tool and dev server
 - **React Router DOM** - Client-side routing
-- **TailwindCSS** - Utility-first CSS framework
+- **TailwindCSS 4** - Utility-first CSS framework
 - **Axios** - HTTP client
 - **Lucide React** - Icon library
 - **Headless UI** - Accessible UI components
 
 ### Backend
-- **Node.js** + **Express** - RESTful API server
-- **MySQL** - Primary database
-- **ChromaDB** - Vector database for embeddings
+- **Node.js** + **Express 4** - RESTful API server (CommonJS)
+- **MySQL** - Primary database with structured schema
+- **ChromaDB** - Vector database for intelligent embeddings
 - **Google Gemini API** - AI-powered chat and analysis
-- **JWT** - Authentication tokens
-- **Swagger** - API documentation
-- **Multer** - File upload handling
-- **Bcrypt** - Password hashing
+- **JWT** - Authentication tokens with bcrypt (12 salt rounds)
+- **Swagger/OpenAPI** - Interactive API documentation
+- **Multer** - Secure file upload handling
+- **Jest** - Testing framework with comprehensive test suite
 
-### Python Sidecar
-- **Flask** - Microservice API
-- **TensorFlow** - ML model inference
-- **Sentence Transformers** - Text embeddings
-- **Pillow** - Image processing
+### Python Sidecar (Port 5001)
+- **Flask** - Lightweight microservice API
+- **TensorFlow** - ML model inference for image analysis
+- **Sentence Transformers** - Advanced text embeddings
+- **Pillow** - Image processing and manipulation
 
 ## 📋 Prerequisites
 
@@ -215,20 +216,69 @@ npm run build
 npm run preview
 ```
 
-## 📚 API Documentation
+## 📖 Documentation
+
+### Frontend Scenarios & API Guide
+For detailed user flow scenarios and API integration examples, see:
+**`other/docs/frontend-scenarios-api-guide.md`**
+
+This comprehensive guide covers:
+- **Guest User Journey**: Browse without registration
+- **Registration & Authentication**: User signup and login flows
+- **Pet Management**: Creating and managing pet profiles
+- **Enhanced Diagnosis**: Complete diagnosis workflow with questionnaires
+- **AI Chat & Consultations**: Interactive chat features
+- **Medical History**: Tracking and viewing past diagnoses
+- **Admin Dashboard**: Administrative interface and features
+
+### API Documentation
 
 Once the backend is running, access the interactive API documentation at:
 
 **Swagger UI**: `http://localhost:5000/api/docs`
 
-The API includes endpoints for:
-- Authentication (`/api/auth`)
-- Pet management (`/api/pets`)
-- Diagnosis (`/api/diagnosis`)
-- Chat/Consultations (`/api/chat`, `/api/consultations`)
-- Image uploads (`/api/images`)
-- Admin operations (`/api/admin`)
-- Contact/Support (`/api/contact`)
+### Available API Endpoints:
+
+- **Authentication** (`/api/auth`)
+  - User registration and login
+  - JWT token management
+  - Password reset functionality
+
+- **Pet Management** (`/api/pets`)
+  - Create, read, update, delete pet profiles
+  - Pet health records management
+
+- **Diagnosis System** (`/api/diagnosis`)
+  - Symptom-based diagnosis
+  - Medical history tracking
+  - Emergency condition detection
+
+- **Questionnaire** (`/api/questionnaire`)
+  - Guided health assessment
+  - Symptom evaluation forms
+
+- **Chat & Consultations** (`/api/chat`, `/api/consultations`)
+  - Real-time AI chat support
+  - Consultation scheduling and management
+  - Chat history persistence
+
+- **Image Processing** (`/api/images`)
+  - Secure image upload handling
+  - Skin condition analysis via TensorFlow
+
+- **Admin Operations** (`/api/admin`)
+  - User management (admin access required)
+  - System monitoring and statistics
+  - Content moderation tools
+
+- **Contact & Support** (`/api/contact`)
+  - Support ticket management
+  - Contact form submissions
+
+### Authentication Middleware:
+- `requireAuth`: Strict authentication for protected routes
+- `optionalAuth`: Permissive authentication for enhanced features
+- `requireAdmin`: Admin-only access control
 
 ## 📁 Project Structure
 
@@ -236,33 +286,41 @@ The API includes endpoints for:
 PetPal_T2/
 ├── backend/
 │   ├── config/           # Configuration files (CORS, Swagger, DB)
-│   ├── controllers/      # Request handlers
+│   ├── controllers/      # Request handlers with asyncHandler wrapper
 │   ├── middleware/       # Express middleware (auth, error handling, rate limiting)
-│   ├── models/          # Database models
+│   ├── models/          # Database models and schema definitions
 │   ├── routes/          # API route definitions
-│   ├── services/        # Business logic (vector DB, AI services)
-│   ├── utils/           # Utility functions
-│   ├── python-sidecar/  # Python ML service
-│   │   ├── app.py
-│   │   └── requirements.txt
-│   ├── uploads/         # User-uploaded files
+│   ├── services/        # Business logic (vector DB, AI services, response helpers)
+│   ├── utils/           # Utility functions (asyncHandler, response helpers)
+│   ├── tests/           # Jest test suites (*.spec.js files)
+│   ├── python-sidecar/  # Python ML service (Flask + TensorFlow)
+│   │   ├── app.py       # Flask server (port 5001)
+│   │   ├── requirements.txt
+│   │   └── models/      # TensorFlow model files
+│   ├── uploads/         # User-uploaded files (secure handling)
+│   ├── jest.config.js   # Jest testing configuration
 │   ├── server.js        # Main entry point
 │   └── package.json
 │
 ├── frontend/
-│   ├── public/          # Static assets
+│   ├── public/          # Static assets and favicon
 │   ├── src/
-│   │   ├── api/         # API client functions
-│   │   ├── assets/      # Images, fonts, etc.
-│   │   ├── components/  # Reusable React components
-│   │   ├── context/     # React Context providers
+│   │   ├── api/         # API client functions and axios configuration
+│   │   ├── assets/      # Images, fonts, and static resources
+│   │   ├── components/  # Reusable React components (JSX)
+│   │   ├── context/     # React Context providers (Auth, Theme)
 │   │   ├── hooks/       # Custom React hooks
-│   │   ├── pages/       # Page components
-│   │   ├── App.jsx      # Main App component
-│   │   └── main.jsx     # Entry point
-│   ├── index.html
-│   ├── vite.config.js
+│   │   ├── pages/       # Page components and route handlers
+│   │   ├── App.jsx      # Main App component with routing
+│   │   └── main.jsx     # React 19 entry point
+│   ├── index.html       # HTML template
+│   ├── vite.config.js   # Vite 8 configuration
+│   ├── tailwind.config.js # TailwindCSS 4 configuration
 │   └── package.json
+│
+├── other/
+│   └── docs/            # Project documentation
+│       └── frontend-scenarios-api-guide.md # Complete user scenarios guide
 │
 └── README.md
 ```
@@ -296,24 +354,56 @@ PetPal_T2/
 
 ## 🔒 Security Features
 
-- JWT-based authentication
-- Password hashing with bcrypt
-- Rate limiting on API endpoints
-- CORS configuration
-- Input validation and sanitization
-- Secure file upload handling
+- **JWT Authentication**: Secure token-based authentication system
+- **Password Security**: Bcrypt hashing with 12 salt rounds
+- **Rate Limiting**: API endpoint protection against abuse
+- **CORS Configuration**: Cross-origin resource sharing control
+- **Input Validation**: Comprehensive request validation and sanitization
+- **Secure File Uploads**: Protected file handling with type validation
+- **Role-Based Access**: Admin and user-level authorization controls
+- **SQL Injection Protection**: Parameterized queries and ORM security
+- **Environment Variables**: Sensitive configuration management
+- **Error Handling**: Secure error responses without information leakage
+
+### Authentication Layers:
+- **Guest Access**: Limited read-only functionality
+- **User Authentication**: Full platform access with personal data
+- **Admin Authorization**: System administration and user management
 
 ## 🧪 Testing
 
+The project includes a comprehensive testing suite using Jest:
+
+### Backend Testing
 ```bash
-# Backend tests (if configured)
 cd backend
 npm test
+```
 
-# Frontend tests (if configured)
+**Test Coverage:**
+- **155 test cases** across **10 test suites** (all passing ✅)
+- Complete API endpoint testing
+- Authentication middleware testing
+- Database model testing with mocking
+- Service layer unit tests
+- Error handling validation
+
+**Testing Configuration:**
+- Jest configuration: `backend/jest.config.js`
+- Test files: `backend/tests/*.spec.js`
+- Mocked dependencies: Models, database config, services
+- Custom `asyncHandler` mocking for controller tests
+
+### Frontend Testing
+```bash
 cd frontend
 npm test
 ```
+
+**Test Structure:**
+- Component unit tests
+- Integration tests for API interactions
+- User flow testing
 
 ## 🤝 Contributing
 
