@@ -3,9 +3,9 @@ const LlmContextModel = require('../models/llmContext.model');
 const DiagnosisModel = require('../models/diagnosis.model');
 const ConsultationModel = require('../models/consultation.model');
 const PetModel = require('../models/pet.model');
+const EmergencyPatternModel = require('../models/emergencyPattern.model');
 const { getLLMResponse } = require('../services/llm.service');
 const { querySimilar, addDiagnosisToVectorDB } = require('../services/vectordb.service');
-const { checkEmergency } = require('../utils/emergency');
 const { asyncHandler, ok, fail } = require('../utils/helpers');
 
 exports.sendMessage = asyncHandler(async (req, res) => {
@@ -16,8 +16,8 @@ exports.sendMessage = asyncHandler(async (req, res) => {
     return fail(res, 'conversation_id and message are required');
   }
 
-  // 1. Emergency trigger check — skip LLM if triggered
-  const emergency = checkEmergency(message);
+  // 1. Database-driven emergency trigger check
+  const emergency = await EmergencyPatternModel.checkEmergency(message);
   if (emergency.triggered) {
     // Save both user message and emergency response together
     await query(
@@ -35,6 +35,7 @@ exports.sendMessage = asyncHandler(async (req, res) => {
       reply: emergency.warning,
       is_final: false,
       is_emergency: true,
+      emergency_pattern: emergency.pattern
     });
   }
 

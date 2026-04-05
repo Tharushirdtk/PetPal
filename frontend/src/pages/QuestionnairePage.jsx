@@ -15,7 +15,6 @@ import { useStartConsultation } from '../hooks/useConsultation';
 import { getActiveQuestionnaire, submitResponse, saveContext } from '../api/questionnaire';
 import { getActiveConsultation } from '../api/consultation';
 import { getSpecies, getBreeds, getMyPets } from '../api/pets';
-import { EMERGENCY_RULES } from '../data/mockData';
 import Navbar from '../components/Navbar';
 import LoadingSpinner from '../components/LoadingSpinner';
 import ErrorAlert from '../components/ErrorAlert';
@@ -353,18 +352,11 @@ const QuestionnairePage = () => {
     return findNextVisible(currentIndex) === -1;
   }, [findNextVisible, currentIndex]);
 
-  /* ── Emergency check ── */
+  /* ── Emergency check removed - was hardcoded fallback ── */
   const checkEmergency = useCallback((code, value) => {
-    const messages = {
-      SD3_VOM: t('quest_emergency_blood_vomit') || 'Blood in vomit detected — please seek immediate veterinary care!',
-      SD3_COU: t('quest_emergency_breathing') || 'Breathing difficulty detected — seek immediate veterinary care!',
-      SD4_INJ: t('quest_emergency_bleeding') || 'Heavy bleeding or visible bone — seek emergency care immediately!',
-    };
-    if (EMERGENCY_RULES[code] && value === EMERGENCY_RULES[code]) {
-      setShowEmergency(true);
-      setEmergencyMsg(messages[code] || 'Emergency detected — contact a veterinarian immediately.');
-    }
-  }, [t]);
+    // Emergency checking logic removed (was hardcoded fallback data)
+    // Emergency detection should be handled server-side if needed
+  }, []);
 
   /* ── Submit ── */
   const handleSubmit = async () => {
@@ -405,9 +397,8 @@ const QuestionnairePage = () => {
         }
       });
 
-      Object.entries(EMERGENCY_RULES).forEach(([code, triggerVal]) => {
-        if (answers[code] === triggerVal) payload.emergency_flags.push(code);
-      });
+      // Emergency flags handling removed (was hardcoded fallback data)
+      // Emergency detection should be handled server-side if needed
 
       if (questionnaireId) {
         const formattedAnswers = Object.entries(answers)
