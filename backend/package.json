@@ -8,7 +8,9 @@
     "start": "node dist/server.js",
     "build": "robocopy . dist /E /XD dist node_modules && exit 0",
     "clean": "rmdir /S /Q dist",
-    "rebuild": "npm run clean && npm run build"
+    "rebuild": "npm run clean && npm run build",
+    "test": "jest --forceExit --detectOpenHandles",
+    "test:verbose": "jest --forceExit --detectOpenHandles --verbose"
   },
   "dependencies": {
     "bcrypt": "^5.1.1",
@@ -26,6 +28,8 @@
     "uuid": "^10.0.0"
   },
   "devDependencies": {
+    "@types/jest": "^30.0.0",
+    "jest": "^30.3.0",
     "nodemon": "^3.1.4"
   }
 }
