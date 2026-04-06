@@ -97,7 +97,8 @@ const AdminDashboard = () => {
 
   const handleTabChange = (tabKey) => {
     setActiveTab(tabKey);
-    setOpenCategory(null); // Close dropdown after selection
+    // Use setTimeout to ensure dropdown closes after state update
+    setTimeout(() => setOpenCategory(null), 0);
   };
 
   return (
