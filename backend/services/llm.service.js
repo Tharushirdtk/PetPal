@@ -5,6 +5,18 @@ const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/${GE
 
 const SYSTEM_PROMPT = `You are PetPal, an expert AI veterinary assistant. You help pet owners identify possible health conditions in dogs and cats. You are NOT a replacement for a vet. Always recommend professional veterinary care for serious conditions. Be empathetic, clear, and concise.
 
+## Image Analysis Interpretation
+When image analysis results are provided, interpret them carefully based on confidence level:
+- HIGH confidence (60%+): The ML model is reasonably confident. Use as supporting evidence alongside symptoms, but not as the sole basis for diagnosis.
+- MODERATE confidence (35-59%): The ML model is uncertain. Treat this as a weak signal only. The questionnaire symptoms and conversation should carry MORE weight than the image prediction.
+- LOW confidence (below 35%) or when marked as uncertain: The ML model cannot reliably classify this image. DO NOT use the top prediction as your diagnosis. Focus entirely on the questionnaire symptoms, conversation history, and your veterinary knowledge. You may mention that the image was analyzed but the results were inconclusive.
+
+When multiple predictions are provided (top5), look for patterns:
+- If the top 3-4 predictions are all skin-related conditions, the image likely shows a skin issue even if no single prediction is highly confident.
+- If predictions are spread across unrelated categories (e.g. skin, respiratory, dental), the model is confused and the image results should be largely disregarded.
+
+CRITICAL: Always cross-reference image predictions with the questionnaire symptoms. If the image says "Kennel Cough" but the questionnaire reports skin redness and itching, the image prediction is likely wrong — prioritize the symptom data.
+
 When you have enough information to make a confident diagnosis, end your response with a JSON block in this exact format:
 <DIAGNOSIS>
 {
@@ -69,7 +81,21 @@ function buildUserPrompt({
   }
 
   if (imageSnapshot && Object.keys(imageSnapshot).length > 0) {
-    prompt += `Image analysis result: ${JSON.stringify(imageSnapshot)}\n`;
+    const img = imageSnapshot.latest || imageSnapshot;
+    prompt += '\n--- IMAGE ANALYSIS ---\n';
+    prompt += `Top prediction: ${img.prediction_text || 'N/A'}\n`;
+    prompt += `Confidence: ${img.confidence_percent ?? 'N/A'}% (Level: ${img.confidence_level || 'unknown'})\n`;
+    prompt += `Model certainty: ${img.is_uncertain ? 'UNCERTAIN - treat with caution' : 'Reasonably certain'}\n`;
+    if (img.prediction_note) {
+      prompt += `Note: ${img.prediction_note}\n`;
+    }
+    if (img.top5 && img.top5.length > 1) {
+      prompt += 'Alternative predictions:\n';
+      for (const alt of img.top5.slice(1)) {
+        prompt += `  - ${alt.label}: ${alt.confidence}%\n`;
+      }
+    }
+    prompt += '--- END IMAGE ANALYSIS ---\n\n';
   }
 
   if (vectorResults && vectorResults.length > 0) {

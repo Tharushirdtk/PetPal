@@ -32,7 +32,7 @@ function mockRes() {
 
 // ── Upload Image ───────────────────────────────────
 describe('Image Controller - uploadImage', () => {
-  beforeEach(() => jest.clearAllMocks());
+  beforeEach(() => jest.resetAllMocks());
 
   test('SCENARIO: No image file returns 400', async () => {
     const req = mockReq({}, {}, { id: 1 }, null);
@@ -62,6 +62,13 @@ describe('Image Controller - uploadImage', () => {
       confidence_percent: 87,
       top_label: 'allergic_dermatitis',
       raw_result: { predictions: [] },
+      confidence_level: 'high',
+      is_uncertain: false,
+      prediction_note: null,
+      top5: [
+        { label: 'Allergic Dermatitis', confidence: 87 },
+        { label: 'Skin Allergy in Dog', confidence: 6 },
+      ],
     });
 
     LlmContextModel.getByConversation.mockResolvedValue({ image_processing_snapshot: '{}' });
@@ -137,6 +144,10 @@ describe('Image Controller - uploadImage', () => {
       confidence_percent: 95,
       top_label: 'normal',
       raw_result: {},
+      confidence_level: 'high',
+      is_uncertain: false,
+      prediction_note: null,
+      top5: [{ label: 'Normal skin', confidence: 95 }],
     });
 
     const file = {
@@ -153,11 +164,118 @@ describe('Image Controller - uploadImage', () => {
 
     expect(res.status).toHaveBeenCalledWith(201);
   });
+
+  test('SCENARIO: Low confidence prediction includes uncertainty metadata in response', async () => {
+    query
+      .mockResolvedValueOnce({ insertId: 100 })
+      .mockResolvedValueOnce({ insertId: 200 })
+      .mockResolvedValueOnce({})
+      .mockResolvedValueOnce({})
+      .mockResolvedValueOnce([])   // no pet species
+      .mockResolvedValueOnce({})   // image_analysis insert
+      .mockResolvedValueOnce({})   // update asset
+      .mockResolvedValueOnce({});  // update job
+
+    runInference.mockResolvedValue({
+      prediction_text: 'Kennel Cough in Dog',
+      confidence_percent: 23,
+      top_label: 'kennel_cough_in_dog',
+      raw_result: {},
+      confidence_level: 'low',
+      is_uncertain: true,
+      prediction_note: 'Model confidence is low. This prediction should be verified with clinical symptoms and veterinary consultation.',
+      top5: [
+        { label: 'Kennel Cough in Dog', confidence: 23 },
+        { label: 'Skin Allergy in Dog', confidence: 18 },
+        { label: 'Hot Spots in Dog', confidence: 15 },
+      ],
+    });
+
+    const file = {
+      path: '/tmp/uploads/wound.jpg',
+      filename: 'wound.jpg',
+      originalname: 'wound.jpg',
+      size: 2048,
+      mimetype: 'image/jpeg',
+    };
+    const req = mockReq({}, {}, { id: 1 }, file);
+    req.file = file;
+    const res = mockRes();
+    await imageCtrl.uploadImage(req, res, jest.fn());
+
+    expect(res.status).toHaveBeenCalledWith(201);
+    const data = res.json.mock.calls[0][0].data;
+    expect(data.analysis.confidence_level).toBe('low');
+    expect(data.analysis.is_uncertain).toBe(true);
+    expect(data.analysis.prediction_note).toContain('Model confidence is low');
+    expect(data.analysis.top5).toHaveLength(3);
+  });
+
+  test('SCENARIO: LLM context snapshot includes top5 and confidence metadata', async () => {
+    query
+      .mockResolvedValueOnce({ insertId: 100 })
+      .mockResolvedValueOnce({ insertId: 200 })
+      .mockResolvedValueOnce({})
+      .mockResolvedValueOnce({})
+      .mockResolvedValueOnce([{ species_name: 'Dog' }])
+      .mockResolvedValueOnce({})
+      .mockResolvedValueOnce({})
+      .mockResolvedValueOnce({})
+      .mockResolvedValueOnce([{ id: 50 }]);  // conversation lookup
+
+    runInference.mockResolvedValue({
+      prediction_text: 'Skin Allergy in Dog',
+      confidence_percent: 72,
+      top_label: 'skin_allergy_in_dog',
+      raw_result: {},
+      confidence_level: 'high',
+      is_uncertain: false,
+      prediction_note: null,
+      top5: [
+        { label: 'Skin Allergy in Dog', confidence: 72 },
+        { label: 'Hot Spots in Dog', confidence: 12 },
+      ],
+    });
+
+    LlmContextModel.getByConversation.mockResolvedValueOnce({ image_processing_snapshot: '{}' });
+    LlmContextModel.updateImageSnapshot.mockResolvedValueOnce(true);
+
+    const file = {
+      path: '/tmp/uploads/skin.jpg',
+      filename: 'skin.jpg',
+      originalname: 'skin.jpg',
+      size: 2048,
+      mimetype: 'image/jpeg',
+    };
+    const req = mockReq(
+      { consultation_id: '10', pet_id: '5' },
+      {},
+      { id: 1 },
+      file
+    );
+    req.file = file;
+    const res = mockRes();
+    await imageCtrl.uploadImage(req, res, jest.fn());
+
+    expect(res.status).toHaveBeenCalledWith(201);
+    const data = res.json.mock.calls[0][0].data;
+    expect(data.status).toBe('complete');
+    expect(data.analysis.confidence_level).toBe('high');
+    expect(data.analysis.top5).toHaveLength(2);
+
+    // Verify LLM context snapshot was updated with enriched data
+    expect(LlmContextModel.updateImageSnapshot).toHaveBeenCalledTimes(1);
+    const snapshotArg = LlmContextModel.updateImageSnapshot.mock.calls[0][1];
+    expect(snapshotArg.latest.confidence_level).toBe('high');
+    expect(snapshotArg.latest.is_uncertain).toBe(false);
+    expect(snapshotArg.latest.top5).toHaveLength(2);
+    expect(snapshotArg.latest.top5[0].label).toBe('Skin Allergy in Dog');
+  });
 });
 
 // ── Get Image Status ───────────────────────────────
 describe('Image Controller - getStatus', () => {
-  beforeEach(() => jest.clearAllMocks());
+  beforeEach(() => jest.resetAllMocks());
 
   test('SCENARIO: Image not found returns 404', async () => {
     query.mockResolvedValue([]);

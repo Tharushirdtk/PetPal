@@ -30,6 +30,10 @@ async function runInference(imagePath, species) {
     confidence_percent: data.confidence_percent,
     top_label: data.top_label,
     raw_result: data,
+    confidence_level: data.confidence_level || 'unknown',
+    is_uncertain: data.is_uncertain || false,
+    prediction_note: data.prediction_note || null,
+    top5: data.top5 || [],
   };
 }
 

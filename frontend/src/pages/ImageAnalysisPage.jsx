@@ -4,6 +4,7 @@ import {
   Upload,
   Check,
   AlertCircle,
+  AlertTriangle,
   X,
   Camera,
   Menu,
@@ -31,6 +32,13 @@ const ImageAnalysisPage = () => {
   const { upload, uploading, imageAssetId, analysis, status, error, reset } = useImageUpload();
 
   const isActive = (path) => location.pathname === path;
+
+  const getConfidenceStyle = (confidence) => {
+    const pct = Math.round((confidence ?? 0) * 100);
+    if (pct >= 60) return { bg: 'bg-green-50 dark:bg-green-900/20', text: 'text-green-700 dark:text-green-400', label: 'High', border: 'border-green-200 dark:border-green-800' };
+    if (pct >= 35) return { bg: 'bg-amber-50 dark:bg-amber-900/20', text: 'text-amber-700 dark:text-amber-400', label: 'Moderate', border: 'border-amber-200 dark:border-amber-800' };
+    return { bg: 'bg-red-50 dark:bg-red-900/20', text: 'text-red-700 dark:text-red-400', label: 'Low', border: 'border-red-200 dark:border-red-800' };
+  };
 
   const navLinks = [
     { to: '/dashboard', label: t('img_nav_dashboard') },
@@ -280,53 +288,93 @@ const ImageAnalysisPage = () => {
         )}
 
         {/* Analysis Complete Card - shown when status is complete */}
-        {status === 'complete' && analysis && (
-          <div className="mt-8 bg-white dark:bg-gray-800 rounded-2xl border border-green-200 dark:border-green-800 shadow-sm p-6">
-            <div className="flex items-center gap-3 mb-4">
-              <div className="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center">
-                <Check className="w-5 h-5 text-green-600" />
-              </div>
-              <div>
-                <h3 className="font-display font-semibold text-lg text-gray-900 dark:text-white">
-                  {t('img_completed')}
-                </h3>
-                <p className="text-sm text-gray-400 dark:text-gray-500">{selectedFile?.name || 'image.jpg'}</p>
-              </div>
-            </div>
+        {status === 'complete' && analysis && (() => {
+          const confStyle = getConfidenceStyle(analysis.top_confidence);
+          const confPct = Math.round((analysis.top_confidence ?? 0) * 100);
+          const isLowConfidence = confPct < 60;
+          const top5 = analysis.raw_result_json?.top5 || analysis.top5;
 
-            {/* ML Results */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-4">
-              {analysis.top_label && (
-                <div className="bg-purple-50 dark:bg-purple-900/20 rounded-xl p-4">
-                  <p className="text-xs text-gray-500 dark:text-gray-400 font-medium mb-1">Top Label</p>
-                  <p className="text-sm font-semibold text-gray-900 dark:text-white">{analysis.top_label}</p>
+          return (
+            <div className={`mt-8 bg-white dark:bg-gray-800 rounded-2xl border ${confStyle.border} shadow-sm p-6`}>
+              <div className="flex items-center gap-3 mb-4">
+                <div className={`w-10 h-10 rounded-full ${confPct >= 60 ? 'bg-green-100' : confPct >= 35 ? 'bg-amber-100' : 'bg-red-100'} flex items-center justify-center`}>
+                  {confPct >= 60
+                    ? <Check className="w-5 h-5 text-green-600" />
+                    : <AlertTriangle className={`w-5 h-5 ${confPct >= 35 ? 'text-amber-600' : 'text-red-600'}`} />
+                  }
                 </div>
-              )}
-              {analysis.top_confidence != null && (
-                <div className="bg-green-50 dark:bg-green-900/20 rounded-xl p-4">
-                  <p className="text-xs text-gray-500 dark:text-gray-400 font-medium mb-1">Confidence</p>
-                  <p className="text-sm font-semibold text-gray-900 dark:text-white">
-                    {Math.round(analysis.top_confidence * 100)}%
+                <div>
+                  <h3 className="font-display font-semibold text-lg text-gray-900 dark:text-white">
+                    {confPct >= 60
+                      ? t('img_completed')
+                      : (t('img_analysis_uncertain') || 'Analysis Complete — Low Confidence')
+                    }
+                  </h3>
+                  <p className="text-sm text-gray-400 dark:text-gray-500">{selectedFile?.name || 'image.jpg'}</p>
+                </div>
+              </div>
+
+              {/* ML Results */}
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-4">
+                {analysis.top_label && (
+                  <div className="bg-purple-50 dark:bg-purple-900/20 rounded-xl p-4">
+                    <p className="text-xs text-gray-500 dark:text-gray-400 font-medium mb-1">Top Label</p>
+                    <p className="text-sm font-semibold text-gray-900 dark:text-white">{analysis.top_label}</p>
+                  </div>
+                )}
+                {analysis.top_confidence != null && (
+                  <div className={`${confStyle.bg} rounded-xl p-4`}>
+                    <p className="text-xs text-gray-500 dark:text-gray-400 font-medium mb-1">Confidence</p>
+                    <p className={`text-sm font-semibold ${confStyle.text}`}>
+                      {confPct}% <span className="text-xs font-normal">({confStyle.label})</span>
+                    </p>
+                  </div>
+                )}
+                {analysis.prediction_text && (
+                  <div className="bg-blue-50 dark:bg-blue-900/20 rounded-xl p-4">
+                    <p className="text-xs text-gray-500 dark:text-gray-400 font-medium mb-1">Prediction</p>
+                    <p className="text-sm font-semibold text-gray-900 dark:text-white">{analysis.prediction_text}</p>
+                  </div>
+                )}
+              </div>
+
+              {/* Low confidence warning */}
+              {isLowConfidence && (
+                <div className={`mt-4 flex items-start gap-3 ${confPct >= 35 ? 'bg-amber-50 dark:bg-amber-900/20' : 'bg-red-50 dark:bg-red-900/20'} rounded-lg p-3`}>
+                  <AlertTriangle className={`w-5 h-5 flex-shrink-0 mt-0.5 ${confPct >= 35 ? 'text-amber-500' : 'text-red-500'}`} />
+                  <p className="text-sm text-gray-600 dark:text-gray-300">
+                    {t('img_low_confidence_warning') || 'Our AI model is not fully confident about this prediction. The AI veterinarian will also consider your questionnaire answers for a more accurate assessment.'}
                   </p>
                 </div>
               )}
-              {analysis.prediction_text && (
-                <div className="bg-blue-50 dark:bg-blue-900/20 rounded-xl p-4">
-                  <p className="text-xs text-gray-500 dark:text-gray-400 font-medium mb-1">Prediction</p>
-                  <p className="text-sm font-semibold text-gray-900 dark:text-white">{analysis.prediction_text}</p>
+
+              {/* Top alternative predictions */}
+              {top5 && top5.length > 1 && (
+                <div className="mt-4">
+                  <p className="text-xs text-gray-500 dark:text-gray-400 font-medium mb-2">Other possibilities</p>
+                  <div className="flex flex-wrap gap-2">
+                    {top5.slice(1, 4).map((alt, i) => (
+                      <span
+                        key={i}
+                        className="inline-flex items-center gap-1 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 text-xs px-3 py-1.5 rounded-full"
+                      >
+                        {alt.label} <span className="text-gray-400 dark:text-gray-500">{alt.confidence}%</span>
+                      </span>
+                    ))}
+                  </div>
                 </div>
               )}
-            </div>
 
-            {/* Upload another button */}
-            <button
-              className="mt-4 text-sm font-semibold text-[#7C3AED] hover:text-[#6D28D9] transition-colors cursor-pointer"
-              onClick={() => { reset(); setSelectedFile(null); }}
-            >
-              Upload another image
-            </button>
-          </div>
-        )}
+              {/* Upload another button */}
+              <button
+                className="mt-4 text-sm font-semibold text-[#7C3AED] hover:text-[#6D28D9] transition-colors cursor-pointer"
+                onClick={() => { reset(); setSelectedFile(null); }}
+              >
+                Upload another image
+              </button>
+            </div>
+          );
+        })()}
 
         {/* Upload Queue - only show when no active upload */}
         {!uploading && !status && (

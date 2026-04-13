@@ -103,6 +103,10 @@ exports.uploadImage = asyncHandler(async (req, res) => {
           top_label: analysisResult.top_label,
           confidence_percent: analysisResult.confidence_percent,
           top_confidence: topConfidence,
+          confidence_level: analysisResult.confidence_level,
+          is_uncertain: analysisResult.is_uncertain,
+          prediction_note: analysisResult.prediction_note,
+          top5: analysisResult.top5,
         };
 
         await LlmContextModel.updateImageSnapshot(convRows[0].id, currentSnapshot);
@@ -131,6 +135,10 @@ exports.uploadImage = asyncHandler(async (req, res) => {
       prediction_text: analysisResult.prediction_text,
       top_label: analysisResult.top_label,
       confidence_percent: analysisResult.confidence_percent,
+      confidence_level: analysisResult.confidence_level,
+      is_uncertain: analysisResult.is_uncertain,
+      prediction_note: analysisResult.prediction_note,
+      top5: analysisResult.top5,
     },
   }, 201);
 });

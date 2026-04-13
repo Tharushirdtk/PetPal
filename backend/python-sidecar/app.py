@@ -2,7 +2,7 @@ import os
 import json
 import numpy as np
 from flask import Flask, request, jsonify
-from PIL import Image
+from PIL import Image, ImageEnhance
 import tensorflow as tf
 from sentence_transformers import SentenceTransformer
 
@@ -41,6 +41,12 @@ DOG_INDICES = [i for i, lbl in CLASS_LABELS.items() if "Dog" in lbl]
 CAT_INDICES = [i for i, lbl in CLASS_LABELS.items() if "Cat" in lbl or "Feline" in lbl]
 
 # ──────────────────────────────────────────────
+#  Confidence thresholds
+# ──────────────────────────────────────────────
+HIGH_CONFIDENCE = 0.60
+MODERATE_CONFIDENCE = 0.35
+
+# ──────────────────────────────────────────────
 #  Load model and embedding model once at startup
 # ──────────────────────────────────────────────
 MODEL_PATH = os.environ.get(
@@ -67,6 +73,119 @@ def preprocess_image(image_path):
     return np.expand_dims(arr, axis=0)
 
 
+def create_augmented_tensors(image_path):
+    """Create augmented versions of an image for test-time augmentation."""
+    img = Image.open(image_path).convert("RGB").resize(INPUT_SIZE)
+
+    augmented = []
+
+    # 1. Horizontal flip
+    augmented.append(img.transpose(Image.FLIP_LEFT_RIGHT))
+
+    # 2. Rotation +15 degrees
+    augmented.append(img.rotate(-15, resample=Image.BILINEAR, fillcolor=(0, 0, 0)))
+
+    # 3. Rotation -15 degrees
+    augmented.append(img.rotate(15, resample=Image.BILINEAR, fillcolor=(0, 0, 0)))
+
+    # 4. Brightness increase (+20%)
+    enhancer = ImageEnhance.Brightness(img)
+    augmented.append(enhancer.enhance(1.2))
+
+    # Convert all to normalized arrays
+    tensors = []
+    for aug_img in augmented:
+        arr = np.array(aug_img, dtype=np.float32) / 255.0
+        tensors.append(arr)
+
+    return np.array(tensors)  # shape: (4, 224, 224, 3)
+
+
+def apply_species_filter(predictions, species):
+    """Zero out predictions for the wrong species and re-normalize."""
+    if species == "dog":
+        filtered = predictions.copy()
+        for i in CAT_INDICES:
+            filtered[i] = 0.0
+    elif species == "cat":
+        filtered = predictions.copy()
+        for i in DOG_INDICES:
+            filtered[i] = 0.0
+    else:
+        return predictions
+
+    total = filtered.sum()
+    if total > 0:
+        filtered = filtered / total
+    return filtered
+
+
+def get_confidence_level(confidence):
+    """Classify confidence into high/moderate/low."""
+    if confidence >= HIGH_CONFIDENCE:
+        return "high"
+    elif confidence >= MODERATE_CONFIDENCE:
+        return "moderate"
+    return "low"
+
+
+def build_response(filtered, tta_applied=False):
+    """Build the full prediction response from filtered probabilities."""
+    top_index = int(np.argmax(filtered))
+    confidence = float(filtered[top_index])
+    confidence_percent = round(confidence * 100, 2)
+    top_label = CLASS_LABELS.get(top_index, f"class_{top_index}")
+
+    # Top-5 predictions
+    top5_indices = np.argsort(filtered)[::-1][:5]
+    top5 = [
+        {
+            "label": CLASS_LABELS.get(int(i), f"class_{i}"),
+            "confidence": round(float(filtered[i]) * 100, 2),
+        }
+        for i in top5_indices
+    ]
+
+    # Confidence metadata
+    confidence_level = get_confidence_level(confidence)
+
+    # Gap between top-1 and top-2
+    if len(top5_indices) >= 2:
+        top2_confidence = float(filtered[top5_indices[1]])
+        top1_top2_gap = round((confidence - top2_confidence) * 100, 2)
+    else:
+        top1_top2_gap = 100.0
+
+    # Uncertain if confidence is low OR top1-top2 gap is very small
+    is_uncertain = confidence < MODERATE_CONFIDENCE or top1_top2_gap < 10.0
+
+    # Human-readable note
+    if confidence_level == "low":
+        prediction_note = (
+            "Model confidence is low. This prediction should be verified "
+            "with clinical symptoms and veterinary consultation."
+        )
+    elif confidence_level == "moderate":
+        prediction_note = (
+            "Model confidence is moderate. Consider this alongside "
+            "reported symptoms for a more reliable assessment."
+        )
+    else:
+        prediction_note = None
+
+    return {
+        "prediction_text": top_label,
+        "confidence_percent": confidence_percent,
+        "top_label": top_label.lower().replace(" ", "_"),
+        "top5": top5,
+        "confidence_level": confidence_level,
+        "is_uncertain": is_uncertain,
+        "prediction_note": prediction_note,
+        "top1_top2_gap": top1_top2_gap,
+        "tta_applied": tta_applied,
+    }
+
+
 # ──────────────────────────────────────────────
 #  /predict  — image classification endpoint
 # ──────────────────────────────────────────────
@@ -80,50 +199,31 @@ def predict():
         return jsonify({"error": f"Image file not found: {image_path}"}), 400
 
     try:
+        # Initial single-pass prediction
         tensor = preprocess_image(image_path)
         predictions = tf_model.predict(tensor, verbose=0)[0]
 
-        # If species is known, zero-out predictions for the wrong species
-        # so only relevant conditions are returned
-        if species == "dog":
-            filtered = predictions.copy()
-            for i in CAT_INDICES:
-                filtered[i] = 0.0
-            # Re-normalize so confidences sum to ~1
-            total = filtered.sum()
-            if total > 0:
-                filtered = filtered / total
-        elif species == "cat":
-            filtered = predictions.copy()
-            for i in DOG_INDICES:
-                filtered[i] = 0.0
-            total = filtered.sum()
-            if total > 0:
-                filtered = filtered / total
-        else:
-            filtered = predictions
+        # Apply species filter
+        filtered = apply_species_filter(predictions, species)
 
-        top_index = int(np.argmax(filtered))
-        confidence = float(filtered[top_index])
-        confidence_percent = round(confidence * 100, 2)
-        top_label = CLASS_LABELS.get(top_index, f"class_{top_index}")
+        # Check if TTA is needed (confidence below HIGH threshold)
+        top_confidence = float(filtered[np.argmax(filtered)])
 
-        # Build top-5 for raw result
-        top5_indices = np.argsort(filtered)[::-1][:5]
-        top5 = [
-            {
-                "label": CLASS_LABELS.get(int(i), f"class_{i}"),
-                "confidence": round(float(filtered[i]) * 100, 2),
-            }
-            for i in top5_indices
-        ]
+        if top_confidence < HIGH_CONFIDENCE:
+            # Run test-time augmentation
+            aug_tensors = create_augmented_tensors(image_path)
+            aug_predictions = tf_model.predict(aug_tensors, verbose=0)  # shape: (4, 22)
 
-        return jsonify({
-            "prediction_text": top_label,
-            "confidence_percent": confidence_percent,
-            "top_label": top_label.lower().replace(" ", "_"),
-            "top5": top5,
-        })
+            # Average original + augmented predictions
+            all_preds = np.vstack([predictions.reshape(1, -1), aug_predictions])  # (5, 22)
+            averaged = np.mean(all_preds, axis=0)
+
+            # Re-apply species filter on averaged result
+            filtered = apply_species_filter(averaged, species)
+
+            return jsonify(build_response(filtered, tta_applied=True))
+
+        return jsonify(build_response(filtered, tta_applied=False))
 
     except Exception as e:
         return jsonify({"error": str(e)}), 500
