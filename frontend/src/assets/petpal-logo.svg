@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 650" fill="none">
+  <!-- Paw Icon -->
+  <g transform="translate(180, 50)">
+    <!-- Top Left Toe -->
+    <ellipse cx="60" cy="70" rx="20" ry="28" fill="#A78BFA" transform="rotate(-25 60 70)"/>
+
+    <!-- Top Center-Left Toe -->
+    <ellipse cx="95" cy="50" rx="22" ry="30" fill="#A78BFA"/>
+
+    <!-- Top Center-Right Toe -->
+    <ellipse cx="145" cy="50" rx="22" ry="30" fill="#A78BFA"/>
+
+    <!-- Top Right Toe -->
+    <ellipse cx="180" cy="70" rx="20" ry="28" fill="#A78BFA" transform="rotate(25 180 70)"/>
+
+    <!-- Main Paw Pad -->
+    <path d="M 70 130 C 60 110, 60 100, 75 95 C 85 92, 100 90, 120 90 C 140 90, 155 92, 165 95 C 180 100, 180 110, 170 130 C 165 145, 160 160, 150 170 C 140 180, 130 185, 120 185 C 110 185, 100 180, 90 170 C 80 160, 75 145, 70 130 Z" fill="#A78BFA"/>
+
+    <!-- White Heart -->
+    <path d="M 120 125 C 120 118, 114 112, 107 112 C 98 112, 93 119, 93 127 C 93 137, 103 147, 120 160 C 137 147, 147 137, 147 127 C 147 119, 142 112, 133 112 C 126 112, 120 118, 120 125 Z" fill="white"/>
+  </g>
+
+  <!-- Pet Pal Text -->
+  <text x="300" y="480"
+        font-family="'Fredoka', 'Quicksand', 'Rounded', 'Comic Sans MS', sans-serif"
+        font-size="140"
+        font-weight="700"
+        fill="#A78BFA"
+        text-anchor="middle"
+        letter-spacing="-2">Pet Pal</text>
+</svg>

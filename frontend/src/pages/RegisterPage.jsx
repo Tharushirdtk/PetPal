@@ -1,11 +1,13 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Shield, Zap, Bell, Users, Eye, EyeOff, Mail, PawPrint } from 'lucide-react';
+import { Shield, Zap, Bell, Users, Eye, EyeOff, Mail } from 'lucide-react';
 import { useLang } from '../i18n/LanguageContext';
 import LangToggle from '../components/LangToggle';
 import { useAuth } from '../context/AuthContext';
 import { register } from '../api/auth';
 import ErrorAlert from '../components/ErrorAlert';
+import petpalPaw from '../assets/petpal-icon.svg';
+import petpalLogo from '../assets/petpal-logo.png';
 
 const RegisterPage = () => {
   const { t } = useLang();
@@ -66,7 +68,7 @@ const RegisterPage = () => {
         <div className="flex items-center justify-between mb-10">
           {/* Logo */}
           <Link to="/" className="flex items-center gap-2">
-            <PawPrint className="w-8 h-8 text-[#7C3AED]" />
+            <img src={petpalPaw} alt="PetPal" className="w-9 h-9" />
             <span className="text-2xl font-bold text-gray-900 dark:text-white">
               Pet<span className="text-[#7C3AED]">Pal</span>
             </span>
@@ -294,7 +296,7 @@ const RegisterPage = () => {
         <div className="relative z-10 w-full max-w-md text-center">
           {/* Icon */}
           <div className="w-20 h-20 rounded-2xl bg-white/15 backdrop-blur-sm flex items-center justify-center mx-auto mb-8 shadow-lg">
-            <PawPrint className="w-10 h-10 text-white" />
+            <img src={petpalPaw} alt="PetPal" className="w-12 h-12" />
           </div>
 
           {/* Heading */}

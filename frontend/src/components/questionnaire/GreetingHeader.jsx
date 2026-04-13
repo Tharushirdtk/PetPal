@@ -1,13 +1,8 @@
 import { useLang } from '../../i18n/LanguageContext';
+import petpalPaw from '../../assets/petpal-icon.svg';
 
 const PawIcon = () => (
-  <svg width="22" height="22" viewBox="0 0 24 24" fill="#7C3AED" xmlns="http://www.w3.org/2000/svg">
-    <ellipse cx="8" cy="7" rx="2.5" ry="3" />
-    <ellipse cx="16" cy="7" rx="2.5" ry="3" />
-    <ellipse cx="4.5" cy="13" rx="2" ry="2.5" />
-    <ellipse cx="19.5" cy="13" rx="2" ry="2.5" />
-    <path d="M12 22c-4 0-7-3.5-7-6 0-2 1.5-3.5 3-4.5 1-.7 2.5-1 4-1s3 .3 4 1c1.5 1 3 2.5 3 4.5 0 2.5-3 6-7 6z" />
-  </svg>
+  <img src={petpalPaw} alt="PetPal" width="22" height="22" />
 );
 
 const getGreetingMessage = (item, t, petName) => {

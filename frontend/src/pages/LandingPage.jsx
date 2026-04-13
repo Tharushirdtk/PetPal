@@ -15,11 +15,10 @@ import { useLang } from '../i18n/LanguageContext';
 import Navbar from '../components/Navbar';
 import { submitContact } from '../api/contact';
 import ErrorAlert from '../components/ErrorAlert';
+import petpalPaw from '../assets/petpal-icon.svg';
 
 const PawIcon = ({ className = 'w-6 h-6' }) => (
-  <svg viewBox="0 0 24 24" fill="currentColor" className={className}>
-    <path d="M12 10c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm-4.5-2c-.83 0-1.5.67-1.5 1.5S6.67 11 7.5 11 9 10.33 9 9.5 8.33 8 7.5 8zm9 0c-.83 0-1.5.67-1.5 1.5s.67 1.5 1.5 1.5 1.5-.67 1.5-1.5S17.33 8 16.5 8zM12 4c-.83 0-1.5.67-1.5 1.5S11.17 7 12 7s1.5-.67 1.5-1.5S12.83 4 12 4zm0 12c-2.21 0-4 1.79-4 4h8c0-2.21-1.79-4-4-4z" />
-  </svg>
+  <img src={petpalPaw} alt="PetPal" className={className} />
 );
 
 const LandingPage = () => {
