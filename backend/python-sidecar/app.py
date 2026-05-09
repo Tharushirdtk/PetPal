@@ -136,6 +136,14 @@ def build_response(filtered, tta_applied=False):
     confidence_percent = round(confidence * 100, 2)
     top_label = CLASS_LABELS.get(top_index, f"class_{top_index}")
 
+    # Extract clean disease name — strip " in Cat" / " in Dog" suffixes
+    # Feline-prefixed labels (e.g. "Feline Leukemia") have no suffix, left unchanged
+    disease_name = top_label
+    for suffix in [" in Cat", " in Dog"]:
+        if top_label.endswith(suffix):
+            disease_name = top_label[: -len(suffix)]
+            break
+
     # Top-5 predictions
     top5_indices = np.argsort(filtered)[::-1][:5]
     top5 = [
@@ -175,6 +183,7 @@ def build_response(filtered, tta_applied=False):
 
     return {
         "prediction_text": top_label,
+        "disease_name": disease_name,
         "confidence_percent": confidence_percent,
         "top_label": top_label.lower().replace(" ", "_"),
         "top5": top5,

@@ -283,6 +283,10 @@ export const translations = {
     img_nav_history: "History",
     img_nav_settings: "Settings",
     img_footer: "PetPal v2.4.0 — Keeping your pets happy and healthy.",
+    img_suspected_diagnosis: "Suspected Diagnosis",
+    img_other_possibilities: "Other possibilities",
+    img_analysis_uncertain: "Analysis Complete — Low Confidence",
+    img_low_confidence_warning: "Our AI model is not fully confident about this prediction. The AI veterinarian will also consider your questionnaire answers for a more accurate assessment.",
 
     // Diagnosis Report
     report_ai_complete: "AI DIAGNOSIS COMPLETE",
@@ -979,6 +983,10 @@ export const translations = {
     img_nav_history: "ඉතිහාසය",
     img_nav_settings: "සැකසුම්",
     img_footer: "PetPal v2.4.0 — ඔබේ සතුන් සතුටින් සහ සෞඛ්‍ය සම්පන්නව තබා ගැනීම.",
+    img_suspected_diagnosis: "හඳුනාගත් රෝගය",
+    img_other_possibilities: "අනෙකුත් හැකියාවන්",
+    img_analysis_uncertain: "විශ්ලේෂණය සම්පූර්ණයි — අඩු විශ්වාසය",
+    img_low_confidence_warning: "අපගේ AI ආදර්ශය මෙම අනාවැකිය ගැන සම්පූර්ණයෙන් විශ්වාස නොකරයි. AI පශු වෛද්‍යවරයා වඩාත් නිවැරදි තක්සේරුවක් සඳහා ඔබේ ප්‍රශ්නාවලිය පිළිතුරු ද සලකා බලනු ඇත.",
 
     // Diagnosis Report
     report_ai_complete: "AI රෝග විනිශ්චය සම්පූර්ණයි",

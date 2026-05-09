@@ -4,6 +4,14 @@ const { runInference } = require('../services/imageModel.service');
 const LlmContextModel = require('../models/llmContext.model');
 const { asyncHandler, ok, fail } = require('../utils/helpers');
 
+function extractDiseaseName(predictionText) {
+  if (!predictionText) return predictionText;
+  for (const suffix of [' in Cat', ' in Dog']) {
+    if (predictionText.endsWith(suffix)) return predictionText.slice(0, -suffix.length);
+  }
+  return predictionText;
+}
+
 exports.uploadImage = asyncHandler(async (req, res) => {
   if (!req.file) {
     return fail(res, 'No image file uploaded');
@@ -101,6 +109,7 @@ exports.uploadImage = asyncHandler(async (req, res) => {
           image_asset_id: imageAssetId,
           prediction_text: analysisResult.prediction_text,
           top_label: analysisResult.top_label,
+          disease_name: analysisResult.disease_name,
           confidence_percent: analysisResult.confidence_percent,
           top_confidence: topConfidence,
           confidence_level: analysisResult.confidence_level,
@@ -133,12 +142,16 @@ exports.uploadImage = asyncHandler(async (req, res) => {
     status: 'complete',
     analysis: {
       prediction_text: analysisResult.prediction_text,
+      disease_name: analysisResult.disease_name,
       top_label: analysisResult.top_label,
       confidence_percent: analysisResult.confidence_percent,
       confidence_level: analysisResult.confidence_level,
       is_uncertain: analysisResult.is_uncertain,
       prediction_note: analysisResult.prediction_note,
-      top5: analysisResult.top5,
+      top5: (analysisResult.top5 || []).map((item) => ({
+        ...item,
+        label: extractDiseaseName(item.label),
+      })),
     },
   }, 201);
 });
@@ -161,6 +174,15 @@ exports.getStatus = asyncHandler(async (req, res) => {
       analysis = rows[0];
       if (typeof analysis.raw_result_json === 'string') {
         analysis.raw_result_json = JSON.parse(analysis.raw_result_json);
+      }
+      // Derive disease_name — not stored in DB, computed from prediction_text
+      analysis.disease_name = extractDiseaseName(analysis.prediction_text);
+      // Clean top5 labels too
+      if (analysis.raw_result_json?.top5) {
+        analysis.raw_result_json.top5 = analysis.raw_result_json.top5.map((item) => ({
+          ...item,
+          label: extractDiseaseName(item.label),
+        }));
       }
     }
   }

@@ -314,28 +314,14 @@ const ImageAnalysisPage = () => {
                 </div>
               </div>
 
-              {/* ML Results */}
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-4">
-                {analysis.top_label && (
-                  <div className="bg-purple-50 dark:bg-purple-900/20 rounded-xl p-4">
-                    <p className="text-xs text-gray-500 dark:text-gray-400 font-medium mb-1">Top Label</p>
-                    <p className="text-sm font-semibold text-gray-900 dark:text-white">{analysis.top_label}</p>
-                  </div>
-                )}
-                {analysis.top_confidence != null && (
-                  <div className={`${confStyle.bg} rounded-xl p-4`}>
-                    <p className="text-xs text-gray-500 dark:text-gray-400 font-medium mb-1">Confidence</p>
-                    <p className={`text-sm font-semibold ${confStyle.text}`}>
-                      {confPct}% <span className="text-xs font-normal">({confStyle.label})</span>
-                    </p>
-                  </div>
-                )}
-                {analysis.prediction_text && (
-                  <div className="bg-blue-50 dark:bg-blue-900/20 rounded-xl p-4">
-                    <p className="text-xs text-gray-500 dark:text-gray-400 font-medium mb-1">Prediction</p>
-                    <p className="text-sm font-semibold text-gray-900 dark:text-white">{analysis.prediction_text}</p>
-                  </div>
-                )}
+              <div className="mt-5 rounded-2xl bg-gradient-to-br from-[#F5F3FF] to-white dark:from-purple-900/30 dark:to-gray-800/50 border-2 border-[#7C3AED]/20 p-5 shadow-sm">
+                <span className="inline-flex items-center gap-1.5 bg-[#7C3AED] text-white text-[10px] font-bold uppercase tracking-widest px-3 py-1 rounded-full">
+                  <Check className="w-3 h-3" />
+                  {t('img_suspected_diagnosis') || 'Suspected Diagnosis'}
+                </span>
+                <p className="text-2xl font-bold text-gray-900 dark:text-white leading-tight mt-3">
+                  {analysis.disease_name}
+                </p>
               </div>
 
               {/* Low confidence warning */}
@@ -351,7 +337,9 @@ const ImageAnalysisPage = () => {
               {/* Top alternative predictions */}
               {top5 && top5.length > 1 && (
                 <div className="mt-4">
-                  <p className="text-xs text-gray-500 dark:text-gray-400 font-medium mb-2">Other possibilities</p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400 font-medium mb-2">
+                    {t('img_other_possibilities') || 'Other possibilities'}
+                  </p>
                   <div className="flex flex-wrap gap-2">
                     {top5.slice(1, 4).map((alt, i) => (
                       <span

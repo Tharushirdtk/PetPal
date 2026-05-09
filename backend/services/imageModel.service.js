@@ -29,6 +29,7 @@ async function runInference(imagePath, species) {
     prediction_text: data.prediction_text,
     confidence_percent: data.confidence_percent,
     top_label: data.top_label,
+    disease_name: data.disease_name || data.prediction_text,
     raw_result: data,
     confidence_level: data.confidence_level || 'unknown',
     is_uncertain: data.is_uncertain || false,
